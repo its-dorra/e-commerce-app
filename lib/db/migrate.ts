@@ -1,21 +1,15 @@
-import { createClient } from '@libsql/client';
-import { drizzle } from 'drizzle-orm/libsql';
 import { migrate } from 'drizzle-orm/libsql/migrator';
-import { DATABASE_TOKEN, DATABASE_URL } from '../env';
-
-// for migrations
-const migrationClient = createClient({
-  url: DATABASE_URL,
-  authToken: DATABASE_TOKEN,
-});
+import { db } from '.';
 
 const migrateDB = async () => {
   try {
-    await migrate(drizzle(migrationClient), {
-      migrationsFolder: './lib/db/migration',
+    console.log('Running migrations ....');
+
+    await migrate(db, {
+      migrationsFolder: './lib/db/migrations',
     });
 
-    migrationClient.close();
+    console.log('Migrations ran successfully.');
   } catch (error) {
     console.log(error);
   }
