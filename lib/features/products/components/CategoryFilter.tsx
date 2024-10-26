@@ -1,0 +1,35 @@
+"use client";
+
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+
+import { useState } from "react";
+import { useDeleteQuery } from "../hooks/useDeleteQuery";
+import { useAppendQuery } from "../hooks/useAppendQuery";
+
+interface CategoryProps {
+  name: string;
+}
+
+export function CategoryFilter({ name }: CategoryProps) {
+  const deleteQuery = useDeleteQuery();
+  const appendQuery = useAppendQuery();
+  const [isActive, setIsActive] = useState(false);
+
+  return (
+    <div className="flex items-center gap-x-3 border-b-[0.5px] py-2">
+      <Checkbox
+        id={name}
+        checked={isActive}
+        onCheckedChange={() => {
+          isActive
+            ? deleteQuery("category", name)
+            : appendQuery("category", name);
+
+          setIsActive(!isActive);
+        }}
+      />
+      <Label htmlFor={name}>{name}</Label>
+    </div>
+  );
+}

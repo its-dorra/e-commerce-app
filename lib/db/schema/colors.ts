@@ -1,13 +1,24 @@
-import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
-import { sql } from 'drizzle-orm';
+import { sqliteTable, text, integer, index } from "drizzle-orm/sqlite-core";
 
-export const colors = sqliteTable('colors', {
-  color_id: integer('color_id', { mode: 'number' }).primaryKey({
-    autoIncrement: true,
-  }),
-  name: text('name').notNull(),
-  hex_code: text('hex_code').notNull(),
-  createdAt: text('created_at')
-    .default(sql`CURRENT_TIMESTAMP`)
-    .notNull(),
-});
+export const colors = sqliteTable(
+  "colors",
+  {
+    id: integer("id", { mode: "number" }).primaryKey({
+      autoIncrement: true,
+    }),
+    name: text("name").notNull(),
+    hex_code: text("hex_code").notNull(),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .$default(() => new Date()),
+    updatedAt: integer("updated_at", { mode: "timestamp" })
+      .notNull()
+      .$default(() => new Date())
+      .$onUpdate(() => new Date()),
+  },
+  (table) => {
+    return {
+      colorNameIdx: index("color_name_idx").on(table.name),
+    };
+  },
+);

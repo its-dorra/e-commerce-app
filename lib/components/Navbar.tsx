@@ -1,66 +1,55 @@
-import {
-  cartIcon,
-  chevronDownIcon,
-  completeLogo,
-  searchIcon,
-  userIcon,
-  userProfileIcon,
-  usersIcon,
-} from "@/assets";
+"use client";
+
+import { cartIcon, completeLogo, userProfileIcon } from "@/assets";
 import Image from "next/image";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
+import CategoriesNavBar from "./Categoriesnavbar";
+import Link from "next/link";
+import SearchProductInput from "./SearchProductInput";
+import { useState } from "react";
+import SideBarButton from "./SideBarButton";
 
 export default function NavBar() {
+  const [isNavigationOpen, setIsNavigationOpen] = useState(false);
+
   return (
-    <div className="flex items-center justify-center py-4">
-      <nav className="flex w-full items-center justify-between">
+    <header className="sticky left-0 top-0 flex w-full items-center justify-center place-self-center bg-primaryWhite py-4">
+      <nav className="container flex items-center justify-between">
         <Image src={completeLogo} alt="logo" />
-        <div className="hidden items-center justify-between md:flex">
-          <ul className="flex items-center gap-4 text-sm">
-            <li className="font-normal">Home</li>
-            <li className="flex items-center gap-1">
-              <span className="font-normal">Categories</span>
-              <DropdownMenu>
-                <DropdownMenuTrigger>
-                  <Image src={chevronDownIcon} alt="chevron down" />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                  <DropdownMenuItem>Profile</DropdownMenuItem>
-                  <DropdownMenuItem>Billing</DropdownMenuItem>
-                  <DropdownMenuItem>Team</DropdownMenuItem>
-                  <DropdownMenuItem>Subscription</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </li>
-            <li className="font-normal">About</li>
-            <li className="font-normal">Contact</li>
-          </ul>
-          <div className="flex items-center gap-x-4">
-            <div className="flex items-center gap-x-2 rounded-sm border p-1.5">
-              <Image
-                src={searchIcon}
-                alt="search icon"
-                width={20}
-                height={20}
-              />
-              <Input
-                className="h-full w-full border-none placeholder:text-sm"
-                placeholder="Search products"
-              />
-            </div>
+        <ul
+          className={`${isNavigationOpen ? "flex" : "hidden"} fixed bottom-0 left-0 right-0 top-[4.5rem] z-50 flex-col items-center justify-center gap-8 bg-primaryWhite text-sm lg:static lg:flex lg:flex-row lg:gap-4`}
+        >
+          <li className="text-2xl font-semibold uppercase tracking-wider lg:text-base lg:font-normal lg:normal-case lg:tracking-normal">
+            Home
+          </li>
+          <CategoriesNavBar />
+          <li className="text-2xl font-semibold uppercase tracking-wider lg:text-base lg:font-normal lg:normal-case lg:tracking-normal">
+            About
+          </li>
+          <li className="text-2xl font-semibold uppercase tracking-wider lg:text-base lg:font-normal lg:normal-case lg:tracking-normal">
+            Contact
+          </li>
+          <li className="text-2xl font-semibold uppercase tracking-wider lg:hidden">
+            Cart
+          </li>
+          <li className="text-2xl font-semibold uppercase tracking-wider lg:hidden">
+            User
+          </li>
+          <SearchProductInput className="lg:hidden" />
+        </ul>
+        <div className="hidden items-center gap-x-4 lg:flex">
+          <SearchProductInput />
+          <Link className="cursor-pointer" href="/profile">
             <Image src={cartIcon} alt="cart icon" />
+          </Link>
+          <Link className="cursor-pointer" href="/profile">
             <Image src={userProfileIcon} alt="user icon" />
-          </div>
+          </Link>
         </div>
+        <SideBarButton
+          isOpen={isNavigationOpen}
+          toggleSideBar={() => setIsNavigationOpen(!isNavigationOpen)}
+        />
       </nav>
-    </div>
+    </header>
   );
 }

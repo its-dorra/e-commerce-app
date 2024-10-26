@@ -1,12 +1,15 @@
-import { sql } from 'drizzle-orm';
-import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
-export const sizes = sqliteTable('sizes', {
-  size_id: integer('size_id', { mode: 'number' }).primaryKey({
+export const sizes = sqliteTable("sizes", {
+  id: integer("id", { mode: "number" }).primaryKey({
     autoIncrement: true,
   }),
-  name: text('name').notNull(),
-  createdAt: text('created_at')
-    .default(sql`CURRENT_TIMESTAMP`)
-    .notNull(),
+  name: text("name").notNull(),
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .notNull()
+    .$default(() => new Date()),
+  updatedAt: integer("updated_at", { mode: "timestamp" })
+    .notNull()
+    .$default(() => new Date())
+    .$onUpdate(() => new Date()),
 });

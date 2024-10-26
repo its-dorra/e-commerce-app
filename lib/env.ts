@@ -1,8 +1,13 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 const envSchema = z.object({
-  DATABASE_URL: z.string(),
-  DATABASE_TOKEN: z.string(),
+  DATABASE_URL: z.string().url(),
+  DATABASE_TOKEN: z.string().min(1),
+  GOOGLE_CLIENT_ID: z.string().min(1),
+  GOOGLE_CLIENT_SECRET: z.string().min(1),
+  NEXT_PUBLIC_BASE_URL: z.string().url(),
 });
 
-export const { DATABASE_TOKEN, DATABASE_URL } = envSchema.parse(process.env);
+const env = envSchema.parse(process.env);
+
+export default env;

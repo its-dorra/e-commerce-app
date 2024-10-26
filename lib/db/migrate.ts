@@ -1,15 +1,15 @@
-import { migrate } from 'drizzle-orm/libsql/migrator';
-import { db } from '.';
+import { migrate } from "drizzle-orm/libsql/migrator";
+import db from ".";
 
 const migrateDB = async () => {
   try {
-    console.log('Running migrations ....');
+    console.log("Running migrations ....");
 
     await migrate(db, {
-      migrationsFolder: './lib/db/migrations',
+      migrationsFolder: "./lib/db/migrations",
     });
 
-    console.log('Migrations ran successfully.');
+    console.log("Migrations ran successfully.");
   } catch (error) {
     console.log(error);
   }

@@ -35,6 +35,7 @@ import warningIcon from "./icons/Warning.svg";
 import searchIcon from "./icons/Search.svg";
 import xIcon from "./icons/X.svg";
 
+import googleIcon from "./icons/Social Icons/Login - Sign up/Colored Icons/Google.svg";
 import facebookIcon from "./icons/Social Icons/Facebook.svg";
 import instagramIcon from "./icons/Social Icons/Instagram.svg";
 import telegramIcon from "./icons/Social Icons/Telegram.svg";
@@ -54,7 +55,19 @@ import visaIcon from "./icons/Colored Icons/Visa.svg";
 import amexIcon from "./icons/Colored Icons/Amex.svg";
 import mastercardIcon from "./icons/Colored Icons/Mastercard.svg";
 
+import tshirt1 from "./images/t-shirt-1.png";
+import tshirt2 from "./images/t-shirt-2.png";
+import tshirt3 from "./images/t-shirt-3.png";
+import tshirt4 from "./images/t-shirt-4.png";
+
+import upperWoman from "./images/upper-woman.png";
+
+import tshirt5 from "./images/t-shirt-5.png";
+import tshirt6 from "./images/t-shirt-6.png";
+import cozyBlack from "./images/cozy-black.png";
+
 export {
+  googleIcon,
   visaIcon,
   amexIcon,
   mastercardIcon,
@@ -106,4 +119,12 @@ export {
   warningIcon,
   searchIcon,
   xIcon,
+  tshirt1,
+  tshirt2,
+  tshirt3,
+  tshirt4,
+  upperWoman,
+  tshirt5,
+  tshirt6,
+  cozyBlack,
 };
