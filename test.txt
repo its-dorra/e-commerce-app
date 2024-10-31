@@ -1,0 +1,184 @@
+i have this drizzle schema and real data with real image urls to fill these table 
+
+
+export const categoriesTable = sqliteTable("categories", {
+  id: integer("id", { mode: "number" }).primaryKey({
+    autoIncrement: true,
+  }),
+  name: text("name").notNull(),
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .notNull()
+    .$default(() => new Date()),
+  updatedAt: integer("updated_at", { mode: "timestamp" })
+    .notNull()
+    .$default(() => new Date())
+    .$onUpdate(() => new Date()),
+});
+
+export const colorsTable = sqliteTable(
+  "colors",
+  {
+    id: integer("id", { mode: "number" }).primaryKey({
+      autoIncrement: true,
+    }),
+    name: text("name").notNull(),
+    hexCode: text("hex_code").notNull(),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .$default(() => new Date()),
+    updatedAt: integer("updated_at", { mode: "timestamp" })
+      .notNull()
+      .$default(() => new Date())
+      .$onUpdate(() => new Date()),
+  },
+  (table) => {
+    return {
+      colorNameIdx: index("color_name_idx").on(table.name),
+    };
+  },
+);
+
+export const imagesTable = sqliteTable(
+  "images",
+  {
+    id: integer("id", { mode: "number" }).primaryKey({
+      autoIncrement: true,
+    }),
+    productColorId: integer("product_color_id")
+      .notNull()
+      .references(() => productColorsTable.id, { onDelete: "cascade" }),
+    imagePath: text("image_path").notNull(),
+    displayOrder: integer("display_order").notNull().default(0),
+    imageType: text("image_type")
+      .$type<"thumbnail" | "gallery">()
+      .notNull()
+      .default("gallery"),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .$default(() => new Date()),
+    updatedAt: integer("updated_at", { mode: "timestamp" })
+      .notNull()
+      .$default(() => new Date())
+      .$onUpdate(() => new Date()),
+  },
+  (table) => {
+    return {
+      productColorIdx: index("product_color_images_idx").on(
+        table.productColorId,
+      ),
+      // Ensure only one primary image per product-color combination
+      primaryConstraint: uniqueIndex("primary_image_idx")
+        .on(table.productColorId, table.isPrimary)
+        .where(sql${table.isPrimary} = 1),
+      orderIdx: index("display_order_idx").on(
+        table.productColorId,
+        table.displayOrder,
+      ),
+    };
+  },
+);
+
+export const productsTable = sqliteTable("products", {
+  id: integer("id", { mode: "number" }).primaryKey({
+    autoIncrement: true,
+  }),
+  name: text("name").notNull(),
+  description: text("description"),
+  basePrice: integer("base_price").notNull(), // SQLite doesn't have a decimal type, so we use text
+  categoryId: integer("category_id", { mode: "number" }).references(
+    () => categoriesTable.id,
+  ),
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .notNull()
+    .$default(() => new Date()),
+  updatedAt: integer("updated_at", { mode: "timestamp" })
+    .notNull()
+    .$default(() => new Date())
+    .$onUpdate(() => new Date()),
+});
+
+
+export const productColorsTable = sqliteTable(
+  "product_colors",
+  {
+    id: integer("id", { mode: "number" }).primaryKey({
+      autoIncrement: true,
+    }),
+    productId: integer("product_id", { mode: "number" })
+      .notNull()
+      .references(() => productsTable.id, { onDelete: "cascade" }),
+    colorId: integer("color_id", { mode: "number" })
+      .notNull()
+      .references(() => colorsTable.id),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .$default(() => new Date()),
+    updatedAt: integer("updated_at", { mode: "timestamp" })
+      .notNull()
+      .$default(() => new Date())
+      .$onUpdate(() => new Date()),
+  },
+  (table) => {
+    return {
+      productColorUnique: uniqueIndex("product_color_unique_idx").on(
+        table.productId,
+        table.colorId,
+      ),
+    };
+  },
+);
+
+export const productVariantsTable = sqliteTable(
+  "product_variants",
+  {
+    id: integer("variant_id", { mode: "number" }).primaryKey({
+      autoIncrement: true,
+    }),
+    productColorId: integer("product_color_id", { mode: "number" })
+      .notNull()
+      .references(() => productColorsTable.id, { onDelete: "cascade" }),
+    sizeId: integer("size_id", { mode: "number" })
+      .notNull()
+      .references(() => sizesTable.id),
+    price_adjustment: integer("price_adjustment").default(0),
+    quantity: integer("quantity", { mode: "number" }).notNull().default(0),
+    low_stock_threshold: integer("low_stock_threshold").default(5),
+    is_active: integer("is_active", { mode: "boolean" })
+      .notNull()
+      .default(true),
+    dimensions: text("dimensions"),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .$default(() => new Date()),
+    updatedAt: integer("updated_at", { mode: "timestamp" })
+      .notNull()
+      .$default(() => new Date())
+      .$onUpdate(() => new Date()),
+  },
+  (table) => {
+    return {
+      variantUnique: uniqueIndex("variant_unique_idx").on(
+        table.productColorId,
+        table.sizeId,
+      ),
+      stockIdx: index("stock_idx").on(table.quantity),
+      activeIdx: index("active_idx").on(table.is_active),
+    };
+  },
+);
+
+export const sizesTable = sqliteTable("sizes", {
+  id: integer("id", { mode: "number" }).primaryKey({
+    autoIncrement: true,
+  }),
+  name: text("name").notNull(),
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .notNull()
+    .$default(() => new Date()),
+  updatedAt: integer("updated_at", { mode: "timestamp" })
+    .notNull()
+    .$default(() => new Date())
+    .$onUpdate(() => new Date()),
+});
+ 
+

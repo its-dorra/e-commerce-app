@@ -12,7 +12,7 @@ export default function NavBar() {
   const [isNavigationOpen, setIsNavigationOpen] = useState(false);
 
   return (
-    <header className="sticky left-0 top-0 flex w-full items-center justify-center place-self-center bg-primaryWhite py-4">
+    <header className="sticky left-0 top-0 flex w-full items-center justify-center place-self-center py-4">
       <nav className="container flex items-center justify-between">
         <Image src={completeLogo} alt="logo" />
         <ul

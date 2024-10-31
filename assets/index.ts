@@ -34,6 +34,7 @@ import productIcon from "./icons/Product.svg";
 import warningIcon from "./icons/Warning.svg";
 import searchIcon from "./icons/Search.svg";
 import xIcon from "./icons/X.svg";
+import filterIcon from "./icons/filter-icon.svg";
 
 import googleIcon from "./icons/Social Icons/Login - Sign up/Colored Icons/Google.svg";
 import facebookIcon from "./icons/Social Icons/Facebook.svg";
@@ -91,6 +92,7 @@ export {
   shareIcon,
   arrowLeftIcon,
   heartIcon,
+  filterIcon,
   shieldCheckIcon,
   arrowRightIcon,
   homeIcon,

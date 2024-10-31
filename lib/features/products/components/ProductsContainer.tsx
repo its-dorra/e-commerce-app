@@ -2,33 +2,24 @@ import Image, { StaticImageData } from "next/image";
 import { Products } from "../../../constants";
 
 interface ProductProps {
-  productPicture: StaticImageData;
-  productTitle: string;
-  productPrice: number;
-  inStock: boolean;
+  picture: string;
+  name: string;
+  price: number;
+  quantity: number;
 }
 
-function ProductItem({
-  productPicture,
-  productTitle,
-  productPrice,
-  inStock,
-}: ProductProps) {
+function ProductItem({ name, price, quantity, picture }: ProductProps) {
   return (
     <div className="space-y-2">
       <div className="rouded-sm h-68 grid w-full place-items-center bg-secondaryWhite">
-        <Image
-          className="h-full w-5/6"
-          src={productPicture}
-          alt={productTitle}
-        />
+        <img className="h-full w-5/6" src={picture} alt={name} />
       </div>
-      <p className="body-1">{productTitle}</p>
+      <p className="body-1">{name}</p>
       <div className="flex items-center gap-x-2">
         <p className="rounded-full border-[0.5px] px-2 py-1 uppercase">
-          {inStock ? "in stock" : "out of stock"}
+          {quantity > 0 ? "in stock" : "out of stock"}
         </p>
-        <p className="body-2 text-black/60">${productPrice}.00</p>
+        <p className="body-2 text-black/60">${price}.00</p>
       </div>
     </div>
   );
@@ -45,10 +36,10 @@ export default function ProductsContainer({
         return (
           <ProductItem
             key={product.id}
-            productPicture={product.image}
-            productTitle={product.title}
-            productPrice={product.price}
-            inStock={product.inStock}
+            picture={product.imageUrl}
+            name={product.name}
+            price={product.basePrice}
+            quantity={product.quantity}
           />
         );
       })}

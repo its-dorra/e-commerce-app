@@ -50,26 +50,32 @@ export const features = [
 export const bestSelling = [
   {
     id: 1,
-    title: "Classic Monochrome Tees",
-    inStock: true,
-    price: 43,
-    image: tshirt1,
+    name: "Classic Monochrome Tees",
+    quantity: 79,
+    basePrice: 43,
+    imageUrl: "tshirt1",
   },
   {
     id: 2,
-    title: "Monochromatic Wardrobe",
-    inStock: true,
-    price: 27,
-    image: tshirt2,
+    name: "Monochromatic Wardrobe",
+    quantity: 20,
+    basePrice: 27,
+    imageUrl: "tshirt2",
   },
   {
     id: 3,
-    title: "Essential Neutrals",
-    inStock: true,
-    price: 22,
-    image: tshirt3,
+    name: "Essential Neutrals",
+    quantity: 0,
+    basePrice: 22,
+    imageUrl: "tshirt3",
   },
-  { id: 4, title: "UTRAANET Black", inStock: true, price: 43, image: tshirt4 },
+  {
+    id: 4,
+    name: "UTRAANET Black",
+    quantity: 15,
+    basePrice: 43,
+    imageUrl: "tshirt4",
+  },
 ];
 
 export type Products = typeof bestSelling;

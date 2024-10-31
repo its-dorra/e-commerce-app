@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { handle } from "hono/vercel";
-import authRoute from "@/lib/features/user/routes";
-import productsRoute from "@/lib/features/products/routes";
+import authRoute from "@/server/routes/users";
+import productsRoute from "@/server/routes/products";
 import { notFound, onError } from "stoker/middlewares";
 
 const app = new Hono()

@@ -3,6 +3,7 @@ import type { Config } from "tailwindcss";
 const config: Config = {
   darkMode: ["class"],
   content: [
+    "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./lib/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./lib/features/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
@@ -11,8 +12,8 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        primaryWhite: "F5F5F5",
-        secondaryWhite: "E9E9EB",
+        primaryWhite: "#F5F5F5",
+        secondaryWhite: "#E9E9EB",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         card: {
