@@ -1,9 +1,11 @@
-import { getCategories } from "../services";
+import { ICategories } from "../types";
 import { CategoryFilter } from "./CategoryFilter";
 
-export default async function CategoriesFilter() {
-  const categories = await getCategories();
-
+export default function CategoriesFilter({
+  data: { categories },
+}: {
+  data: ICategories;
+}) {
   return (
     <div className="space-y-2">
       <h5 className="h5 mb-4">Categories</h5>

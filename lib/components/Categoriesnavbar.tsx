@@ -8,15 +8,20 @@ import {
 } from "@/components/ui/dropdown-menu";
 import Image from "next/image";
 import Link from "next/link";
-import { categories } from "../constants";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { getCategories } from "../features/products/services";
 
-export default function CategoriesNavBar() {
+import { categories } from "../constants";
+import { Button } from "@/components/ui/button";
+
+export default async function CategoriesNavBar() {
+  // const categories = await getCategories();
+
   return (
     <li>
       <Accordion type="single" collapsible className="lg:hidden">
@@ -25,15 +30,16 @@ export default function CategoriesNavBar() {
             Categories
           </AccordionTrigger>
           <AccordionContent className="text my-6 space-y-1 underline">
-            {categories.map(({ id, category }) => {
+            {categories.map(({ id, category: name }) => {
               return (
-                <Link
-                  key={id}
-                  href=""
-                  className="block text-center text-lg font-normal"
-                >
-                  {category}
-                </Link>
+                <Button variant="link" key={id} asChild>
+                  <Link
+                    href={`/listing/1?categories=${name}`}
+                    className="block text-center text-lg font-normal"
+                  >
+                    {name}
+                  </Link>
+                </Button>
               );
             })}
           </AccordionContent>
@@ -47,14 +53,21 @@ export default function CategoriesNavBar() {
           <Image src={chevronDownIcon} alt="chevron down" />
         </DropdownMenuTrigger>
         <DropdownMenuContent className="space-y-1 rounded-sm bg-primaryWhite p-4">
-          {categories.map(({ id, category }) => {
+          {categories.map(({ id, category: name }) => {
             return (
               <DropdownMenuItem
                 key={id}
                 asChild
                 className="text-base font-normal"
               >
-                <Link href="">{category}</Link>
+                <Button variant="link" key={id} asChild>
+                  <Link
+                    href={`/listing/1?categories=${name}`}
+                    className="block text-center text-lg font-normal"
+                  >
+                    {name}
+                  </Link>
+                </Button>
               </DropdownMenuItem>
             );
           })}

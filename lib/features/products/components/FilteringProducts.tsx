@@ -1,22 +1,27 @@
 "use client";
 
+import CategoriesFilter from "@/lib/features/products/components/CategoriesFilter";
+import ColorsFilter from "@/lib/features/products/components/ColorsFilter";
+import SizesFilter from "@/lib/features/products/components/SizesFilter";
+
 import { useToggleFilter } from "@/lib/stores/filters.store";
 // import CategoriesFilter from "./CategoriesFilter";
 import { Button } from "@/components/ui/button";
 import { ReactNode } from "react";
 import Image from "next/image";
 import { xIcon } from "@/assets";
+import { ICategories, IColors, ISizes } from "../types";
 
 interface FilteringProuctsProps {
-  CategoriesFilter: ReactNode;
-  ColorsFilter: ReactNode;
-  SizesFilter: ReactNode;
+  CategoriesFilterData: ICategories;
+  ColorsFilterData: IColors;
+  SizesFilterData: ISizes;
 }
 
 export default function FilteringProducts({
-  CategoriesFilter,
-  ColorsFilter,
-  SizesFilter,
+  CategoriesFilterData,
+  ColorsFilterData,
+  SizesFilterData,
 }: FilteringProuctsProps) {
   const { isFilterAsideOpen, toggle } = useToggleFilter((state) => state);
 
@@ -31,9 +36,9 @@ export default function FilteringProducts({
       >
         <Image src={xIcon} alt="exit icon" className="h-4 w-4" />
       </Button>
-      {CategoriesFilter}
-      {ColorsFilter}
-      {SizesFilter}
+      <CategoriesFilter data={CategoriesFilterData} />
+      <ColorsFilter data={ColorsFilterData} />
+      <SizesFilter data={SizesFilterData} />
     </aside>
   );
 }

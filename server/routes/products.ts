@@ -41,8 +41,6 @@ const route = new Hono()
 
       const { products, pagination } = await getProducts(page, filters);
 
-      console.log({ products, pagination });
-
       return c.json({ products, pagination });
     },
   );

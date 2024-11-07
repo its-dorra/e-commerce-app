@@ -1,25 +1,19 @@
-import Image, { StaticImageData } from "next/image";
-import { Products } from "../../../constants";
+import { IProducts } from "../types";
 
-interface ProductProps {
-  picture: string;
-  name: string;
-  price: number;
-  quantity: number;
-}
+type ProductProps = Omit<IProducts["products"][number], "id">;
 
-function ProductItem({ name, price, quantity, picture }: ProductProps) {
+function ProductItem({ name, basePrice, quantity, imageUrl }: ProductProps) {
   return (
-    <div className="space-y-2">
+    <div className="w-[250px] space-y-2">
       <div className="rouded-sm h-68 grid w-full place-items-center bg-secondaryWhite">
-        <img className="h-full w-5/6" src={picture} alt={name} />
+        <img className="h-full w-5/6" src={imageUrl} alt={name} />
       </div>
       <p className="body-1">{name}</p>
       <div className="flex items-center gap-x-2">
         <p className="rounded-full border-[0.5px] px-2 py-1 uppercase">
           {quantity > 0 ? "in stock" : "out of stock"}
         </p>
-        <p className="body-2 text-black/60">${price}.00</p>
+        <p className="body-2 text-black/60">${basePrice}.00</p>
       </div>
     </div>
   );
@@ -28,17 +22,17 @@ function ProductItem({ name, price, quantity, picture }: ProductProps) {
 export default function ProductsContainer({
   products,
 }: {
-  products: Products;
+  products: IProducts["products"];
 }) {
   return (
-    <div className="grid w-full grid-cols-[250px] justify-around gap-x-4 gap-y-8 md:grid-cols-[repeat(2,250px)] lg:grid-cols-[repeat(4,250px)]">
+    <div className="flex w-full flex-wrap gap-x-4 gap-y-8">
       {products.map((product) => {
         return (
           <ProductItem
             key={product.id}
-            picture={product.imageUrl}
+            imageUrl={product.imageUrl}
             name={product.name}
-            price={product.basePrice}
+            basePrice={product.basePrice}
             quantity={product.quantity}
           />
         );

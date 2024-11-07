@@ -78,8 +78,6 @@ export const bestSelling = [
   },
 ];
 
-export type Products = typeof bestSelling;
-
 export const latestProducts = [
   {
     id: 1,

@@ -9,7 +9,15 @@ export const getCategories = async () => {
 };
 
 export const getColors = async () => {
-  const res = await api.shop.colors.$get();
+  const res = await api.shop.colors.$get(undefined, {
+    fetch: (input, requestInit, Env, executionCtx) => {
+      requestInit!.next = {
+        revalidate: 2 * 60,
+      };
+
+      return fetch(input, requestInit);
+    },
+  });
   if (!res.ok) throw new Error("Can't get colors");
   const { colors } = await res.json();
 
@@ -17,7 +25,15 @@ export const getColors = async () => {
 };
 
 export const getSizes = async () => {
-  const res = await api.shop.sizes.$get();
+  const res = await api.shop.sizes.$get(undefined, {
+    fetch: (input, requestInit, Env, executionCtx) => {
+      requestInit!.next = {
+        revalidate: 2 * 60,
+      };
+
+      return fetch(input, requestInit);
+    },
+  });
   if (!res.ok) throw new Error("Can't get sizes");
   const { sizes } = await res.json();
 
@@ -35,9 +51,21 @@ export const getProducts = async ({
   sizes: string | string[] | undefined;
   page: string | string[] | undefined;
 }) => {
-  const res = await api.shop.products.$get({
-    query: { page, categories, sizes, colors },
-  });
+  const res = await api.shop.products.$get(
+    {
+      query: { page, categories, sizes, colors },
+    },
+    {
+      fetch: (input, requestInit, Env, executionCtx) => {
+        requestInit!.next = {
+          revalidate: 5,
+        };
+        // requestInit!.cache = "no-store";
+
+        return fetch(input, requestInit);
+      },
+    },
+  );
 
   if (!res.ok) throw new Error("Can't get products");
 

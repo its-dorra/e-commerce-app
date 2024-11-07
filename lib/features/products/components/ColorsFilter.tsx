@@ -1,9 +1,7 @@
-import { getColors } from "../services";
+import { IColors } from "../types";
 import { ColorFilter } from "./ColorFilter";
 
-export default async function ColorsFilter() {
-  const colors = await getColors();
-
+export default function ColorsFilter({ data: { colors } }: { data: IColors }) {
   return (
     <div className="space-y-4">
       <h5 className="h5">Colors</h5>

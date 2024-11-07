@@ -97,7 +97,7 @@ route.get("/logout", async (c) => {
   await lucia.invalidateSession(session.id);
 
   const sessionCookie = lucia.createBlankSessionCookie();
-  (await cookies()).set(
+  cookies().set(
     sessionCookie.name,
     sessionCookie.value,
     sessionCookie.attributes,
@@ -118,14 +118,14 @@ route
       },
     );
 
-    (await cookies()).set("google_oauth_state", state, {
+    cookies().set("google_oauth_state", state, {
       secure: true,
       path: "/",
       httpOnly: true,
       maxAge: 60 * 10,
     });
 
-    (await cookies()).set("google_code_verifier", codeVerifier, {
+    cookies().set("google_code_verifier", codeVerifier, {
       secure: true,
       path: "/",
       httpOnly: true,
@@ -149,10 +149,8 @@ route
       const code = url.searchParams.get("code");
       const state = url.searchParams.get("state");
 
-      const storedState =
-        (await cookies()).get("google_oauth_state")?.value ?? null;
-      const codeVerifier =
-        (await cookies()).get("google_code_verifier")?.value ?? null;
+      const storedState = cookies().get("google_oauth_state")?.value ?? null;
+      const codeVerifier = cookies().get("google_code_verifier")?.value ?? null;
 
       if (
         !code ||

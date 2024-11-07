@@ -12,11 +12,11 @@ export default function NavBar() {
   const [isNavigationOpen, setIsNavigationOpen] = useState(false);
 
   return (
-    <header className="sticky left-0 top-0 flex w-full items-center justify-center place-self-center py-4">
+    <header className="sticky left-0 right-0 top-0 flex w-full items-center justify-center place-self-center py-4">
       <nav className="container flex items-center justify-between">
         <Image src={completeLogo} alt="logo" />
         <ul
-          className={`${isNavigationOpen ? "flex" : "hidden"} fixed bottom-0 left-0 right-0 top-[4.5rem] z-50 flex-col items-center justify-center gap-8 bg-primaryWhite text-sm lg:static lg:flex lg:flex-row lg:gap-4`}
+          className={`${isNavigationOpen ? "flex" : "hidden"} fixed bottom-0 left-0 right-0 top-[4.5rem] z-50 flex-col items-center justify-center gap-8 bg-white text-sm lg:static lg:flex lg:flex-row lg:gap-4`}
         >
           <li className="text-2xl font-semibold uppercase tracking-wider lg:text-base lg:font-normal lg:normal-case lg:tracking-normal">
             Home
