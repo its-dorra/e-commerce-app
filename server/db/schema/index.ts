@@ -1,9 +1,9 @@
 import { cartsTable, cartItemsTable } from "./carts";
-import { categoriesTable } from "./categories";
+import { categoriesTable, categoriesRelations } from "./categories";
 import { colorsTable } from "./colors";
 import { imagesTable } from "./images";
 import { ordersTable } from "./orders";
-import { productsTable } from "./products";
+import { productsTable, productsRelations } from "./products";
 import { productVariantsTable, productColorsTable } from "./productVariants";
 import { sizesTable } from "./sizes";
 import {
@@ -14,6 +14,8 @@ import {
 } from "./users";
 
 export {
+  productsRelations,
+  categoriesRelations,
   sessionTable,
   profilesTable,
   cartsTable,

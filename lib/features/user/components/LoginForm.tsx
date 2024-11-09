@@ -12,7 +12,7 @@ import FormField from "../../../components/FormField";
 import Link from "next/link";
 
 import { z } from "zod";
-import { loginSchema } from "../schemas";
+import { loginSchema } from "@/server/schemas/users";
 
 export default function LoginForm() {
   const form = useForm<z.infer<typeof loginSchema>, ZodValidator>({

@@ -178,3 +178,5 @@ export const getProducts = async (page: number, filters: FilterQuery) => {
     },
   };
 };
+
+export const getProductById = async (id: string) => {};

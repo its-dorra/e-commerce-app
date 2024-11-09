@@ -5,6 +5,7 @@ import { productQuerySchema } from "../schemas/products";
 import {
   getCategories,
   getColors,
+  getProductById,
   getProducts,
   getSizes,
 } from "../data-access/products";
@@ -43,6 +44,11 @@ const route = new Hono()
 
       return c.json({ products, pagination });
     },
-  );
+  )
+  .get("/products/:id", async (c) => {
+    const { id } = c.req.param();
+
+    const product = await getProductById(id);
+  });
 
 export default route;

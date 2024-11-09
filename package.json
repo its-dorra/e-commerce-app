@@ -43,6 +43,7 @@
     "react-dom": "^18",
     "server-only": "^0.0.1",
     "stoker": "^1.0.9",
+    "swiper": "^11.1.14",
     "tailwind-merge": "^2.5.3",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.23.8",

@@ -10,7 +10,7 @@ import { useForm } from "@tanstack/react-form";
 import Image from "next/image";
 import FormField from "../../../components/FormField";
 import Link from "next/link";
-import { signupSchema } from "../../../db/schema/users";
+import { signupSchema } from "@/server/schemas/users";
 import { z } from "zod";
 
 export default function SignupForm() {
