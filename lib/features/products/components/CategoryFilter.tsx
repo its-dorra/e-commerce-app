@@ -17,8 +17,6 @@ export function CategoryFilter({ name }: CategoryProps) {
     .getAll("categories")
     .find((params) => params === name);
 
-  console.log("smthn");
-
   const deleteQuery = useDeleteQuery();
   const appendQuery = useAppendQuery();
   const [isActive, setIsActive] = useState(isQueryParamInUrl);

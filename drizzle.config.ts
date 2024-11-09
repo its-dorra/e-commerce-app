@@ -3,8 +3,8 @@ import env from "./server/env";
 
 export default {
   dialect: "sqlite",
-  schema: "./lib/db/schema/*.ts",
-  out: "./lib/db/migrations",
+  schema: "./server/db/schema/*.ts",
+  out: "./server/db/migrations",
   driver: "turso",
   dbCredentials: {
     url: env.DATABASE_URL,

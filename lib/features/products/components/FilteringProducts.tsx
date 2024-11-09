@@ -7,22 +7,12 @@ import SizesFilter from "@/lib/features/products/components/SizesFilter";
 import { useToggleFilter } from "@/lib/stores/filters.store";
 // import CategoriesFilter from "./CategoriesFilter";
 import { Button } from "@/components/ui/button";
-import { ReactNode } from "react";
+import { PropsWithChildren, ReactNode } from "react";
 import Image from "next/image";
 import { xIcon } from "@/assets";
 import { ICategories, IColors, ISizes } from "../types";
 
-interface FilteringProuctsProps {
-  CategoriesFilterData: ICategories;
-  ColorsFilterData: IColors;
-  SizesFilterData: ISizes;
-}
-
-export default function FilteringProducts({
-  CategoriesFilterData,
-  ColorsFilterData,
-  SizesFilterData,
-}: FilteringProuctsProps) {
+export default function FilteringProducts({ children }: PropsWithChildren) {
   const { isFilterAsideOpen, toggle } = useToggleFilter((state) => state);
 
   return (
@@ -31,14 +21,12 @@ export default function FilteringProducts({
     >
       <Button
         className="absolute right-3 top-3 px-2 lg:hidden"
-        variant={"outline"}
+        variant="outline"
         onClick={toggle}
       >
         <Image src={xIcon} alt="exit icon" className="h-4 w-4" />
       </Button>
-      <CategoriesFilter data={CategoriesFilterData} />
-      <ColorsFilter data={ColorsFilterData} />
-      <SizesFilter data={SizesFilterData} />
+      {children}
     </aside>
   );
 }

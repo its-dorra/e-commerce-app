@@ -51,16 +51,18 @@ export const getProducts = async ({
   sizes: string | string[] | undefined;
   page: string | string[] | undefined;
 }) => {
+  await new Promise((r) => setTimeout(r, 3000));
+
   const res = await api.shop.products.$get(
     {
       query: { page, categories, sizes, colors },
     },
     {
       fetch: (input, requestInit, Env, executionCtx) => {
-        requestInit!.next = {
-          revalidate: 5,
-        };
-        // requestInit!.cache = "no-store";
+        // requestInit!.next = {
+        //   revalidate: 0,
+        // };
+        requestInit!.cache = "no-store";
 
         return fetch(input, requestInit);
       },

@@ -14,12 +14,11 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { getCategories } from "../features/products/services";
 
 import { categories } from "../constants";
 import { Button } from "@/components/ui/button";
 
-export default async function CategoriesNavBar() {
+export default function CategoriesNavBar() {
   // const categories = await getCategories();
 
   return (
