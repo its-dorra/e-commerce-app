@@ -8,6 +8,8 @@ import {
 import { productsTable } from "./products";
 import { colorsTable } from "./colors";
 import { sizesTable } from "./sizes";
+import { relations } from "drizzle-orm";
+import { imagesTable } from "./images";
 
 export const productColorsTable = sqliteTable(
   "product_colors",
@@ -74,4 +76,34 @@ export const productVariantsTable = sqliteTable(
       activeIdx: index("active_idx").on(table.is_active),
     };
   },
+);
+
+export const productColorsRelations = relations(
+  productColorsTable,
+  ({ one, many }) => ({
+    product: one(productsTable, {
+      fields: [productColorsTable.productId],
+      references: [productsTable.id],
+    }),
+    color: one(colorsTable, {
+      fields: [productColorsTable.colorId],
+      references: [colorsTable.id],
+    }),
+    image: many(imagesTable),
+    productVariants: many(productVariantsTable),
+  }),
+);
+
+export const productVariantsRelations = relations(
+  productVariantsTable,
+  ({ one }) => ({
+    size: one(sizesTable, {
+      fields: [productVariantsTable.sizeId],
+      references: [sizesTable.id],
+    }),
+    productColor: one(productColorsTable, {
+      fields: [productVariantsTable.productColorId],
+      references: [productColorsTable.id],
+    }),
+  }),
 );

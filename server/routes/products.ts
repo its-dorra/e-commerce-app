@@ -10,6 +10,7 @@ import {
   getSizes,
 } from "../data-access/products";
 import { toArray } from "../../lib/utils";
+import { StatusCodes } from "http-status-codes";
 
 const route = new Hono()
   .get("/categories", async (c) => {
@@ -49,6 +50,13 @@ const route = new Hono()
     const { id } = c.req.param();
 
     const product = await getProductById(id);
+
+    if (!product) {
+      c.status(StatusCodes.NOT_FOUND);
+      throw new Error("Cannot find product");
+    }
+
+    return c.json({ product });
   });
 
 export default route;

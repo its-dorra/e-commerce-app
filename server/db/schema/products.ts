@@ -26,5 +26,5 @@ export const productsRelations = relations(productsTable, ({ one, many }) => ({
     fields: [productsTable.categoryId],
     references: [categoriesTable.id],
   }),
-  colors: many(productColorsTable),
+  productColor: many(productColorsTable),
 }));

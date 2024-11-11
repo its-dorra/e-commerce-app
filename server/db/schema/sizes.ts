@@ -1,4 +1,6 @@
+import { relations } from "drizzle-orm";
 import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { productVariantsTable } from "./productVariants";
 
 export const sizesTable = sqliteTable("sizes", {
   id: integer("id", { mode: "number" }).primaryKey({
@@ -12,3 +14,7 @@ export const sizesTable = sqliteTable("sizes", {
     .$default(() => new Date())
     .$onUpdate(() => new Date()),
 });
+
+export const sizesRelations = relations(sizesTable, ({ one }) => ({
+  productVariant: one(productVariantsTable),
+}));

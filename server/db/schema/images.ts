@@ -1,5 +1,6 @@
 import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { productColorsTable } from "./productVariants";
+import { relations } from "drizzle-orm";
 
 export const imagesTable = sqliteTable(
   "images",
@@ -35,3 +36,10 @@ export const imagesTable = sqliteTable(
     };
   },
 );
+
+export const imagesRelations = relations(imagesTable, ({ one }) => ({
+  productColor: one(productColorsTable, {
+    fields: [imagesTable.productColorId],
+    references: [productColorsTable.id],
+  }),
+}));

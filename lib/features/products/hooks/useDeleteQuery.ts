@@ -6,14 +6,14 @@ export const useDeleteQuery = () => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const deleteQueryString = useCallback(
-    (name: string) => {
+    (name: string, value?: string) => {
       const params = new URLSearchParams(searchParams.toString());
-      params.delete(name);
+      params.delete(name, value);
       return params.toString();
     },
     [searchParams],
   );
-  return (name: string) => {
-    router.push(pathname + "?" + deleteQueryString(name));
+  return (name: string, value?: string) => {
+    router.push(pathname + "?" + deleteQueryString(name, value));
   };
 };

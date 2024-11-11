@@ -179,4 +179,51 @@ export const getProducts = async (page: number, filters: FilterQuery) => {
   };
 };
 
-export const getProductById = async (id: string) => {};
+export const getProductById = async (id: string) => {
+  return db.query.productsTable.findFirst({
+    where: (table, { eq }) => eq(table.id, +id),
+    columns: {
+      createdAt: false,
+      updatedAt: false,
+      categoryId: false,
+    },
+    with: {
+      category: {
+        columns: {
+          name: true,
+        },
+      },
+      productColor: {
+        columns: {
+          colorId: false,
+          createdAt: false,
+          updatedAt: false,
+        },
+        with: {
+          productVariants: {
+            columns: {
+              createdAt: false,
+              updatedAt: false,
+            },
+            with: {
+              size: {
+                columns: {
+                  id: true,
+                  name: true,
+                },
+              },
+            },
+          },
+          color: {
+            columns: {
+              name: true,
+              hexCode: true,
+              id: true,
+            },
+          },
+          image: true,
+        },
+      },
+    },
+  });
+};

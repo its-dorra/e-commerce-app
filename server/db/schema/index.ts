@@ -1,11 +1,16 @@
 import { cartsTable, cartItemsTable } from "./carts";
 import { categoriesTable, categoriesRelations } from "./categories";
-import { colorsTable } from "./colors";
-import { imagesTable } from "./images";
+import { colorsTable, colorsRelations } from "./colors";
+import { imagesTable, imagesRelations } from "./images";
 import { ordersTable } from "./orders";
 import { productsTable, productsRelations } from "./products";
-import { productVariantsTable, productColorsTable } from "./productVariants";
-import { sizesTable } from "./sizes";
+import {
+  productVariantsTable,
+  productColorsTable,
+  productColorsRelations,
+  productVariantsRelations,
+} from "./productVariants";
+import { sizesTable, sizesRelations } from "./sizes";
 import {
   usersTable,
   accountsTable,
@@ -15,7 +20,12 @@ import {
 
 export {
   productsRelations,
+  colorsRelations,
+  imagesRelations,
   categoriesRelations,
+  productColorsRelations,
+  productVariantsRelations,
+  sizesRelations,
   sessionTable,
   profilesTable,
   cartsTable,

@@ -1,19 +1,19 @@
-i have this drizzle schema and real data with real image urls to fill these table 
-
-
 export const categoriesTable = sqliteTable("categories", {
   id: integer("id", { mode: "number" }).primaryKey({
     autoIncrement: true,
   }),
   name: text("name").notNull(),
-  createdAt: integer("created_at", { mode: "timestamp" })
-    .notNull()
-    .$default(() => new Date()),
+  createdAt: integer("created_at", { mode: "timestamp" }).$default(
+    () => new Date(),
+  ),
   updatedAt: integer("updated_at", { mode: "timestamp" })
-    .notNull()
     .$default(() => new Date())
     .$onUpdate(() => new Date()),
 });
+
+export const categoriesRelations = relations(categoriesTable, ({ one }) => ({
+  product: one(productsTable),
+}));
 
 export const colorsTable = sqliteTable(
   "colors",
@@ -23,11 +23,10 @@ export const colorsTable = sqliteTable(
     }),
     name: text("name").notNull(),
     hexCode: text("hex_code").notNull(),
-    createdAt: integer("created_at", { mode: "timestamp" })
-      .notNull()
-      .$default(() => new Date()),
+    createdAt: integer("created_at", { mode: "timestamp" }).$default(
+      () => new Date(),
+    ),
     updatedAt: integer("updated_at", { mode: "timestamp" })
-      .notNull()
       .$default(() => new Date())
       .$onUpdate(() => new Date()),
   },
@@ -37,6 +36,10 @@ export const colorsTable = sqliteTable(
     };
   },
 );
+
+export const colorsRelations = relations(colorsTable, ({ one }) => ({
+  productColor: one(productColorsTable),
+}));
 
 export const imagesTable = sqliteTable(
   "images",
@@ -50,14 +53,13 @@ export const imagesTable = sqliteTable(
     imagePath: text("image_path").notNull(),
     displayOrder: integer("display_order").notNull().default(0),
     imageType: text("image_type")
-      .$type<"thumbnail" | "gallery">()
+      .$type<"product" | "gallery">()
       .notNull()
       .default("gallery"),
-    createdAt: integer("created_at", { mode: "timestamp" })
-      .notNull()
-      .$default(() => new Date()),
+    createdAt: integer("created_at", { mode: "timestamp" }).$default(
+      () => new Date(),
+    ),
     updatedAt: integer("updated_at", { mode: "timestamp" })
-      .notNull()
       .$default(() => new Date())
       .$onUpdate(() => new Date()),
   },
@@ -66,10 +68,6 @@ export const imagesTable = sqliteTable(
       productColorIdx: index("product_color_images_idx").on(
         table.productColorId,
       ),
-      // Ensure only one primary image per product-color combination
-      primaryConstraint: uniqueIndex("primary_image_idx")
-        .on(table.productColorId, table.isPrimary)
-        .where(sql${table.isPrimary} = 1),
       orderIdx: index("display_order_idx").on(
         table.productColorId,
         table.displayOrder,
@@ -77,6 +75,10 @@ export const imagesTable = sqliteTable(
     };
   },
 );
+
+export const imagesRelations = relations(imagesTable, ({ one }) => ({
+  productColor: one(productColorsTable),
+}));
 
 export const productsTable = sqliteTable("products", {
   id: integer("id", { mode: "number" }).primaryKey({
@@ -88,14 +90,21 @@ export const productsTable = sqliteTable("products", {
   categoryId: integer("category_id", { mode: "number" }).references(
     () => categoriesTable.id,
   ),
-  createdAt: integer("created_at", { mode: "timestamp" })
-    .notNull()
-    .$default(() => new Date()),
+  createdAt: integer("created_at", { mode: "timestamp" }).$default(
+    () => new Date(),
+  ),
   updatedAt: integer("updated_at", { mode: "timestamp" })
-    .notNull()
     .$default(() => new Date())
     .$onUpdate(() => new Date()),
 });
+
+export const productsRelations = relations(productsTable, ({ one, many }) => ({
+  category: one(categoriesTable, {
+    fields: [productsTable.categoryId],
+    references: [categoriesTable.id],
+  }),
+  productColor: many(productColorsTable),
+}));
 
 
 export const productColorsTable = sqliteTable(
@@ -110,11 +119,10 @@ export const productColorsTable = sqliteTable(
     colorId: integer("color_id", { mode: "number" })
       .notNull()
       .references(() => colorsTable.id),
-    createdAt: integer("created_at", { mode: "timestamp" })
-      .notNull()
-      .$default(() => new Date()),
+    createdAt: integer("created_at", { mode: "timestamp" }).$default(
+      () => new Date(),
+    ),
     updatedAt: integer("updated_at", { mode: "timestamp" })
-      .notNull()
       .$default(() => new Date())
       .$onUpdate(() => new Date()),
   },
@@ -147,11 +155,10 @@ export const productVariantsTable = sqliteTable(
       .notNull()
       .default(true),
     dimensions: text("dimensions"),
-    createdAt: integer("created_at", { mode: "timestamp" })
-      .notNull()
-      .$default(() => new Date()),
+    createdAt: integer("created_at", { mode: "timestamp" }).$default(
+      () => new Date(),
+    ),
     updatedAt: integer("updated_at", { mode: "timestamp" })
-      .notNull()
       .$default(() => new Date())
       .$onUpdate(() => new Date()),
   },
@@ -167,18 +174,50 @@ export const productVariantsTable = sqliteTable(
   },
 );
 
+export const productColorsRelations = relations(
+  productColorsTable,
+  ({ one, many }) => ({
+    product: one(productsTable, {
+      fields: [productColorsTable.productId],
+      references: [productsTable.id],
+    }),
+    color: one(colorsTable, {
+      fields: [productColorsTable.colorId],
+      references: [colorsTable.id],
+    }),
+    image: many(imagesTable),
+    productVariants: many(productVariantsTable),
+  }),
+);
+
+export const productVariantsRelations = relations(
+  productVariantsTable,
+  ({ one }) => ({
+    size: one(sizesTable, {
+      fields: [productVariantsTable.sizeId],
+      references: [sizesTable.id],
+    }),
+    productColor: one(productColorsTable, {
+      fields: [productVariantsTable.productColorId],
+      references: [productColorsTable.id],
+    }),
+  }),
+);
+
+
 export const sizesTable = sqliteTable("sizes", {
   id: integer("id", { mode: "number" }).primaryKey({
     autoIncrement: true,
   }),
   name: text("name").notNull(),
-  createdAt: integer("created_at", { mode: "timestamp" })
-    .notNull()
-    .$default(() => new Date()),
+  createdAt: integer("created_at", { mode: "timestamp" }).$default(
+    () => new Date(),
+  ),
   updatedAt: integer("updated_at", { mode: "timestamp" })
-    .notNull()
     .$default(() => new Date())
     .$onUpdate(() => new Date()),
 });
- 
 
+export const sizesRelations = relations(sizesTable, ({ one }) => ({
+  productVariant: one(productVariantsTable),
+}));
