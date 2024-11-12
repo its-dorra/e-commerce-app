@@ -222,7 +222,11 @@ export const getProductById = async (id: string) => {
               id: true,
             },
           },
-          image: true,
+          image: {
+            columns: {
+              imagePath: true,
+            },
+          },
         },
       },
     },
@@ -231,9 +235,10 @@ export const getProductById = async (id: string) => {
   if (!product) return undefined;
 
   let totalQuantity = 0;
-  const images: any[] = [];
+  const images: string[] = [];
   product?.productColor.forEach((color) => {
-    images.concat(color.image);
+    const productImages = color.image.map((path) => path.imagePath);
+    images.push(...productImages);
     color.productVariants.forEach((variant) => {
       totalQuantity += variant.quantity;
     });
@@ -258,3 +263,5 @@ export const getProductById = async (id: string) => {
     totalQuantity,
   };
 };
+
+export type ProductDetails = Awaited<ReturnType<typeof getProductById>>;
