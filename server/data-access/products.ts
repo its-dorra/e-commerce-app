@@ -180,7 +180,7 @@ export const getProducts = async (page: number, filters: FilterQuery) => {
 };
 
 export const getProductById = async (id: string) => {
-  return db.query.productsTable.findFirst({
+  const product = await db.query.productsTable.findFirst({
     where: (table, { eq }) => eq(table.id, +id),
     columns: {
       createdAt: false,
@@ -198,6 +198,7 @@ export const getProductById = async (id: string) => {
           colorId: false,
           createdAt: false,
           updatedAt: false,
+          productId: false,
         },
         with: {
           productVariants: {
@@ -226,4 +227,34 @@ export const getProductById = async (id: string) => {
       },
     },
   });
+
+  if (!product) return undefined;
+
+  let totalQuantity = 0;
+  const images: any[] = [];
+  product?.productColor.forEach((color) => {
+    images.concat(color.image);
+    color.productVariants.forEach((variant) => {
+      totalQuantity += variant.quantity;
+    });
+  });
+
+  return {
+    id: product.id,
+    name: product.name,
+    category: product.category!.name,
+    colors: product.productColor.map((color) => ({
+      name: color.color.name,
+      hexCode: color.color.hexCode,
+      variants: color.productVariants.map((variant) => ({
+        id: variant.id,
+        size: {
+          name: variant.size.name,
+        },
+        quantity: variant.quantity,
+      })),
+    })),
+    images,
+    totalQuantity,
+  };
 };

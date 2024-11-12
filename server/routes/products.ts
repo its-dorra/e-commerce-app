@@ -51,11 +51,6 @@ const route = new Hono()
 
     const product = await getProductById(id);
 
-    if (!product) {
-      c.status(StatusCodes.NOT_FOUND);
-      throw new Error("Cannot find product");
-    }
-
     return c.json({ product });
   });
 
