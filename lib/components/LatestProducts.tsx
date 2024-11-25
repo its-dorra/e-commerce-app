@@ -28,9 +28,9 @@ export default function LatestProducts() {
           Latest
         </Button>
       </div>
-      <ProductsContainer
+      {/* <ProductsContainer
         products={state === "Featured" ? latestProducts : bestSelling}
-      />
+      /> */}
     </section>
   );
 }

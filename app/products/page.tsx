@@ -14,6 +14,8 @@ import {
 } from "@/lib/features/products/services";
 import { Suspense } from "react";
 
+export const revalidate = 0;
+
 interface ProductsProps {
   searchParams: {
     categories: string | string[] | undefined;

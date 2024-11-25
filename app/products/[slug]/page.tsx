@@ -3,6 +3,8 @@ import ProductImagesSwiper from "@/lib/features/products/components/ProductImage
 import { getProductById } from "@/lib/features/products/services";
 import { notFound } from "next/navigation";
 
+export const revalidate = 0;
+
 export default async function ProductPage({
   params: { slug },
 }: {

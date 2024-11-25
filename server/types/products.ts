@@ -1,6 +1,5 @@
-export type FilterQuery {
-    categories? : string[];
-    colors? : string[];
-    sizes? : string[];
-
-}
+export type FilterQuery = {
+  categories?: string[];
+  colors?: string[];
+  sizes?: string[];
+};

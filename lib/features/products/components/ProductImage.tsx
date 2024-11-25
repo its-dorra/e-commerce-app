@@ -1,12 +1,16 @@
 export default function ProductImage({
   imageUrl,
   alt,
+  className,
 }: {
   imageUrl: string;
   alt: string;
+  className?: string;
 }) {
   return (
-    <div className="grid h-[420px] w-full place-items-center rounded-sm bg-secondaryWhite">
+    <div
+      className={`grid h-[350px] w-full place-items-center rounded-sm bg-secondaryWhite ${className}`}
+    >
       <img
         className="w-5/6 object-contain mix-blend-color-burn"
         src={imageUrl}

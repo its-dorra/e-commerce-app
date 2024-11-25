@@ -264,4 +264,7 @@ export const getProductById = async (id: string) => {
   };
 };
 
-export type ProductDetails = Awaited<ReturnType<typeof getProductById>>;
+export type ProductDetails = Exclude<
+  Awaited<ReturnType<typeof getProductById>>,
+  undefined
+>;

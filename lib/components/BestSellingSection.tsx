@@ -1,5 +1,4 @@
 import { bestSelling } from "../constants";
-import ProductItem from "./ProductItem";
 import ProductsContainer from "../features/products/components/ProductsContainer";
 
 export default function BestSellingSection() {

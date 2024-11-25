@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { loginSchema, signupSchema } from "../schemas";
+import { loginSchema, signupSchema } from "@/server/schemas/users";
 import api from "@/lib/api";
 
 export const login = async (json: z.infer<typeof loginSchema>) => {
