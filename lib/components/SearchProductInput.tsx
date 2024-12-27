@@ -17,8 +17,9 @@ export default function SearchProductInput({
         <Image src={searchIcon} alt="search icon" width={20} height={20} />
       </Label>
 
-      <Input
-        className="h-full w-full border-none outline-none placeholder:text-sm"
+      <input
+        id="input"
+        className="h-full w-full border-none bg-transparent px-1 py-2 outline-none ring-0 placeholder:text-sm"
         placeholder="Search products"
       />
     </div>

@@ -1,7 +1,15 @@
 import api from "@/lib/api";
+import { configCacheForFetch, getGlobalTag, getIdTag } from "@/lib/cache";
 
 export const getCategories = async () => {
-  const res = await api.shop.categories.$get();
+  const res = await api.shop.categories.$get(undefined, {
+    fetch(input, requestInit, Env, executionCtx) {
+      return fetch(
+        input,
+        configCacheForFetch(requestInit, [getGlobalTag("productsCategories")]),
+      );
+    },
+  });
   if (!res.ok) throw new Error("Can't get categories");
   const { categories } = await res.json();
 
@@ -10,12 +18,11 @@ export const getCategories = async () => {
 
 export const getColors = async () => {
   const res = await api.shop.colors.$get(undefined, {
-    fetch: (input, requestInit, Env, executionCtx) => {
-      requestInit!.next = {
-        revalidate: 2 * 60,
-      };
-
-      return fetch(input, requestInit);
+    fetch(input, requestInit, Env, executionCtx) {
+      return fetch(
+        input,
+        configCacheForFetch(requestInit, [getGlobalTag("productsColors")]),
+      );
     },
   });
   if (!res.ok) throw new Error("Can't get colors");
@@ -26,12 +33,11 @@ export const getColors = async () => {
 
 export const getSizes = async () => {
   const res = await api.shop.sizes.$get(undefined, {
-    fetch: (input, requestInit, Env, executionCtx) => {
-      requestInit!.next = {
-        revalidate: 2 * 60,
-      };
-
-      return fetch(input, requestInit);
+    fetch(input, requestInit, Env, executionCtx) {
+      return fetch(
+        input,
+        configCacheForFetch(requestInit, [getGlobalTag("productsSizes")]),
+      );
     },
   });
   if (!res.ok) throw new Error("Can't get sizes");
@@ -56,9 +62,11 @@ export const getProducts = async ({
       query: { page, categories, sizes, colors },
     },
     {
-      fetch: (input, requestInit, Env, executionCtx) => {
-        requestInit!.cache = "no-store";
-        return fetch(input, requestInit);
+      fetch(input, requestInit, Env, executionCtx) {
+        return fetch(
+          input,
+          configCacheForFetch(requestInit, [getGlobalTag("products")]),
+        );
       },
     },
   );
@@ -71,9 +79,19 @@ export const getProducts = async ({
 };
 
 export const getProductById = async (id: string) => {
-  const res = await api.shop.products[":id"].$get({ param: { id } });
+  const res = await api.shop.products[":id"].$get(
+    { param: { id } },
+    {
+      fetch(input, requestInit, Env, executionCtx) {
+        return fetch(
+          input,
+          configCacheForFetch(requestInit, [getIdTag("product", id)]),
+        );
+      },
+    },
+  );
 
-  if (!res.ok) throw new Error("Can't get products");
+  if (!res.ok) throw new Error("Can't get product");
 
   const { product } = await res.json();
 

@@ -10,7 +10,7 @@ import {
   getSizes,
 } from "../data-access/products";
 import { toArray } from "../../lib/utils";
-import { StatusCodes } from "http-status-codes";
+import { z } from "zod";
 
 const route = new Hono()
   .get("/categories", async (c) => {
@@ -46,12 +46,16 @@ const route = new Hono()
       return c.json({ products, pagination });
     },
   )
-  .get("/products/:id", async (c) => {
-    const { id } = c.req.param();
+  .get(
+    "/products/:id",
+    zValidator("param", z.object({ id: z.number().min(1) })),
+    async (c) => {
+      const { id } = c.req.valid("param");
 
-    const product = await getProductById(id);
+      const product = await getProductById(id);
 
-    return c.json({ product });
-  });
+      return c.json({ product });
+    },
+  );
 
 export default route;

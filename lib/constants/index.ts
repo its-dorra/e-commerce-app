@@ -1,14 +1,12 @@
 import {
-  cozyBlack,
+  cartIcon,
   deliveryIcon,
+  heartIcon,
+  logoutIcon,
+  ordersIcon,
   shieldCheckIcon,
   starBadgeIcon,
-  tshirt1,
-  tshirt2,
-  tshirt3,
-  tshirt4,
-  tshirt5,
-  tshirt6,
+  userIcon,
 } from "@/assets";
 
 export const categories = [
@@ -47,64 +45,41 @@ export const features = [
   },
 ];
 
-export const bestSelling = [
+export const accountSidebarItems = [
   {
     id: 1,
-    name: "Classic Monochrome Tees",
-    quantity: 79,
-    basePrice: 43,
-    imageUrl: "tshirt1",
+    href: "/account/orders",
+    title: "Orders",
+    icon: ordersIcon,
   },
   {
     id: 2,
-    name: "Monochromatic Wardrobe",
-    quantity: 20,
-    basePrice: 27,
-    imageUrl: "tshirt2",
+    href: "/account/cart",
+    title: "Cart",
+    icon: cartIcon,
   },
   {
     id: 3,
-    name: "Essential Neutrals",
-    quantity: 0,
-    basePrice: 22,
-    imageUrl: "tshirt3",
+    href: "/account/address",
+    title: "Address",
+    icon: deliveryIcon,
   },
   {
     id: 4,
-    name: "UTRAANET Black",
-    quantity: 15,
-    basePrice: 43,
-    imageUrl: "tshirt4",
-  },
-];
-
-export const latestProducts = [
-  {
-    id: 1,
-    title: "Elegant Ebony Sweatshirts",
-    inStock: true,
-    price: 35,
-    image: tshirt5,
+    href: "/account/wishlist",
+    title: "Wishlist",
+    icon: heartIcon,
   },
   {
-    id: 2,
-    title: "Sleek and Cozy Black",
-    inStock: true,
-    price: 57,
-    image: cozyBlack,
+    id: 5,
+    href: "/account/account-details",
+    title: "Account Details",
+    icon: userIcon,
   },
   {
-    id: 3,
-    title: "Raw Black Tees",
-    inStock: true,
-    price: 19,
-    image: tshirt1,
-  },
-  {
-    id: 4,
-    title: "Raw Black Tees",
-    inStock: true,
-    price: 30,
-    image: tshirt6,
+    id: 6,
+    href: "/account/logout",
+    title: "Logout",
+    icon: logoutIcon,
   },
 ];

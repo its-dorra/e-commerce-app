@@ -2,6 +2,7 @@ import Link from "next/link";
 import { IProducts } from "../types";
 import ProductImage from "./ProductImage";
 import InStock from "./InStock";
+import { Button } from "@/components/ui/button";
 
 type ProductProps = IProducts["products"][number];
 
@@ -13,16 +14,18 @@ function ProductItem({
   imageUrl,
 }: ProductProps) {
   return (
-    <Link href={`/products/${id}`}>
-      <div className="w-[250px] space-y-2">
-        <ProductImage imageUrl={imageUrl} alt={name} />
-        <p className="body-1">{name}</p>
-        <div className="flex items-center gap-x-2">
-          <InStock quantity={quantity} />
-          <p className="body-2 text-black/60">${basePrice}.00</p>
+    <Button variant="ghost" className="h-fit w-fit">
+      <Link href={`/products/${id}`}>
+        <div className="flex w-[250px] flex-col items-start space-y-2">
+          <ProductImage imageUrl={imageUrl} alt={name} />
+          <p className="body-1">{name}</p>
+          <div className="flex items-center gap-x-2">
+            <InStock quantity={quantity} />
+            <p className="body-2 text-black/60">${basePrice}.00</p>
+          </div>
         </div>
-      </div>
-    </Link>
+      </Link>
+    </Button>
   );
 }
 

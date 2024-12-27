@@ -2,42 +2,45 @@
 @tailwind components;
 @tailwind utilities;
 
+* {
+  scroll-behavior: smooth;
+}
+
 @layer components {
   .h1 {
-    @apply text-[40px] leading-[150%] font-semibold;
+    @apply text-[40px] font-semibold leading-[150%];
   }
   .h2 {
-    @apply text-[32px] leading-[auto] font-semibold;
+    @apply text-[32px] font-semibold leading-[auto];
   }
   .h3 {
-    @apply text-[24px] leading-[auto] font-bold;
+    @apply text-[24px] font-bold leading-[auto];
   }
   .h4 {
-    @apply text-[18px] leading-[auto] font-semibold;
+    @apply text-[18px] font-semibold leading-[auto];
   }
   .h5 {
-    @apply text-[16px] leading-[auto] font-semibold;
+    @apply text-[16px] font-semibold leading-[auto];
   }
   .h6 {
-    @apply text-[14px] leading-[auto] font-medium;
+    @apply text-[14px] font-medium leading-[auto];
   }
 
   .body-1 {
-    @apply text-[14px] leading-[175%] font-normal;
+    @apply text-[14px] font-normal leading-[175%];
   }
 
   .body-2 {
-    @apply text-[14px] leading-[175%] font-medium;
+    @apply text-[14px] font-medium leading-[175%];
   }
 
   .label {
-    @apply text-[12px] leading-[24px] font-medium;
+    @apply text-[12px] font-medium leading-[24px];
   }
 }
 
 @layer base {
   :root {
-
     --background: 0 0% 100%;
 
     --foreground: 0 0% 3.9%;
@@ -86,10 +89,9 @@
 
     --chart-5: 27 87% 67%;
 
-    --radius: 0.5rem
+    --radius: 0.5rem;
   }
   .dark {
-
     --background: 0 0% 3.9%;
 
     --foreground: 0 0% 98%;
@@ -136,7 +138,7 @@
 
     --chart-4: 280 65% 60%;
 
-    --chart-5: 340 75% 55%
+    --chart-5: 340 75% 55%;
   }
 }
 

@@ -11,10 +11,6 @@ export const categoriesTable = sqliteTable("categories", {
     .$onUpdate(() => new Date()),
 });
 
-export const categoriesRelations = relations(categoriesTable, ({ one }) => ({
-  product: one(productsTable),
-}));
-
 export const colorsTable = sqliteTable(
   "colors",
   {
@@ -36,10 +32,6 @@ export const colorsTable = sqliteTable(
     };
   },
 );
-
-export const colorsRelations = relations(colorsTable, ({ one }) => ({
-  productColor: one(productColorsTable),
-}));
 
 export const imagesTable = sqliteTable(
   "images",
@@ -76,10 +68,6 @@ export const imagesTable = sqliteTable(
   },
 );
 
-export const imagesRelations = relations(imagesTable, ({ one }) => ({
-  productColor: one(productColorsTable),
-}));
-
 export const productsTable = sqliteTable("products", {
   id: integer("id", { mode: "number" }).primaryKey({
     autoIncrement: true,
@@ -97,14 +85,6 @@ export const productsTable = sqliteTable("products", {
     .$default(() => new Date())
     .$onUpdate(() => new Date()),
 });
-
-export const productsRelations = relations(productsTable, ({ one, many }) => ({
-  category: one(categoriesTable, {
-    fields: [productsTable.categoryId],
-    references: [categoriesTable.id],
-  }),
-  productColor: many(productColorsTable),
-}));
 
 
 export const productColorsTable = sqliteTable(
@@ -174,37 +154,6 @@ export const productVariantsTable = sqliteTable(
   },
 );
 
-export const productColorsRelations = relations(
-  productColorsTable,
-  ({ one, many }) => ({
-    product: one(productsTable, {
-      fields: [productColorsTable.productId],
-      references: [productsTable.id],
-    }),
-    color: one(colorsTable, {
-      fields: [productColorsTable.colorId],
-      references: [colorsTable.id],
-    }),
-    image: many(imagesTable),
-    productVariants: many(productVariantsTable),
-  }),
-);
-
-export const productVariantsRelations = relations(
-  productVariantsTable,
-  ({ one }) => ({
-    size: one(sizesTable, {
-      fields: [productVariantsTable.sizeId],
-      references: [sizesTable.id],
-    }),
-    productColor: one(productColorsTable, {
-      fields: [productVariantsTable.productColorId],
-      references: [productColorsTable.id],
-    }),
-  }),
-);
-
-
 export const sizesTable = sqliteTable("sizes", {
   id: integer("id", { mode: "number" }).primaryKey({
     autoIncrement: true,
@@ -218,6 +167,105 @@ export const sizesTable = sqliteTable("sizes", {
     .$onUpdate(() => new Date()),
 });
 
-export const sizesRelations = relations(sizesTable, ({ one }) => ({
-  productVariant: one(productVariantsTable),
-}));
+
+export const usersTable = sqliteTable(
+  "users",
+  {
+    id: text("id").primaryKey(),
+    email: text("email").notNull().unique(),
+    role: text("role").$type<"admin" | "user">().default("user"),
+    createdAt: integer("created_at", { mode: "timestamp" }).$default(
+      () => new Date(),
+    ),
+  },
+  (table) => {
+    return { emailIdx: index("email_idx").on(table.email) };
+  },
+);
+
+export const cartsTable = sqliteTable("carts", {
+  id: integer("id", { mode: "number" }).primaryKey({
+    autoIncrement: true,
+  }),
+  user_id: integer("user_id")
+    .notNull()
+    .references(() => users.id),
+  createdAt: integer("created_at", { mode: "timestamp" }).$default(
+    () => new Date(),
+  ),
+  updatedAt: integer("updated_at", { mode: "timestamp" })
+    .$default(() => new Date())
+    .$onUpdate(() => new Date()),
+});
+
+export const cartItemsTable = sqliteTable("cart_items", {
+  cart_item_id: integer("cart_item_id", { mode: "number" }).primaryKey({
+    autoIncrement: true,
+  }),
+  product_variant_id: integer("product_variant_id")
+    .notNull()
+    .references(() => productVariantsTable.id),
+  quantity: integer("quantity").notNull().default(1),
+  cart_id: integer("cart_id").notNull(),
+  createdAt: integer("created_at", { mode: "timestamp" }).$default(
+    () => new Date(),
+  ),
+  updatedAt: integer("updated_at", { mode: "timestamp" })
+    .$default(() => new Date())
+    .$onUpdate(() => new Date()),
+});
+
+export const accountsTable = sqliteTable(
+  "accounts",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .unique()
+      .references(() => usersTable.id, { onDelete: "cascade" }),
+    password: text("password"),
+    googleId: text("google_id").unique(),
+    accountType: text("account_type").$type<"email" | "google">(),
+    createdAt: integer("created_at", { mode: "timestamp" }).$default(
+      () => new Date(),
+    ),
+  },
+  (table) => {
+    return {
+      userIdIdx: index("user_id_idx").on(table.userId),
+      googleIdIdx: index("google_id_idx").on(table.googleId),
+    };
+  },
+);
+
+export const sessionTable = sqliteTable(
+  "session",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => usersTable.id, { onDelete: "cascade" }),
+    expiresAt: integer("expires_at").notNull(),
+  },
+  (table) => {
+    return { userIdIdx: index("sessions_user_id_idx").on(table.userId) };
+  },
+);
+
+export const profilesTable = sqliteTable("profile", {
+  id: text("id").primaryKey(),
+  userId: text("userId")
+    .notNull()
+    .references(() => usersTable.id, { onDelete: "cascade" })
+    .unique(),
+  displayName: text("displayName"),
+  imageId: text("imageId"),
+  image: text("image"),
+  bio: text("bio").notNull().default(""),
+  createdAt: integer("created_at", { mode: "timestamp" }).$default(
+    () => new Date(),
+  ),
+  updatedAt: integer("updated_at", { mode: "timestamp" })
+    .$default(() => new Date())
+    .$onUpdate(() => new Date()),
+});

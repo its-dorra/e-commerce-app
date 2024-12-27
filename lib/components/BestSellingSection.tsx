@@ -1,4 +1,4 @@
-import { bestSelling } from "../constants";
+// import { bestSelling } from "../constants";
 import ProductsContainer from "../features/products/components/ProductsContainer";
 
 export default function BestSellingSection() {
@@ -8,7 +8,7 @@ export default function BestSellingSection() {
         <p className="body-1 text-center uppercase text-black/60">shop now</p>
         <h2 className="h2 text-center">Best Selling</h2>
       </div>
-      <ProductsContainer products={bestSelling} />
+      {/*<ProductsContainer products={bestSelling} />*/}
     </section>
   );
 }

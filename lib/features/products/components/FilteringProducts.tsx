@@ -1,6 +1,6 @@
 "use client";
 
-import { useToggleFilter } from "@/lib/stores/filters.store";
+import { useToggleFilter } from "@/lib/stores/filter-sidebar.store";
 
 import { Button } from "@/components/ui/button";
 import { PropsWithChildren } from "react";

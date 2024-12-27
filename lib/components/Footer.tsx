@@ -12,7 +12,10 @@ import Link from "next/link";
 
 export default function Footer() {
   return (
-    <footer className="grid w-full max-w-[850px] grid-cols-1 justify-between gap-12 place-self-center py-12 md:grid-cols-[auto_auto_auto]">
+    <footer
+      id="about"
+      className="grid w-full max-w-[850px] grid-cols-1 justify-between gap-12 place-self-center py-12 md:grid-cols-[auto_auto_auto]"
+    >
       <div className="space-y-4">
         <Image src={footerLogo} alt="logo" />
         <div className="tracking-wide text-black/70">

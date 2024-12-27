@@ -10,6 +10,7 @@ import { colorsTable } from "./colors";
 import { sizesTable } from "./sizes";
 import { relations } from "drizzle-orm";
 import { imagesTable } from "./images";
+import { cartItemsTable } from "./carts";
 
 export const productColorsTable = sqliteTable(
   "product_colors",
@@ -52,12 +53,8 @@ export const productVariantsTable = sqliteTable(
     sizeId: integer("size_id", { mode: "number" })
       .notNull()
       .references(() => sizesTable.id),
-    price_adjustment: integer("price_adjustment").default(0),
+    priceAdjustment: integer("price_adjustment").default(0),
     quantity: integer("quantity", { mode: "number" }).notNull().default(0),
-    low_stock_threshold: integer("low_stock_threshold").default(5),
-    is_active: integer("is_active", { mode: "boolean" })
-      .notNull()
-      .default(true),
     dimensions: text("dimensions"),
     createdAt: integer("created_at", { mode: "timestamp" }).$default(
       () => new Date(),
@@ -72,8 +69,6 @@ export const productVariantsTable = sqliteTable(
         table.productColorId,
         table.sizeId,
       ),
-      stockIdx: index("stock_idx").on(table.quantity),
-      activeIdx: index("active_idx").on(table.is_active),
     };
   },
 );
@@ -96,7 +91,7 @@ export const productColorsRelations = relations(
 
 export const productVariantsRelations = relations(
   productVariantsTable,
-  ({ one }) => ({
+  ({ one, many }) => ({
     size: one(sizesTable, {
       fields: [productVariantsTable.sizeId],
       references: [sizesTable.id],
@@ -105,5 +100,6 @@ export const productVariantsRelations = relations(
       fields: [productVariantsTable.productColorId],
       references: [productColorsTable.id],
     }),
+    cartItem: many(cartItemsTable),
   }),
 );

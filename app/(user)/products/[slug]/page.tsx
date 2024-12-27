@@ -15,8 +15,8 @@ export default async function ProductPage({
   if (!product) return notFound();
 
   return (
-    <main className="container space-y-8">
-      <div className="flex flex-col items-center gap-y-8 lg:flex-row lg:justify-between">
+    <main className="container flex w-full grow flex-col items-center space-y-8">
+      <div className="flex flex-col items-center gap-x-12 gap-y-8 lg:max-w-4xl lg:flex-row lg:justify-between">
         <ProductImagesSwiper images={product.images} />
         <ProductDetails product={product} />
       </div>

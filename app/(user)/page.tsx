@@ -9,7 +9,7 @@ export default function Home() {
     <main>
       <HeroSection />
       <FeaturesSection />
-      <BestSellingSection />
+      {/*<BestSellingSection />*/}
       <BrowseFashion />
       <LatestProducts />
     </main>

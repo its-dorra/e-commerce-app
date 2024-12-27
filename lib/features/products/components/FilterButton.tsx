@@ -2,7 +2,7 @@
 
 import { filterIcon } from "@/assets";
 import { Button } from "@/components/ui/button";
-import { useToggleFilter } from "@/lib/stores/filters.store";
+import { useToggleFilter } from "@/lib/stores/filter-sidebar.store";
 import Image from "next/image";
 
 export default function FilterButton() {

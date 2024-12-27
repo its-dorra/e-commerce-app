@@ -13,6 +13,7 @@ import arrowUpIcon from "./icons/Arrow up.svg";
 import infoIcon from "./icons/Info.svg";
 import sortIcon from "./icons/Sort.svg";
 import cartIcon from "./icons/Cart.svg";
+import ordersIcon from './icons/Order.png'
 import keyIcon from "./icons/Key.svg";
 import starBadgeIcon from "./icons/Star Badge.svg";
 import checkIcon from "./icons/Check.svg";
@@ -100,6 +101,7 @@ export {
   infoIcon,
   sortIcon,
   cartIcon,
+  ordersIcon,
   keyIcon,
   starBadgeIcon,
   checkIcon,

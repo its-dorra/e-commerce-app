@@ -83,3 +83,12 @@ export async function createProfile(
     .returning();
   return profile;
 }
+
+export const getUserWithFullDetails = async (userId: string) => {
+  return db.query.usersTable.findFirst({
+    where: ({ id }, { eq }) => eq(id, userId),
+    with: {
+      profile: true,
+    },
+  });
+};

@@ -8,7 +8,7 @@ import {
   productVariantsTable,
   sizesTable,
 } from "@/server/db/schema";
-import { and, eq, exists, inArray, sql, SQL } from "drizzle-orm";
+import { and, eq, exists, gt, inArray, sql, SQL } from "drizzle-orm";
 
 import { FilterQuery } from "../types/products";
 import { productColorsTable } from "@/server/db/schema/productVariants";
@@ -127,7 +127,12 @@ export const getProducts = async (page: number, filters: FilterQuery) => {
 
   // Build final query
   const finalQuery = productsQuery
-    .where(conditions.length > 0 ? and(...conditions) : undefined)
+    .where(
+      and(
+        conditions.length > 0 ? and(...conditions) : undefined,
+        // gt(productVariantsTable.quantity, 0),
+      ),
+    )
     .groupBy(productsTable.id)
     .orderBy(productsTable.id)
     .limit(PER_PAGE)
@@ -144,7 +149,17 @@ export const getProducts = async (page: number, filters: FilterQuery) => {
       eq(productsTable.id, productColorsTable.productId),
     )
     .leftJoin(colorsTable, eq(productColorsTable.colorId, colorsTable.id))
-    .where(conditions.length > 0 ? and(...conditions) : undefined);
+    .leftJoin(
+      productVariantsTable,
+      eq(productColorsTable.id, productVariantsTable.productColorId),
+    )
+
+    .where(
+      and(
+        conditions.length > 0 ? and(...conditions) : undefined,
+        // gt(productVariantsTable.quantity, 0),
+      ),
+    );
   const [products, [{ count }]] = await Promise.all([finalQuery, countQuery]);
 
   const finalProducts = products.map((product) => {
@@ -179,9 +194,14 @@ export const getProducts = async (page: number, filters: FilterQuery) => {
   };
 };
 
-export const getProductById = async (id: string) => {
+export const getBaseProduct = (productId: number) =>
+  db.query.productsTable.findFirst({
+    where: ({ id }, { eq }) => eq(id, productId),
+  });
+
+export const getProductById = async (id: number) => {
   const product = await db.query.productsTable.findFirst({
-    where: (table, { eq }) => eq(table.id, +id),
+    where: (table, { eq }) => eq(table.id, id),
     columns: {
       createdAt: false,
       updatedAt: false,
@@ -202,6 +222,7 @@ export const getProductById = async (id: string) => {
         },
         with: {
           productVariants: {
+            where: (table, { gt }) => gt(table.quantity, 0),
             columns: {
               createdAt: false,
               updatedAt: false,
@@ -248,20 +269,37 @@ export const getProductById = async (id: string) => {
     id: product.id,
     name: product.name,
     category: product.category!.name,
-    colors: product.productColor.map((color) => ({
-      name: color.color.name,
-      hexCode: color.color.hexCode,
-      variants: color.productVariants.map((variant) => ({
-        id: variant.id,
-        size: {
-          name: variant.size.name,
-        },
-        quantity: variant.quantity,
-      })),
-    })),
+    colors: product.productColor
+      .map((color) => ({
+        colorName: color.color.name,
+        hexCode: color.color.hexCode,
+        variants: color.productVariants.map((variant) => ({
+          id: variant.id,
+          size: {
+            name: variant.size.name,
+          },
+          quantity: variant.quantity,
+        })),
+      }))
+      .filter((color) => color.variants.length > 0),
     images,
     totalQuantity,
   };
+};
+
+export const getProductVarientById = (productVariantId: number) => {
+  return db.query.productVariantsTable.findFirst({
+    where({ id }, { eq }) {
+      return eq(id, productVariantId);
+    },
+    with: {
+      productColor: {
+        with: {
+          product: true,
+        },
+      },
+    },
+  });
 };
 
 export type ProductDetails = Exclude<

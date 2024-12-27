@@ -3,6 +3,8 @@ import { zValidator } from "@hono/zod-validator";
 import { StatusCodes } from "http-status-codes";
 import bcrypt from "bcrypt";
 import { setSession, validateRequest } from "../lucia/utils";
+import * as HttpStatusCodes from "stoker/http-status-codes";
+import * as HttpStatusPhrases from "stoker/http-status-phrases";
 
 import { googleClient, lucia } from "../lucia";
 import {
@@ -21,8 +23,10 @@ import {
   createUser,
   getAccountByUserId,
   getUserByEmail,
+  getUserWithFullDetails,
 } from "@/server/data-access/users";
 import { z } from "zod";
+import { isAuth } from "../middlewares/users";
 
 const route = new Hono()
   .post("/login", zValidator("json", loginSchema), async (c) => {
@@ -72,7 +76,7 @@ const route = new Hono()
         throw new Error("Account already exixts");
       }
 
-      const hashedPassword = await bcrypt.hash(password!, 12);
+      const hashedPassword = await bcrypt.hash(password, 12);
 
       const user = await createUser(email);
 
@@ -86,24 +90,38 @@ const route = new Hono()
     } catch (error) {
       throw error;
     }
+  })
+  .get("/user", isAuth, async (c) => {
+    const { id: userId } = c.var.user;
+
+    try {
+      const currentUser = await getUserWithFullDetails(userId);
+      if (!currentUser) {
+        c.status(HttpStatusCodes.NOT_FOUND);
+        throw new Error(HttpStatusPhrases.NOT_FOUND);
+      }
+      return c.json(currentUser);
+    } catch (error) {
+      c.status(HttpStatusCodes.INTERNAL_SERVER_ERROR);
+      throw new Error(HttpStatusPhrases.INTERNAL_SERVER_ERROR);
+    }
+  })
+  .post("/logout", async (c) => {
+    const { session } = await validateRequest();
+    if (!session) {
+      return c.json({ success: true });
+    }
+
+    await lucia.invalidateSession(session.id);
+
+    const sessionCookie = lucia.createBlankSessionCookie();
+    cookies().set(
+      sessionCookie.name,
+      sessionCookie.value,
+      sessionCookie.attributes,
+    );
+    return c.json({ success: true });
   });
-
-route.get("/logout", async (c) => {
-  const { session } = await validateRequest();
-  if (!session) {
-    return c.redirect("/login");
-  }
-
-  await lucia.invalidateSession(session.id);
-
-  const sessionCookie = lucia.createBlankSessionCookie();
-  cookies().set(
-    sessionCookie.name,
-    sessionCookie.value,
-    sessionCookie.attributes,
-  );
-  return c.redirect("/login");
-});
 
 route
   .get("/google", async (c) => {
@@ -196,9 +214,7 @@ route
         c.header("Location", afterLogin);
         return c.json(null);
       } catch (e) {
-        // the specific error message depends on the provider
         if (e instanceof OAuth2RequestError) {
-          // invalid code
           c.status(StatusCodes.BAD_REQUEST);
           throw e;
         }

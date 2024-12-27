@@ -31,7 +31,7 @@ export const validateRequest = cache(
     const result = await lucia.validateSession(sessionId);
 
     try {
-      if (result.session && result.session.fresh) {
+      if (result?.session?.fresh) {
         const sessionCookie = lucia.createSessionCookie(result.session.id);
         cookies().set(
           sessionCookie.name,

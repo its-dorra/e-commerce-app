@@ -2,7 +2,8 @@ import NavBar from "@/lib/components/Navbar";
 import "./globals.css";
 import { Inter } from "next/font/google";
 import Footer from "@/lib/components/Footer";
-import ReactQueryClientProvider from "@/lib/providers/query-client";
+import { ReactNode } from "react";
+import UserProvider from "@/lib/providers/user-provider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -11,19 +12,13 @@ const inter = Inter({
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: ReactNode;
 }>) {
   return (
-    <ReactQueryClientProvider>
-      <html lang="en">
-        <body className={`${inter.className} flex items-center justify-center`}>
-          <div className="grid min-h-screen w-screen grid-rows-[auto_1fr_auto] px-8 py-1 md:px-12 lg:px-16 xl:px-20">
-            <NavBar />
-            {children}
-            <Footer />
-          </div>
-        </body>
-      </html>
-    </ReactQueryClientProvider>
+    <html lang="en">
+      <body className={`${inter.className} flex items-center justify-center`}>
+        <UserProvider>{children}</UserProvider>
+      </body>
+    </html>
   );
 }

@@ -1,4 +1,7 @@
+import { relations } from "drizzle-orm";
 import { sqliteTable, text, integer, index } from "drizzle-orm/sqlite-core";
+import { cartsTable } from "./carts";
+import { ordersTable } from "./orders";
 
 export const usersTable = sqliteTable(
   "users",
@@ -69,3 +72,16 @@ export const profilesTable = sqliteTable("profile", {
     .$default(() => new Date())
     .$onUpdate(() => new Date()),
 });
+
+export const userRelations = relations(usersTable, ({ one, many }) => ({
+  carts: many(cartsTable),
+  orders: many(ordersTable),
+  profile: one(profilesTable),
+}));
+
+export const profileRelations = relations(profilesTable, ({ one }) => ({
+  user: one(usersTable, {
+    fields: [profilesTable.userId],
+    references: [usersTable.id],
+  }),
+}));

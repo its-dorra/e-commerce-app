@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
+import { sqliteTable, text, integer, real } from "drizzle-orm/sqlite-core";
 import { categoriesTable } from "./categories";
 import { relations } from "drizzle-orm";
 import { productColorsTable } from "./productVariants";
@@ -9,7 +9,7 @@ export const productsTable = sqliteTable("products", {
   }),
   name: text("name").notNull(),
   description: text("description"),
-  basePrice: integer("base_price").notNull(), // SQLite doesn't have a decimal type, so we use text
+  basePrice: real("base_price").notNull(),
   categoryId: integer("category_id", { mode: "number" }).references(
     () => categoriesTable.id,
   ),
