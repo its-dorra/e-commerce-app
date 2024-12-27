@@ -3,6 +3,7 @@ import { lucia } from ".";
 import type { Session, User } from "lucia";
 import { cache } from "react";
 import { UserId } from "lucia";
+import { AdminAuthenticationError, AuthenticationError } from "@/lib/utils";
 
 export const setSession = async (userId: UserId) => {
   const session = await lucia.createSession(userId, {});
@@ -51,3 +52,30 @@ export const validateRequest = cache(
     return result;
   },
 );
+
+export const getCurrentUser = cache(async () => {
+  const { user } = await validateRequest();
+  return user ?? undefined;
+});
+
+export const assertAuthenticated = async () => {
+  const user = await getCurrentUser();
+  if (!user) {
+    throw new AuthenticationError();
+  }
+  return user;
+};
+
+export const assertAdmin = async () => {
+  const user = await assertAuthenticated();
+
+  if (user.role !== "admin") throw new AdminAuthenticationError();
+
+  return user;
+};
+
+export const isAdmin = async () => {
+  const user = await getCurrentUser();
+
+  return user?.role === "admin";
+};

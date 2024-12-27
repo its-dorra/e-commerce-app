@@ -22,26 +22,6 @@ export const signup = async (json: z.infer<typeof signupSchema>) => {
   return data;
 };
 
-export const getCurrentUser = async () => {
-  const res = await api.auth.user.$get(undefined, {
-    fetch(input, requestInit, Env, executionCtx) {
-      const config = {
-        ...requestInit,
-        next: {
-          ...requestInit?.next,
-          revalidate: 0,
-        },
-      } satisfies RequestInit;
-
-      return fetch(input, config);
-    },
-  });
-
-  if (!res.ok) throw new Error("Can't get current user");
-
-  return res.json();
-};
-
 export const logout = async () => {
   const res = await api.auth.logout.$post();
 

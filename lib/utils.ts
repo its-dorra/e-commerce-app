@@ -1,6 +1,12 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
+export const AUTHENTICATION_ERROR_MESSAGE =
+  "You must be logged in to view this content";
+
+export const ADMIN_AUTHENTICATION_ERROR_MESSAGE =
+  "You must be an admin to view this content";
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
@@ -16,5 +22,19 @@ export const catchError = async <T, E extends Error>(
     return [res, undefined];
   } catch (error) {
     return [undefined, error as E];
+  }
+};
+
+export const AuthenticationError = class AuthenticationError extends Error {
+  constructor() {
+    super(AUTHENTICATION_ERROR_MESSAGE);
+    this.name = "AuthenticationError";
+  }
+};
+
+export const AdminAuthenticationError = class AdminAuthenticationError extends Error {
+  constructor() {
+    super(ADMIN_AUTHENTICATION_ERROR_MESSAGE);
+    this.name = "AdminAuthenticationError";
   }
 };

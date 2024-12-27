@@ -91,21 +91,6 @@ const route = new Hono()
       throw error;
     }
   })
-  .get("/user", isAuth, async (c) => {
-    const { id: userId } = c.var.user;
-
-    try {
-      const currentUser = await getUserWithFullDetails(userId);
-      if (!currentUser) {
-        c.status(HttpStatusCodes.NOT_FOUND);
-        throw new Error(HttpStatusPhrases.NOT_FOUND);
-      }
-      return c.json(currentUser);
-    } catch (error) {
-      c.status(HttpStatusCodes.INTERNAL_SERVER_ERROR);
-      throw new Error(HttpStatusPhrases.INTERNAL_SERVER_ERROR);
-    }
-  })
   .post("/logout", async (c) => {
     const { session } = await validateRequest();
     if (!session) {
