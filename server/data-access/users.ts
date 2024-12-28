@@ -49,7 +49,7 @@ export async function createAccountViaGoogle(userId: UserId, googleId: string) {
     .insert(accountsTable)
     .values({
       id,
-      userId: userId,
+      userId,
       accountType: "google",
       googleId,
     })

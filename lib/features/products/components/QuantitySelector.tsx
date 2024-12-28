@@ -5,38 +5,44 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 
 interface QuantitySelectorProps {
+  showLimitMessage?: boolean;
   value: number;
   maxValue: number;
-  setValue: (val: number) => void;
+  size?: "default" | "sm" | "lg" | "icon" | null;
+  handleIncreaseQuantity: () => void;
+  handleDecreaseQuantity: () => void;
 }
 
 export default function QuantitySelector({
+  showLimitMessage = false,
   value,
   maxValue,
-  setValue,
+  size,
+  handleDecreaseQuantity,
+  handleIncreaseQuantity,
 }: QuantitySelectorProps) {
-  const handleIncrease = () => {
-    if (value === maxValue) return;
-    setValue(value + 1);
-  };
-
-  const handleDescrease = () => {
-    if (value === 0) return;
-    setValue(value - 1);
-  };
-
   return (
     <div className="flex items-center gap-3">
       <div className="flex items-center gap-x-3 rounded-sm border">
-        <Button variant="ghost" onClick={handleDescrease}>
+        <Button
+          variant="ghost"
+          size={size}
+          disabled={value === 1}
+          onClick={handleDecreaseQuantity}
+        >
           <Image src={minusIcon} alt="remove icon" />
         </Button>
         <span>{value}</span>
-        <Button variant="ghost" onClick={handleIncrease}>
+        <Button
+          variant="ghost"
+          size={size}
+          disabled={value === maxValue}
+          onClick={handleIncreaseQuantity}
+        >
           <Image src={addIcon} alt="add icon" />
         </Button>
       </div>
-      {maxValue < 10 && (
+      {showLimitMessage && maxValue < 10 && (
         <p className="text-red-600">There&apos;s only {maxValue} left</p>
       )}
     </div>

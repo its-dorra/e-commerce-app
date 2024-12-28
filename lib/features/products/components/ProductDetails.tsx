@@ -6,7 +6,12 @@ import { useState } from "react";
 import QuantitySelector from "./QuantitySelector";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import { heartIcon } from "@/assets";
+import { useUser } from "@/lib/providers/user-provider";
+import toast from "react-hot-toast";
+import { useAddToCart } from "../../cart/hooks/useAddToCart";
+import { useIsInWishlist } from "../../wishlist/hooks/useIsInWishlist";
+import { HeartIcon } from "lucide-react";
+import { useToggleWishList } from "../../wishlist/hooks/useToggleWishlist";
 
 export default function ({ product }: { product: ProductDetails }) {
   const [filter, setFilter] = useState<{
@@ -14,6 +19,19 @@ export default function ({ product }: { product: ProductDetails }) {
     size?: string;
     quantity: number;
   }>({ quantity: 1 });
+
+  const { user } = useUser();
+
+  const {
+    data: isInWishlist,
+    isPending: isLoadingInWishlist,
+    isError,
+  } = useIsInWishlist(product.id);
+
+  const { mutate: addToCart, isPending: isAddingToCart } = useAddToCart();
+
+  const { mutate: toggleWishlist, isPending: isTogglingWishlist } =
+    useToggleWishList();
 
   const sizes: string[] | undefined = filter?.color
     ? product.colors
@@ -31,6 +49,37 @@ export default function ({ product }: { product: ProductDetails }) {
 
   const handleChangeQuantity = (val: number) => {
     setFilter((prev) => ({ ...prev, quantity: val }));
+  };
+
+  const handleIncreaseQuantity = () => {
+    if (filter.quantity + 1 === maxValue) return;
+    handleChangeQuantity(filter.quantity + 1);
+  };
+
+  const handleDecreaseQuantity = () => {
+    if (filter.quantity - 1 === 0) return;
+    handleChangeQuantity(filter.quantity - 1);
+  };
+
+  const handleToggleWishlist = () => {
+    if (!user)
+      return toast.error("You need to be logged in before you can add to cart");
+
+    toggleWishlist({ productId: product.id });
+  };
+
+  const handleAddToCart = () => {
+    if (!user)
+      return toast.error("You need to be logged in before you can add to cart");
+
+    const productVariant = product.colors
+      .find((color) => color.colorName === filter.color)!
+      .variants.find((variant) => variant.size.name === filter.size);
+
+    addToCart({
+      productVariantId: productVariant!.id,
+      quantity: filter.quantity,
+    });
   };
 
   return (
@@ -85,17 +134,37 @@ export default function ({ product }: { product: ProductDetails }) {
       {sizes && sizes.length > 0 && maxValue && (
         <QuantitySelector
           value={filter.quantity}
-          setValue={handleChangeQuantity}
+          handleIncreaseQuantity={handleIncreaseQuantity}
+          handleDecreaseQuantity={handleDecreaseQuantity}
           maxValue={maxValue}
         />
       )}
 
-      {product.totalQuantity > 0 &&   (
+      {product.totalQuantity > 0 && (
         <div className="flex items-center gap-x-3">
-          <Button disabled={!filter.size && !filter.color && !filter.quantity} className="w-[15rem]">Add to cart</Button>
-          <Button variant="outline">
-            <Image src={heartIcon} alt="heart icon" />
+          <Button
+            onClick={handleAddToCart}
+            disabled={
+              !filter.size ||
+              !filter.color ||
+              !filter.quantity ||
+              isAddingToCart
+            }
+            className="w-[15rem]"
+          >
+            Add to cart
           </Button>
+          {!isLoadingInWishlist && (
+            <Button
+              disabled={!user || isError}
+              variant="outline"
+              onClick={handleToggleWishlist}
+            >
+              <HeartIcon
+                className={isInWishlist ? "fill-red-500 text-red-500" : ""}
+              />
+            </Button>
+          )}
         </div>
       )}
     </div>

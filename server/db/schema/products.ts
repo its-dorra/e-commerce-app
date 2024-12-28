@@ -2,6 +2,7 @@ import { sqliteTable, text, integer, real } from "drizzle-orm/sqlite-core";
 import { categoriesTable } from "./categories";
 import { relations } from "drizzle-orm";
 import { productColorsTable } from "./productVariants";
+import { wishListTable } from "./wishlist";
 
 export const productsTable = sqliteTable("products", {
   id: integer("id", { mode: "number" }).primaryKey({
@@ -27,4 +28,5 @@ export const productsRelations = relations(productsTable, ({ one, many }) => ({
     references: [categoriesTable.id],
   }),
   productColor: many(productColorsTable),
+  wishList: many(wishListTable),
 }));

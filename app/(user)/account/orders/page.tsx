@@ -1,6 +1,14 @@
+import { assertAuthenticated } from "@/server/lucia/utils";
+import { redirect } from "next/navigation";
 
+export default async function OrdersPage() {
+  const user = await assertAuthenticated();
 
+  const userRole = user.role;
 
-export default function OrdersPage(){
-  return <div>orders</div>
+  if (userRole === "admin") {
+    return redirect("/dashboard");
+  }
+
+  return <div>orders</div>;
 }

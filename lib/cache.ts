@@ -7,6 +7,7 @@ export const configCacheForFetch = (
 ) => {
   const config = {
     ...requestInit,
+    cache: "force-cache",
     next: {
       ...requestInit?.next,
       tags: ["*", ...tags],
@@ -18,13 +19,9 @@ export const configCacheForFetch = (
 
 export const GLOBAL_CACHE_TAGS = {
   products: "products",
-  productsColors: "products-colors",
-  productsSizes: "products-sizes",
-  productsCategories: "products-categories",
 } as const;
 
 export const USER_TAGS = {
-  cart: "cart",
   orders: "orders",
 } as const;
 

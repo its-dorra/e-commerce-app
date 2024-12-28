@@ -1,5 +1,4 @@
 import { Hono } from "hono";
-import { isAdmin, isAuth } from "../middlewares/users";
 import { zValidator } from "@hono/zod-validator";
 import { productQuerySchema } from "../schemas/products";
 import {
@@ -28,27 +27,21 @@ const route = new Hono()
 
     return c.json({ sizes });
   })
-  .get(
-    "/products",
-    // isAuth,
-    // isAdmin,
-    zValidator("query", productQuerySchema),
-    async (c) => {
-      const { page, categories, colors, sizes } = c.req.valid("query");
-      const filters = {
-        categories: toArray(categories),
-        colors: toArray(colors),
-        sizes: toArray(sizes),
-      };
+  .get("/products", zValidator("query", productQuerySchema), async (c) => {
+    const { page, categories, colors, sizes } = c.req.valid("query");
+    const filters = {
+      categories: toArray(categories),
+      colors: toArray(colors),
+      sizes: toArray(sizes),
+    };
 
-      const { products, pagination } = await getProducts(page, filters);
+    const { products, pagination } = await getProducts(page, filters);
 
-      return c.json({ products, pagination });
-    },
-  )
+    return c.json({ products, pagination });
+  })
   .get(
     "/products/:id",
-    zValidator("param", z.object({ id: z.number().min(1) })),
+    zValidator("param", z.object({ id: z.coerce.number().min(1) })),
     async (c) => {
       const { id } = c.req.valid("param");
 

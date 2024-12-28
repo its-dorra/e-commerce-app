@@ -1,15 +1,7 @@
 import api from "@/lib/api";
-import { configCacheForFetch, getUserTag } from "@/lib/cache";
 
-export const getCart = async (userId: string) => {
-  const res = await api.cart.$get(undefined, {
-    fetch(input, requestInit, Env, executionCtx) {
-      return fetch(
-        input,
-        configCacheForFetch(requestInit, [getUserTag("cart", userId)]),
-      );
-    },
-  });
+export const getCart = async () => {
+  const res = await api.cart.$get();
 
   if (!res.ok) throw new Error("Can't get cart");
 
@@ -21,23 +13,11 @@ export const getCart = async (userId: string) => {
 export const addItemToCart = async ({
   productVariantId,
   quantity,
-  userId,
 }: {
   productVariantId: number;
   quantity: number;
-  userId: string;
 }) => {
-  const res = await api.cart.$post(
-    { json: { productVariantId, quantity } },
-    {
-      fetch(input, requestInit, Env, executionCtx) {
-        return fetch(
-          input,
-          configCacheForFetch(requestInit, [getUserTag("cart", userId)]),
-        );
-      },
-    },
-  );
+  const res = await api.cart.$post({ json: { productVariantId, quantity } });
 
   if (!res.ok) throw new Error("Can't add item to cart");
 
@@ -47,28 +27,16 @@ export const addItemToCart = async ({
 };
 
 export const updateCartItemQuantity = async ({
-  productVariantId,
+  cartItemId,
   quantity,
-  userId,
 }: {
-  productVariantId: number;
+  cartItemId: number;
   quantity: number;
-  userId: string;
 }) => {
-  const res = await api.cart[":id"].$patch(
-    {
-      param: { id: `${productVariantId}` },
-      json: { quantity },
-    },
-    {
-      fetch(input, requestInit, Env, executionCtx) {
-        return fetch(
-          input,
-          configCacheForFetch(requestInit, [getUserTag("cart", userId)]),
-        );
-      },
-    },
-  );
+  const res = await api.cart[":id"].$patch({
+    param: { id: `${cartItemId}` },
+    json: { quantity },
+  });
 
   if (!res.ok) throw new Error("Can't update cart item quantity");
 
@@ -77,22 +45,10 @@ export const updateCartItemQuantity = async ({
 
 export const deleteCartItem = async ({
   cartItemId,
-  userId,
 }: {
   cartItemId: number;
-  userId: string;
 }) => {
-  const res = await api.cart[":id"].$delete(
-    { param: { id: `${cartItemId}` } },
-    {
-      fetch(input, requestInit, Env, executionCtx) {
-        return fetch(
-          input,
-          configCacheForFetch(requestInit, [getUserTag("cart", userId)]),
-        );
-      },
-    },
-  );
+  const res = await api.cart[":id"].$delete({ param: { id: `${cartItemId}` } });
 
   if (!res.ok) throw new Error("Can't delete cart item");
 

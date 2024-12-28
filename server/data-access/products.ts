@@ -194,11 +194,6 @@ export const getProducts = async (page: number, filters: FilterQuery) => {
   };
 };
 
-export const getBaseProduct = (productId: number) =>
-  db.query.productsTable.findFirst({
-    where: ({ id }, { eq }) => eq(id, productId),
-  });
-
 export const getProductById = async (id: number) => {
   const product = await db.query.productsTable.findFirst({
     where: (table, { eq }) => eq(table.id, id),

@@ -5,7 +5,6 @@ import addIcon from "./icons/Add.svg";
 import emptyStarIcon from "./icons/Empty Star.svg";
 import shareIcon from "./icons/Share.svg";
 import arrowLeftIcon from "./icons/Arrow Left.svg";
-import heartIcon from "./icons/Heart.svg";
 import shieldCheckIcon from "./icons/Shield Check.svg";
 import arrowRightIcon from "./icons/Arrow Right.svg";
 import homeIcon from "./icons/Home.svg";
@@ -13,7 +12,7 @@ import arrowUpIcon from "./icons/Arrow up.svg";
 import infoIcon from "./icons/Info.svg";
 import sortIcon from "./icons/Sort.svg";
 import cartIcon from "./icons/Cart.svg";
-import ordersIcon from './icons/Order.png'
+import ordersIcon from "./icons/Order.png";
 import keyIcon from "./icons/Key.svg";
 import starBadgeIcon from "./icons/Star Badge.svg";
 import checkIcon from "./icons/Check.svg";
@@ -36,6 +35,7 @@ import warningIcon from "./icons/Warning.svg";
 import searchIcon from "./icons/Search.svg";
 import xIcon from "./icons/X.svg";
 import filterIcon from "./icons/filter-icon.svg";
+import heartIcon from "./icons/Heart.svg";
 
 import googleIcon from "./icons/Social Icons/Login - Sign up/Colored Icons/Google.svg";
 import facebookIcon from "./icons/Social Icons/Facebook.svg";
@@ -69,6 +69,7 @@ import tshirt6 from "./images/t-shirt-6.png";
 import cozyBlack from "./images/cozy-black.png";
 
 export {
+  heartIcon,
   googleIcon,
   visaIcon,
   amexIcon,
@@ -92,7 +93,6 @@ export {
   emptyStarIcon,
   shareIcon,
   arrowLeftIcon,
-  heartIcon,
   filterIcon,
   shieldCheckIcon,
   arrowRightIcon,

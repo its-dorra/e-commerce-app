@@ -2,14 +2,7 @@ import api from "@/lib/api";
 import { configCacheForFetch, getGlobalTag, getIdTag } from "@/lib/cache";
 
 export const getCategories = async () => {
-  const res = await api.shop.categories.$get(undefined, {
-    fetch(input, requestInit, Env, executionCtx) {
-      return fetch(
-        input,
-        configCacheForFetch(requestInit, [getGlobalTag("productsCategories")]),
-      );
-    },
-  });
+  const res = await api.shop.categories.$get();
   if (!res.ok) throw new Error("Can't get categories");
   const { categories } = await res.json();
 
@@ -17,14 +10,7 @@ export const getCategories = async () => {
 };
 
 export const getColors = async () => {
-  const res = await api.shop.colors.$get(undefined, {
-    fetch(input, requestInit, Env, executionCtx) {
-      return fetch(
-        input,
-        configCacheForFetch(requestInit, [getGlobalTag("productsColors")]),
-      );
-    },
-  });
+  const res = await api.shop.colors.$get();
   if (!res.ok) throw new Error("Can't get colors");
   const { colors } = await res.json();
 
@@ -32,14 +18,7 @@ export const getColors = async () => {
 };
 
 export const getSizes = async () => {
-  const res = await api.shop.sizes.$get(undefined, {
-    fetch(input, requestInit, Env, executionCtx) {
-      return fetch(
-        input,
-        configCacheForFetch(requestInit, [getGlobalTag("productsSizes")]),
-      );
-    },
-  });
+  const res = await api.shop.sizes.$get();
   if (!res.ok) throw new Error("Can't get sizes");
   const { sizes } = await res.json();
 

@@ -60,7 +60,7 @@ const route = new Hono()
       }
 
       await setSession(existingUser.id);
-      return c.redirect("/");
+      return c.json({ success: true, message: "You logged in successfully" });
     } catch (error) {
       throw error;
     }
@@ -76,19 +76,35 @@ const route = new Hono()
         throw new Error("Account already exixts");
       }
 
-      const hashedPassword = await bcrypt.hash(password, 12);
-
       const user = await createUser(email);
 
-      await createAccount(user.id, hashedPassword);
+      await createAccount(user.id, password);
 
       await createProfile(user.id, fullName);
 
       await setSession(user.id);
 
-      return c.redirect(afterLogin);
+      return c.json({
+        success: true,
+        message: "You created and accound and logged in successfully",
+      });
     } catch (error) {
       throw error;
+    }
+  })
+  .get("/user", isAuth, async (c) => {
+    const { id: userId } = c.var.user;
+
+    try {
+      const currentUser = await getUserWithFullDetails(userId);
+      if (!currentUser) {
+        c.status(HttpStatusCodes.NOT_FOUND);
+        throw new Error(HttpStatusPhrases.NOT_FOUND);
+      }
+      return c.json(currentUser);
+    } catch (error) {
+      c.status(HttpStatusCodes.INTERNAL_SERVER_ERROR);
+      throw new Error(HttpStatusPhrases.INTERNAL_SERVER_ERROR);
     }
   })
   .post("/logout", async (c) => {

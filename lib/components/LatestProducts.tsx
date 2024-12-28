@@ -2,8 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import ProductsContainer from "../features/products/components/ProductsContainer";
-import { bestSelling, latestProducts } from "../constants";
+// import ProductsContainer from "../features/products/components/ProductsContainer";
 
 export default function LatestProducts() {
   const [state, setState] = useState<"Featured" | "Latest">("Featured");

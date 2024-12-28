@@ -1,8 +1,26 @@
+"use client";
+
 import { logout } from "@/lib/features/user/services";
-import { redirect, RedirectType } from "next/navigation";
+import { authEvents } from "@/lib/providers/user-provider";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import toast from "react-hot-toast";
 
-export default async function Logout() {
-  const res = await logout();
+export default function Logout() {
+  const router = useRouter();
 
-  redirect("/login", RedirectType.replace);
+  useEffect(() => {
+    (async () => {
+      try {
+        await logout();
+        window.dispatchEvent(new Event(authEvents.authChange));
+        toast.success("You logged out successfully");
+        router.replace("/");
+      } catch (error) {
+        throw error;
+      }
+    })();
+  }, []);
+
+  return null;
 }

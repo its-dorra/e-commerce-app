@@ -25,7 +25,10 @@ import {
   profileRelations,
 } from "./users";
 
+import { wishListRelations, wishListTable } from "./wishlist";
+
 export {
+  wishListRelations,
   profileRelations,
   productsRelations,
   colorsRelations,
@@ -38,6 +41,7 @@ export {
   ordersRelations,
   cartItemsRelations,
   cartsRelations,
+  wishListTable,
   sessionTable,
   profilesTable,
   cartsTable,

@@ -64,9 +64,17 @@ export const getCartItems = (userId: string) => {
         with: {
           productVariant: {
             with: {
+              size: true,
               productColor: {
                 with: {
-                  image: true,
+                  image: {
+                    columns: {
+                      imagePath: true,
+                    },
+                    limit: 1,
+
+                    orderBy: ({ displayOrder }, { asc }) => asc(displayOrder),
+                  },
                   product: true,
                 },
               },

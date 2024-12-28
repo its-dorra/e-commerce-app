@@ -7,65 +7,97 @@ import {
   SheetContent,
   SheetHeader,
   SheetTitle,
-  SheetTrigger,
 } from "@/components/ui/sheet";
 import { useUser } from "@/lib/providers/user-provider";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
+import toast from "react-hot-toast";
+import { useCart } from "../hooks/useCart";
+import LoadingSpinner from "@/lib/components/LoadingSpinner";
+import CartItem from "./CartItem";
 
 export default function CartButton() {
-  const router = useRouter();
   const { user } = useUser();
   const [isOpen, setIsOpen] = useState(false);
+  const { data: cart, isLoading, isError } = useCart();
+
+  const totalPrice =
+    cart &&
+    cart.cartItems.reduce((acc, cur) => acc + cur.quantity * cur.itemPrice, 0);
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
-      {/* <SheetTrigger> */}
       <button
         onClick={() => {
-          // if (!user) return router.push("/login");
-          // TODO : modify it after completing the auth
+          if (!user) {
+            toast.error("You need to be logged in to view the cart");
+            return;
+          }
           setIsOpen(true);
         }}
         className="ml-auto mr-4 cursor-pointer rounded-full p-2 hover:bg-gray-100 lg:ml-4"
       >
         <Image src={cartIcon} alt="user icon" />
       </button>
-      {/* </SheetTrigger> */}
       <SheetContent className="flex min-w-fit max-w-xl flex-col">
         <SheetHeader>
-          <SheetTitle>
-            Your Cart{" "}
-            <span className="text-base">{/* TODO: Add cart quantity */}</span>
-          </SheetTitle>
+          <SheetTitle>Shopping cart</SheetTitle>
         </SheetHeader>
         <div className="flex grow flex-col items-center justify-between gap-y-5 overflow-y-auto">
-          <ul className="space-y-5">cartItems</ul>
+          {isError ? (
+            <p className="">Can&apos;t get your cart</p>
+          ) : (
+            <>
+              {isLoading && <LoadingSpinner size="lg" />}
+              {!cart || cart?.cartItems?.length === 0 ? (
+                <div className="flex grow items-center justify-center">
+                  <div className="flex flex-col items-center">
+                    <p className="text-lg font-semibold">Your cart is empty</p>
+                    <Button variant="link">
+                      <Link
+                        className="inline-flex items-center gap-2"
+                        href="/products"
+                        onClick={() => setIsOpen(false)}
+                      >
+                        <span>Start shopping now</span>
+                        <Image src={cartIcon} alt="cart icon" />
+                      </Link>
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <ul className="space-y-5">
+                  {cart.cartItems.map((item) => (
+                    <CartItem key={item.id} item={item} />
+                  ))}
+                </ul>
+              )}
+            </>
+          )}
         </div>
         <div className="flex w-full flex-col items-stretch gap-y-3">
           <div className="flex items-center justify-between">
-            <p>Total</p>
-            <p>
-              {
-                //  TODO : total price
-              }
-            </p>
+            {!!totalPrice && (
+              <>
+                <p className="semi-bold">Total</p>
+                <p className="semi-bold">$ {totalPrice}</p>
+              </>
+            )}
           </div>
-          <Button>
+          <Button disabled={!totalPrice}>
             <Link href="/account/cart">View Cart</Link>
           </Button>
-          <Link
-            href="/account/checkout"
-            className="text-center text-sm text-muted-foreground underline"
-          >
-            Checkout
-          </Link>
+          <Button variant="link" disabled={!totalPrice}>
+            <Link
+              href="/account/checkout"
+              className="text-center text-sm text-muted-foreground"
+            >
+              Checkout
+            </Link>
+          </Button>
         </div>
       </SheetContent>
     </Sheet>
   );
 }
-
-function CartItem() {}

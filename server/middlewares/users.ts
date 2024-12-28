@@ -11,6 +11,9 @@ type Env = {
 
 export const isAuth = createMiddleware<Env>(async (c, next) => {
   const { user } = await validateRequest();
+
+  console.log({ user });
+
   if (!user) {
     c.status(StatusCodes.UNAUTHORIZED);
     throw new Error("You are not authorized");

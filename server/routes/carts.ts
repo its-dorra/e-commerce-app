@@ -12,8 +12,6 @@ import * as HttpStatusCodes from "stoker/http-status-codes";
 import * as HttpStatusPhrases from "stoker/http-status-phrases";
 import { catchError } from "@/lib/utils";
 import { ErrorWithStatus } from "../types/types";
-import { revalidateTag } from "next/cache";
-import { getUserTag } from "@/lib/cache";
 
 const route = new Hono()
   .use(isAuth)
@@ -50,7 +48,6 @@ const route = new Hono()
         }
         throw error;
       }
-      revalidateTag(getUserTag("cart", userId));
 
       return c.json(cartItem);
     },
@@ -68,15 +65,11 @@ const route = new Hono()
       const { id: cartItemId } = c.req.valid("param");
       const { quantity } = c.req.valid("json");
 
-      const { id: userId } = c.var.user;
-
       try {
         const [cartItem] = await updateCartItemQuantity({
           cartItemId,
           quantity,
         });
-
-        revalidateTag(getUserTag("cart", userId));
 
         return c.json(cartItem);
       } catch (error) {
@@ -90,17 +83,14 @@ const route = new Hono()
     zValidator(
       "param",
       z.object({
-        id: z.number().min(1),
+        id: z.coerce.number().min(1),
       }),
     ),
     async (c) => {
       const { id: cartItemId } = c.req.valid("param");
-      const { id: userId } = c.var.user;
 
       try {
         const [cartItem] = await deleteCartItem(cartItemId);
-
-        revalidateTag(getUserTag("cart", userId));
 
         return c.json(cartItem);
       } catch (error) {

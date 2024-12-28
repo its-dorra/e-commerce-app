@@ -1,3 +1,5 @@
+import { cn } from "@/lib/utils";
+
 export default function ProductImage({
   imageUrl,
   alt,
@@ -9,7 +11,10 @@ export default function ProductImage({
 }) {
   return (
     <div
-      className={`grid h-[350px] w-full place-items-center rounded-sm bg-secondaryWhite ${className}`}
+      className={cn(
+        "grid h-[350px] w-full place-items-center rounded-sm bg-secondaryWhite",
+        className,
+      )}
     >
       <img
         className="w-5/6 object-contain mix-blend-color-burn"
