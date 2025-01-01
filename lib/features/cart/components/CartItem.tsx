@@ -14,11 +14,13 @@ export default function CartItem({
     quantity,
     itemPrice,
     id,
+
     productVariant: {
       size: { name: size },
       quantity: productQuantity,
       productColor: {
         image: images,
+        color: { hexCode },
         product: { name },
       },
     },
@@ -31,7 +33,7 @@ export default function CartItem({
   const { mutate: deleteItem, isPending: isDeleting } = useDeleteCartItem();
 
   const handleDeleteItem = () => {
-    deleteItem({ cartItemId: id });
+    deleteItem({ id });
   };
 
   const handleIncreaseQuantity = () => {
@@ -64,7 +66,10 @@ export default function CartItem({
       <div className="flex flex-col items-start justify-between gap-4">
         <div className="inline-flex items-center gap-3">
           <p>{name}</p>
-          <div className="size-2 rounded-full bg-green-700" />
+          <div
+            className="size-3 rounded-full"
+            style={{ backgroundColor: hexCode }}
+          />
           <Image src={minusIcon} alt="minus icon" />
           <p className="text-muted-foreground">{size}</p>
         </div>

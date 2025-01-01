@@ -1,8 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
-import { isInWishlist } from "../services";
+import { clientTrpc } from "@/lib/trpc/client";
 
-export const useIsInWishlist = (productId: number) =>
-  useQuery({
-    queryFn: () => isInWishlist({ productId }),
-    queryKey: ["wishlist", productId],
+export const useIsInWishlist = (value: { productId: number }) =>
+  clientTrpc.wishlists.isInWishlist.useQuery(value, {
+    refetchOnMount: false,
+    retry: false,
   });

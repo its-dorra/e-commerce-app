@@ -8,12 +8,15 @@ import Link from "next/link";
 import EmptyListMessage from "@/lib/components/EmptyListMessage";
 
 export default function WishlistContainer() {
-  const { data } = useWishlist();
+  const { data, isPending } = useWishlist();
 
-  if (data.length === 0) return <EmptyListMessage listName="Wishlist" />;
+  console.log({ data, isPending });
+
+  if (!data || data.length === 0)
+    return <EmptyListMessage listName="Wishlist" />;
 
   return (
-    <ul>
+    <ul className="flex flex-col items-stretch gap-y-4">
       {data.map((item) => (
         <WishlistItem key={`${item.productId}-${item.userId}`} item={item} />
       ))}
@@ -23,13 +26,13 @@ export default function WishlistContainer() {
 
 function WishlistItem({ item }: { item: WishlistItem }) {
   return (
-    <li className="flex items-center border-b pb-4 last:border-none">
+    <li className="flex w-[32rem] max-w-full items-center border-b pb-4 last:border-none">
       <ProductImage
         imageUrl={item.product.productColor[0].image[0].imagePath}
         alt="Product image"
         className="mr-4 size-20"
       />
-      <div className="mr-8 space-y-2">
+      <div className="mr-auto space-y-2">
         <p className="text-base font-medium">{item.product.name}</p>
         <p className="text-sm font-semibold">${item.product.basePrice}</p>
       </div>

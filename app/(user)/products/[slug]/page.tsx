@@ -1,18 +1,57 @@
 import ProductDetails from "@/lib/features/products/components/ProductDetails";
 import ProductImagesSwiper from "@/lib/features/products/components/ProductImagesSwiper";
 import { getProductById } from "@/lib/features/products/services";
+import { serverTrpc } from "@/lib/trpc/server";
+import { baseUrl } from "@/lib/utils";
 import { notFound } from "next/navigation";
 
-export const revalidate = 0;
+export const dynamic = "force-static";
 
-export default async function ProductPage({
-  params: { slug },
-}: {
-  params: { slug: string };
+export async function generateMetadata(props: {
+  params: Promise<{ slug: string }>;
 }) {
-  const product = await getProductById(slug);
+  const params = await props.params;
+
+  const { slug } = params;
+
+  const product = await getProductById(Number(slug));
 
   if (!product) return notFound();
+
+  return {
+    title: `Fashion Haven | ${product.name}`,
+    description: `Discover ${product.name} at Fashion Haven.`,
+    openGraph: {
+      title: `Fashion Haven | ${product.name}`,
+      description: `Discover ${product.name} at Fashion Haven.`,
+      url: `${baseUrl}/products/${product.id}`,
+      siteName: "Fashion Haven",
+      locale: "en_US",
+    },
+    twitter: {
+      card: "summary",
+      title: `Fashion Haven | ${product.name}`,
+      description: `Discover ${product.name} at Fashion Haven.`,
+    },
+    robots: {
+      index: true,
+      follow: true,
+    },
+  };
+}
+
+export default async function ProductPage(props: {
+  params: Promise<{ slug: string }>;
+}) {
+  const params = await props.params;
+
+  const { slug } = params;
+
+  const product = await getProductById(Number(slug));
+
+  if (!product) return notFound();
+
+  void serverTrpc.products.productById.prefetch({ id: Number(slug) });
 
   return (
     <main className="container flex w-full grow flex-col items-center space-y-8">

@@ -1,48 +1,32 @@
 "use client";
 
-import {
-  createContext,
-  PropsWithChildren,
-  useContext,
-  useLayoutEffect,
-  useState,
-} from "react";
-import { getCurrentUser } from "../features/user/services";
-import { useQueryClient } from "@tanstack/react-query";
+import { createContext, PropsWithChildren, useContext } from "react";
+
+import { useUser as useUserQuery } from "../features/user/hooks/useUser";
 
 interface UserContext {
-  user: Awaited<ReturnType<typeof getCurrentUser>> | null;
+  user?: {
+    id: string;
+    email: string;
+    role: "user" | "admin" | null;
+    createdAt: Date | null;
+    profile: {
+      id: string;
+      createdAt: Date | null;
+      userId: string;
+      updatedAt: Date | null;
+      displayName: string | null;
+      imageId: string | null;
+      image: string | null;
+      bio: string;
+    } | null;
+  };
 }
-
-export const authEvents = {
-  authChange: "auth-change",
-};
 
 const UserContext = createContext<UserContext | null>(null);
 
 export default function UserProvider({ children }: PropsWithChildren) {
-  const [user, setUser] = useState<UserContext["user"]>(null);
-  const queryClient = useQueryClient();
-
-  useLayoutEffect(() => {
-    const fetchSession = async () => {
-      try {
-        const currentUser = await getCurrentUser();
-        setUser(currentUser);
-      } catch (error) {
-        setUser(null);
-      } finally {
-        queryClient.clear();
-      }
-    };
-
-    fetchSession();
-
-    window.addEventListener(authEvents.authChange, fetchSession);
-
-    return () =>
-      window.removeEventListener(authEvents.authChange, fetchSession);
-  }, []);
+  const { data: user } = useUserQuery();
 
   return (
     <UserContext.Provider value={{ user }}>{children}</UserContext.Provider>

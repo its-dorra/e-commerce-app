@@ -1,78 +1,37 @@
-import api from "@/lib/api";
-import { configCacheForFetch, getGlobalTag, getIdTag } from "@/lib/cache";
+import { serverTrpc } from "@/lib/trpc/server";
+import { cache } from "react";
 
 export const getCategories = async () => {
-  const res = await api.shop.categories.$get();
-  if (!res.ok) throw new Error("Can't get categories");
-  const { categories } = await res.json();
+  const res = await serverTrpc.products.categories();
 
-  return categories;
+  return res;
 };
 
 export const getColors = async () => {
-  const res = await api.shop.colors.$get();
-  if (!res.ok) throw new Error("Can't get colors");
-  const { colors } = await res.json();
+  const res = await serverTrpc.products.colors();
 
-  return colors;
+  return res;
 };
 
 export const getSizes = async () => {
-  const res = await api.shop.sizes.$get();
-  if (!res.ok) throw new Error("Can't get sizes");
-  const { sizes } = await res.json();
+  const res = await serverTrpc.products.sizes();
 
-  return sizes;
+  return res;
 };
 
-export const getProducts = async ({
-  categories,
-  colors,
-  sizes,
-  page,
-}: {
-  categories: string | string[] | undefined;
-  colors: string | string[] | undefined;
-  sizes: string | string[] | undefined;
-  page: string | string[] | undefined;
+export const getProducts = async (values: {
+  categories?: string | string[];
+  colors?: string | string[];
+  sizes?: string | string[];
+  page?: number;
 }) => {
-  const res = await api.shop.products.$get(
-    {
-      query: { page, categories, sizes, colors },
-    },
-    {
-      fetch(input, requestInit, Env, executionCtx) {
-        return fetch(
-          input,
-          configCacheForFetch(requestInit, [getGlobalTag("products")]),
-        );
-      },
-    },
-  );
+  const res = await serverTrpc.products.products(values);
 
-  if (!res.ok) throw new Error("Can't get products");
-
-  const data = await res.json();
-
-  return data;
+  return res;
 };
 
-export const getProductById = async (id: string) => {
-  const res = await api.shop.products[":id"].$get(
-    { param: { id } },
-    {
-      fetch(input, requestInit, Env, executionCtx) {
-        return fetch(
-          input,
-          configCacheForFetch(requestInit, [getIdTag("product", id)]),
-        );
-      },
-    },
-  );
+export const getProductById = cache(async (id: number) => {
+  const res = await serverTrpc.products.productById({ id });
 
-  if (!res.ok) throw new Error("Can't get product");
-
-  const { product } = await res.json();
-
-  return product;
-};
+  return res;
+});

@@ -1,31 +1,29 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { deleteCartItem } from "../services";
 import toast from "react-hot-toast";
-import queryKey from "./useCart";
-import { Cart } from "../types";
+import { clientTrpc } from "@/lib/trpc/client";
 
 export const useDeleteCartItem = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: deleteCartItem,
-    onMutate: async ({ cartItemId }) => {
-      await queryClient.cancelQueries({ queryKey });
+  const utils = clientTrpc.useUtils();
+  return clientTrpc.carts.deleteCartItem.useMutation({
+    onMutate: async ({ id }) => {
+      await utils.carts.getCart.cancel();
 
-      const previousState = queryClient.getQueryData<Cart>(queryKey);
+      const previousState = utils.carts.getCart.getData();
 
-      queryClient.setQueryData<Cart>(queryKey, (oldData) => {
-        if (!oldData) return undefined;
+      utils.carts.getCart.setData(undefined, (oldData) => {
+        if (!oldData || !oldData.cart) return undefined;
 
         return {
-          ...oldData,
-          cartItems: oldData.cartItems.filter((item) => item.id !== cartItemId),
+          cart: {
+            ...oldData.cart,
+            cartItems: oldData.cart.cartItems.filter((item) => item.id !== id),
+          },
         };
       });
 
       return { previousState };
     },
     onError: (error, vars, context) => {
-      queryClient.setQueryData(queryKey, context?.previousState);
+      utils.carts.getCart.setData(undefined, context?.previousState);
       toast.error("Can't delete cart item. Plz try again");
     },
   });

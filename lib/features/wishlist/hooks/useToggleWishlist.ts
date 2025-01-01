@@ -1,34 +1,33 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toggleWishlist } from "../services";
+import { clientTrpc } from "@/lib/trpc/client";
+import toast from "react-hot-toast";
 
 export const useToggleWishList = () => {
-  const queryClient = useQueryClient();
+  const utils = clientTrpc.useUtils();
 
-  return useMutation({
-    mutationFn: toggleWishlist,
+  return clientTrpc.wishlists.toggleWishlistItem.useMutation({
     onMutate: async ({ productId }) => {
-      await queryClient.cancelQueries({ queryKey: ["wishlist", productId] });
+      await utils.wishlists.isInWishlist.cancel({ productId });
 
-      const previousState = queryClient.getQueryData<boolean>([
-        "wishlist",
-        productId,
-      ]);
+      const previousState = utils.wishlists.isInWishlist.getData({ productId });
 
-      queryClient.setQueryData<boolean>(["wishlist", productId], (oldData) => {
+      utils.wishlists.isInWishlist.setData({ productId }, (oldData) => {
         if (oldData === undefined) return true;
+
         return !oldData;
       });
 
-      return { previousState, productId };
+      return { previousState };
     },
-    onError: (error, variables, context) => {
-      queryClient.setQueryData(
-        ["wishlist", context?.productId],
+    onError: (error, { productId }, context) => {
+      toast.error(`Something wrong happend ${error.message}`);
+
+      utils.wishlists.isInWishlist.setData(
+        { productId },
         context?.previousState,
       );
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["wishlist-items"] });
+    onSettled: () => {
+      utils.wishlists.getWishlistItems.invalidate();
     },
   });
 };

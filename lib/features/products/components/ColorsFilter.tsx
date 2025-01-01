@@ -1,7 +1,7 @@
 import { IColors } from "../types";
 import { ColorFilter } from "./ColorFilter";
 
-export default function ColorsFilter({ data: { colors } }: { data: IColors }) {
+export default function ColorsFilter({ data: colors }: { data: IColors }) {
   return (
     <div className="space-y-4">
       <h5 className="h5">Colors</h5>

@@ -22,7 +22,7 @@ export default function ErrorPage({
   );
 
   return (
-    <div className="container mx-auto min-h-screen space-y-8 py-12">
+    <div className="container mx-auto min-h-screen space-y-8 px-8 py-12 md:px-16 lg:px-24">
       {isAuthenticationError && (
         <>
           <h1 className="text-4xl font-bold">Oops! You Need to Be Logged In</h1>

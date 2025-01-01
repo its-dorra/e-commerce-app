@@ -1,21 +1,16 @@
-import { Hono } from "hono";
+import productsRouter from "@/server/routers/products";
+import cartsRouter from "@/server/routers/carts";
+import wishlistsRouter from "@/server/routers/wishlists";
+import addressRouter from "@/server/routers/address";
+import { router } from "./trpc";
+import authRouter from "./routers/users";
 
-import authRoute from "@/server/routes/users";
-import productsRoute from "@/server/routes/products";
-import cartsRoute from "@/server/routes/carts";
-import wishlistsRoute from "@/server/routes/wishlists";
+export const appRouter = router({
+  products: productsRouter,
+  auth: authRouter,
+  carts: cartsRouter,
+  wishlists: wishlistsRouter,
+  address: addressRouter,
+});
 
-import { notFound, onError } from "stoker/middlewares";
-
-const app = new Hono()
-  .basePath("/api")
-  .route("/auth", authRoute)
-  .route("/shop", productsRoute)
-  .route("/cart", cartsRoute)
-  .route("/wishlist", wishlistsRoute)
-  .notFound(notFound)
-  .onError(onError);
-
-export default app;
-
-export type AppType = typeof app;
+export type AppRouter = typeof appRouter;

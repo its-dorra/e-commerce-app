@@ -1,5 +1,9 @@
+import UserPageLayout from "@/lib/components/UserPageLayout";
 import WishlistContainer from "@/lib/features/wishlist/components/wishlist-container";
+import { HydrateClient, serverTrpc } from "@/lib/trpc/server";
+
 import { assertAuthenticated } from "@/server/lucia/utils";
+
 import { redirect } from "next/navigation";
 
 export default async function WishListPage() {
@@ -11,10 +15,13 @@ export default async function WishListPage() {
     return redirect("/dashboard");
   }
 
+  await serverTrpc.wishlists.getWishlistItems.prefetch();
+
   return (
-    <div className="flex h-full flex-col items-start gap-4">
-      <h4 className="h4">Wishlist</h4>
-      <WishlistContainer />
-    </div>
+    <UserPageLayout title="Wishlist">
+      <HydrateClient>
+        <WishlistContainer />
+      </HydrateClient>
+    </UserPageLayout>
   );
 }

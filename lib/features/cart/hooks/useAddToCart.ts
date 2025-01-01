@@ -1,15 +1,14 @@
+import { clientTrpc } from "@/lib/trpc/client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { addItemToCart } from "../services";
 import toast from "react-hot-toast";
 
 export const useAddToCart = () => {
-  const queryClient = useQueryClient();
+  const utils = clientTrpc.useUtils();
 
-  return useMutation({
-    mutationFn: addItemToCart,
+  return clientTrpc.carts.addCartItem.useMutation({
     onSuccess: () => {
       toast.success("Item added to cart successfully");
-      queryClient.invalidateQueries({ queryKey: ["cart"] });
+      utils.carts.getCart.invalidate();
     },
     onError: () => {
       toast.error("Can't add item to cart . Plz try again");

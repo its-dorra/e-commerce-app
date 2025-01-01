@@ -13,23 +13,56 @@ import {
   getSizes,
 } from "@/lib/features/products/services";
 import { Suspense } from "react";
+import { baseUrl } from "@/lib/utils";
 
-export const revalidate = 0;
+export const dynamic = "force-static";
+
+export const metadata = {
+  title: "Fashion Haven | Explore Our Products",
+  description:
+    "Discover the latest trends in fashion at Fashion Haven. Browse our collection of stylish and comfortable clothing for every occasion.",
+  openGraph: {
+    title: "Fashion Haven | Explore Our Products",
+    description:
+      "Browse the Fashion Haven collection to find trendy and high-quality clothing for every style. Shop now and elevate your wardrobe.",
+    url: `${baseUrl}/products`,
+    siteName: "Fashion Haven",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "Fashion Haven | Explore Our Products",
+    description:
+      "Browse the Fashion Haven collection to find trendy and high-quality clothing for every style. Shop now and elevate your wardrobe.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+};
 
 interface ProductsProps {
-  searchParams: {
+  searchParams: Promise<{
     categories: string | string[] | undefined;
     colors: string | string[] | undefined;
     sizes: string | string[] | undefined;
-    page: string | string[] | undefined;
-  };
+    page: string | undefined;
+  }>;
 }
 
-async function Products({ searchParams }: ProductsProps) {
+async function Products({
+  searchParams,
+}: {
+  searchParams: Awaited<ProductsProps["searchParams"]>;
+}) {
   const {
     products,
     pagination: { totalPages, page, total, perPage },
-  } = await getProducts({ ...searchParams });
+  } = await getProducts({
+    ...searchParams,
+    page: searchParams.page ? +searchParams.page : undefined,
+  });
 
   const from = (page - 1) * perPage + 1;
   const to = totalPages > page ? page * perPage : total;
@@ -54,7 +87,8 @@ async function Products({ searchParams }: ProductsProps) {
   );
 }
 
-export default async function ProductsListing({ searchParams }: ProductsProps) {
+export default async function ProductsListing(props: ProductsProps) {
+  const searchParams = await props.searchParams;
   const [sizes, categories, colors] = await Promise.all([
     getSizes(),
     getCategories(),
@@ -64,9 +98,9 @@ export default async function ProductsListing({ searchParams }: ProductsProps) {
   return (
     <main className="grid w-full grid-cols-1 lg:grid-cols-[250px_1fr]">
       <FilteringProducts>
-        <CategoriesFilter data={{ categories }} />
-        <ColorsFilter data={{ colors }} />
-        <SizesFilter data={{ sizes }} />
+        <CategoriesFilter data={categories} />
+        <ColorsFilter data={colors} />
+        <SizesFilter data={sizes} />
       </FilteringProducts>
       <Suspense
         key={JSON.stringify(searchParams)}

@@ -1,7 +1,7 @@
 import db from "@/server/db";
 import { accountsTable, usersTable } from "@/server/db/schema/users";
 import { eq } from "drizzle-orm";
-import { GoogleUser } from "../routes/users";
+import { GoogleUser } from "../routers/users";
 import { generateIdFromEntropySize, UserId } from "lucia";
 import { createProfile, createUser } from "@/server/data-access/users";
 

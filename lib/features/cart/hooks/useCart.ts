@@ -1,14 +1,3 @@
-import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
-import { getCart } from "../services";
+import { clientTrpc } from "@/lib/trpc/client";
 
-
-const queryKey = ['cart']
-
-export const useCart = () => {
-  return useQuery({
-    queryKey,
-    queryFn: getCart,
-  });
-};
-
-export default queryKey
+export const useCart = () => clientTrpc.carts.getCart.useQuery();

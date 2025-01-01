@@ -4,7 +4,7 @@ import { getProductVarientById } from "./products";
 import { cartItemsTable, cartsTable } from "../db/schema";
 import { and, eq } from "drizzle-orm";
 import { ErrorWithStatus } from "../types/types";
-import * as HttpStatusCodes from "stoker/http-status-codes";
+import { TRPCError } from "@trpc/server";
 
 export const handleCartItem = ({
   cartId,
@@ -67,6 +67,7 @@ export const getCartItems = (userId: string) => {
               size: true,
               productColor: {
                 with: {
+                  color: true,
                   image: {
                     columns: {
                       imagePath: true,
@@ -118,56 +119,78 @@ export const addItemToCart = async ({
     getProductVarientById(productVariantId),
   );
   if (errorGettingProductVariant)
-    throw new ErrorWithStatus(
-      "Failed to fetch product details",
-      HttpStatusCodes.INTERNAL_SERVER_ERROR,
-    );
+    throw new TRPCError({
+      message: "Failed to fetch product details",
+      code: "INTERNAL_SERVER_ERROR",
+    });
   if (!productVariant)
-    throw new ErrorWithStatus(
-      "Product variant not found",
-      HttpStatusCodes.NOT_FOUND,
-    );
+    throw new TRPCError({
+      message: "Product variant not found",
+      code: "NOT_FOUND",
+    });
 
   const [userCart, errorHandlingCart] = await catchError(getCart(userId));
 
   if (errorHandlingCart)
-    throw new ErrorWithStatus(
-      "Failed to process cart",
-      HttpStatusCodes.INTERNAL_SERVER_ERROR,
-    );
+    throw new TRPCError({
+      message: "Failed to process cart",
+      code: "INTERNAL_SERVER_ERROR",
+    });
 
   const [cartItem, errorHandlingCartItem] = await catchError(
     handleCartItem({ cartId: userCart.id, productVariant, quantity }),
   );
 
   if (errorHandlingCartItem)
-    throw new ErrorWithStatus(
-      "Failed to process cart",
-      HttpStatusCodes.INTERNAL_SERVER_ERROR,
-    );
+    throw new TRPCError({
+      message: "Failed to process cart",
+      code: "INTERNAL_SERVER_ERROR",
+    });
 
   return cartItem;
 };
 
-export const deleteCartItem = (cartItemId: number) => {
+export const deleteCartItem = async ({
+  cartItemId,
+  userId,
+}: {
+  cartItemId: number;
+  userId: string;
+}) => {
+  const userCart = await getCart(userId);
+
   return db
     .delete(cartItemsTable)
-    .where(eq(cartItemsTable.id, cartItemId))
+    .where(
+      and(
+        eq(cartItemsTable.id, cartItemId),
+        eq(cartItemsTable.cartId, userCart.id),
+      ),
+    )
     .returning();
 };
 
-export const updateCartItemQuantity = ({
+export const updateCartItemQuantity = async ({
   cartItemId,
   quantity,
+  userId,
 }: {
   cartItemId: number;
   quantity: number;
+  userId: string;
 }) => {
-  if (quantity <= 0) return deleteCartItem(cartItemId);
+  if (quantity <= 0) return deleteCartItem({ cartItemId, userId });
+
+  const userCart = await getCart(userId);
 
   return db
     .update(cartItemsTable)
     .set({ quantity })
-    .where(eq(cartItemsTable.id, cartItemId))
+    .where(
+      and(
+        eq(cartItemsTable.id, cartItemId),
+        eq(cartItemsTable.cartId, userCart.id),
+      ),
+    )
     .returning();
 };

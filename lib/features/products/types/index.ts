@@ -1,12 +1,6 @@
-import api from "@/lib/api";
-import { InferResponseType } from "hono";
+import { getCategories, getColors, getProducts, getSizes } from "../services";
 
-const categoriesRes = api.shop.categories.$get;
-const sizesRes = api.shop.sizes.$get;
-const colorsRes = api.shop.colors.$get;
-const getProductsRes = api.shop.products.$get;
-
-export type ICategories = InferResponseType<typeof categoriesRes>;
-export type ISizes = InferResponseType<typeof sizesRes>;
-export type IColors = InferResponseType<typeof colorsRes>;
-export type IProducts = InferResponseType<typeof getProductsRes>;
+export type ICategories = Awaited<ReturnType<typeof getCategories>>;
+export type ISizes = Awaited<ReturnType<typeof getSizes>>;
+export type IColors = Awaited<ReturnType<typeof getColors>>;
+export type IProducts = Awaited<ReturnType<typeof getProducts>>;

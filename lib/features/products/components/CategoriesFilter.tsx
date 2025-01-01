@@ -2,7 +2,7 @@ import { ICategories } from "../types";
 import { CategoryFilter } from "./CategoryFilter";
 
 export default function CategoriesFilter({
-  data: { categories },
+  data: categories,
 }: {
   data: ICategories;
 }) {

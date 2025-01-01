@@ -20,11 +20,14 @@ import CartItem from "./CartItem";
 export default function CartButton() {
   const { user } = useUser();
   const [isOpen, setIsOpen] = useState(false);
-  const { data: cart, isLoading, isError } = useCart();
+  const { data, isLoading, isError } = useCart();
 
   const totalPrice =
-    cart &&
-    cart.cartItems.reduce((acc, cur) => acc + cur.quantity * cur.itemPrice, 0);
+    data?.cart &&
+    data?.cart.cartItems.reduce(
+      (acc, cur) => acc + cur.quantity * cur.itemPrice,
+      0,
+    );
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -50,7 +53,7 @@ export default function CartButton() {
           ) : (
             <>
               {isLoading && <LoadingSpinner size="lg" />}
-              {!cart || cart?.cartItems?.length === 0 ? (
+              {!data?.cart || data?.cart?.cartItems?.length === 0 ? (
                 <div className="flex grow items-center justify-center">
                   <div className="flex flex-col items-center">
                     <p className="text-lg font-semibold">Your cart is empty</p>
@@ -68,7 +71,7 @@ export default function CartButton() {
                 </div>
               ) : (
                 <ul className="space-y-5">
-                  {cart.cartItems.map((item) => (
+                  {data.cart.cartItems.map((item) => (
                     <CartItem key={item.id} item={item} />
                   ))}
                 </ul>

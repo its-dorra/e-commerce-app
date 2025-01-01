@@ -14,6 +14,7 @@ export default function EmptyListMessage({ listName }: { listName: string }) {
           <span>Start Shopping</span>
           <Image
             src={arrowRightIcon}
+            className="fill-white text-white"
             width={24}
             height={24}
             alt="arrow right icon"

@@ -1,8 +1,8 @@
-import { getCart } from "../services";
+import { useCart } from "../hooks/useCart";
 
-export type Cart = Awaited<ReturnType<typeof getCart>>;
-
-export type CartItem = Exclude<
-  Awaited<ReturnType<typeof getCart>>,
+export type Cart = Exclude<
+  Exclude<ReturnType<typeof useCart>["data"], undefined>["cart"],
   undefined
->["cartItems"][number];
+>;
+
+export type CartItem = Cart["cartItems"][number];

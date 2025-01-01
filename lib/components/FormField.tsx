@@ -9,12 +9,14 @@ export default function FormField({
   field: FieldApi<any, any, any, any>;
   label: string;
 }) {
+  const isPassword = label === "Password" || label === "Confirm password";
+
   return (
     <div className="space-y-1">
       <Label htmlFor={field.name}>{label}</Label>
       <Input
-        className="px-2 outline-black"
-        type={`${label === "Password" ? "password" : "text"}`}
+        className="px-2 focus-visible:ring-0"
+        type={`${isPassword ? "password" : "text"}`}
         id={field.name}
         name={field.name}
         value={field.state.value}

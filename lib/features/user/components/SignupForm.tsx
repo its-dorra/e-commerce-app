@@ -3,7 +3,6 @@
 import { googleIcon } from "@/assets";
 import { Button } from "@/components/ui/button";
 import { ZodValidator, zodValidator } from "@tanstack/zod-form-adapter";
-import { Separator } from "@/components/ui/separator";
 
 import { useForm } from "@tanstack/react-form";
 
@@ -12,14 +11,10 @@ import FormField from "../../../components/FormField";
 import Link from "next/link";
 import { signupSchema } from "@/server/schemas/users";
 import { z } from "zod";
-import { signup } from "../services";
-import toast from "react-hot-toast";
-import { useRouter } from "next/navigation";
-import { authEvents } from "@/lib/providers/user-provider";
+import { useSignup } from "../hooks/useSignup";
 
 export default function SignupForm() {
-  const router = useRouter();
-
+  const { mutate, isPending } = useSignup();
   const form = useForm<z.infer<typeof signupSchema>, ZodValidator>({
     defaultValues: {
       fullName: "",
@@ -30,17 +25,8 @@ export default function SignupForm() {
     validators: {
       onChange: signupSchema,
     },
-    onSubmit: async ({ value }) => {
-      try {
-        await signup(value);
-        toast.success(
-          "You created an account successfully , Enjoy your session",
-        );
-        window.dispatchEvent(new Event(authEvents.authChange));
-        router.replace("/");
-      } catch (error: any) {
-        toast.error(`Something went wrong \n ${error.message}`);
-      }
+    onSubmit: ({ value }) => {
+      mutate(value);
     },
   });
 

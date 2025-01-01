@@ -1,7 +1,55 @@
 "use client";
 import { useAccountSidebarStore } from "@/lib/stores/account-sidebar.store";
-import { accountSidebarItems } from "@/lib/constants";
+
 import SidebarItem from "@/lib/components/SidebarItem";
+import {
+  cartIcon,
+  deliveryIcon,
+  heartIcon,
+  logoutIcon,
+  ordersIcon,
+  userIcon,
+} from "@/assets";
+
+export const accountSidebarItems = [
+  {
+    id: 5,
+    href: "/account/account-details",
+    title: "Account Details",
+    icon: userIcon,
+  },
+  {
+    id: 1,
+    href: "/account/orders",
+    title: "Orders",
+    icon: ordersIcon,
+  },
+  {
+    id: 2,
+    href: "/account/cart",
+    title: "Cart",
+    icon: cartIcon,
+  },
+  {
+    id: 3,
+    href: "/account/address",
+    title: "Address",
+    icon: deliveryIcon,
+  },
+  {
+    id: 4,
+    href: "/account/wishlist",
+    title: "Wishlist",
+    icon: heartIcon,
+  },
+
+  {
+    id: 6,
+    href: "/account/logout",
+    title: "Logout",
+    icon: logoutIcon,
+  },
+];
 
 export default function AccountSidebar() {
   const { isSidebarOpen } = useAccountSidebarStore();

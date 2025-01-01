@@ -1,13 +1,4 @@
-import {
-  cartIcon,
-  deliveryIcon,
-  heartIcon,
-  logoutIcon,
-  ordersIcon,
-  shieldCheckIcon,
-  starBadgeIcon,
-  userIcon,
-} from "@/assets";
+import { deliveryIcon, shieldCheckIcon, starBadgeIcon } from "@/assets";
 
 export const categories = [
   { id: 0, category: "T-Shirts" },
@@ -42,44 +33,5 @@ export const features = [
     featureContent:
       "Your security is our priority. Your payments are secure with us.",
     featureIcon: shieldCheckIcon,
-  },
-];
-
-export const accountSidebarItems = [
-  {
-    id: 1,
-    href: "/account/orders",
-    title: "Orders",
-    icon: ordersIcon,
-  },
-  {
-    id: 2,
-    href: "/account/cart",
-    title: "Cart",
-    icon: cartIcon,
-  },
-  {
-    id: 3,
-    href: "/account/address",
-    title: "Address",
-    icon: deliveryIcon,
-  },
-  {
-    id: 4,
-    href: "/account/wishlist",
-    title: "Wishlist",
-    icon: heartIcon,
-  },
-  {
-    id: 5,
-    href: "/account/account-details",
-    title: "Account Details",
-    icon: userIcon,
-  },
-  {
-    id: 6,
-    href: "/account/logout",
-    title: "Logout",
-    icon: logoutIcon,
   },
 ];

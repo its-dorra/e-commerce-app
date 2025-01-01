@@ -1,25 +1,23 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { updateCartItemQuantity } from "../services";
+import { clientTrpc } from "@/lib/trpc/client";
 import toast from "react-hot-toast";
-import queryKey from "./useCart";
-import { Cart } from "../types";
 
 export const useUpdateCartItemQuantity = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: updateCartItemQuantity,
+  const utils = clientTrpc.useUtils();
+  return clientTrpc.carts.updateCartItemQuantity.useMutation({
     onMutate: async ({ cartItemId, quantity }) => {
-      await queryClient.cancelQueries({ queryKey });
+      await utils.carts.getCart.cancel();
 
-      const previousState = queryClient.getQueryData<Cart>(queryKey);
+      const previousState = utils.carts.getCart.getData();
 
-      queryClient.setQueryData<Cart>(queryKey, (oldData) => {
-        if (!oldData) return undefined;
+      utils.carts.getCart.setData(undefined, (oldData) => {
+        if (!oldData || !oldData.cart) return undefined;
         return {
-          ...oldData,
-          cartItems: oldData.cartItems.map((item) =>
-            item.id === cartItemId ? { ...item, quantity } : item,
-          ),
+          cart: {
+            ...oldData.cart,
+            cartItems: oldData.cart?.cartItems.map((item) =>
+              item.id === cartItemId ? { ...item, quantity } : item,
+            ),
+          },
         };
       });
 
@@ -27,7 +25,7 @@ export const useUpdateCartItemQuantity = () => {
     },
     onError: (error, variables, context) => {
       console.error({ error });
-      queryClient.setQueryData(queryKey, context?.previousState);
+      utils.carts.getCart.setData(undefined, context?.previousState);
       toast.error("Can't update cart item. Plz try again");
     },
   });

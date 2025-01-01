@@ -1,8 +1,4 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
-import { getWishlistItems } from "../services";
+import { clientTrpc } from "@/lib/trpc/client";
 
 export const useWishlist = () =>
-  useSuspenseQuery({
-    queryFn: getWishlistItems,
-    queryKey: ["wishlist-items"],
-  });
+  clientTrpc.wishlists.getWishlistItems.useQuery();

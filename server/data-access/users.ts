@@ -84,11 +84,44 @@ export async function createProfile(
   return profile;
 }
 
-export const getUserWithFullDetails = async (userId: string) => {
+export const getUserWithFullDetails = (userId: string) => {
   return db.query.usersTable.findFirst({
     where: ({ id }, { eq }) => eq(id, userId),
     with: {
       profile: true,
+      account: true,
     },
+  });
+};
+
+export const updateAccountDetails = async ({
+  userId,
+  displayName,
+  password,
+}: {
+  userId: string;
+  password?: string;
+  displayName?: string;
+}) => {
+  return db.transaction(async (tx) => {
+    if (displayName) {
+      await tx
+        .update(profilesTable)
+        .set({ displayName })
+        .where(eq(profilesTable.userId, userId));
+    }
+    if (password) {
+      const account = await tx.query.accountsTable.findFirst({
+        where: (fields, { eq }) => eq(fields.userId, userId),
+      });
+      if (account?.accountType !== "email") return true;
+      const hash = await bcrypt.hash(password, 12);
+      await tx
+        .update(accountsTable)
+        .set({ password: hash })
+        .where(eq(accountsTable.userId, userId));
+    }
+
+    return true;
   });
 };

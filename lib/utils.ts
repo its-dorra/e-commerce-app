@@ -38,3 +38,8 @@ export const AdminAuthenticationError = class AdminAuthenticationError extends E
     this.name = "AdminAuthenticationError";
   }
 };
+
+export const baseUrl = (() => {
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+  return "http://localhost:3000";
+})();

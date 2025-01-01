@@ -3,6 +3,7 @@ import { sqliteTable, text, integer, index } from "drizzle-orm/sqlite-core";
 import { cartsTable } from "./carts";
 import { ordersTable } from "./orders";
 import { wishListTable } from "./wishlist";
+import { addressTable } from "./address";
 
 export const usersTable = sqliteTable(
   "users",
@@ -78,12 +79,21 @@ export const userRelations = relations(usersTable, ({ one, many }) => ({
   carts: many(cartsTable),
   orders: many(ordersTable),
   profile: one(profilesTable),
+  account: one(accountsTable),
   wishList: many(wishListTable),
+  address: one(addressTable),
 }));
 
 export const profileRelations = relations(profilesTable, ({ one }) => ({
   user: one(usersTable, {
     fields: [profilesTable.userId],
+    references: [usersTable.id],
+  }),
+}));
+
+export const accountRelations = relations(accountsTable, ({ one }) => ({
+  user: one(usersTable, {
+    fields: [accountsTable.userId],
     references: [usersTable.id],
   }),
 }));

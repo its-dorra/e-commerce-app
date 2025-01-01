@@ -3,23 +3,20 @@
 import { googleIcon } from "@/assets";
 import { Button } from "@/components/ui/button";
 import { ZodValidator, zodValidator } from "@tanstack/zod-form-adapter";
-import { Separator } from "@/components/ui/separator";
 
 import { useForm } from "@tanstack/react-form";
 
 import Image from "next/image";
-import FormField from "../../../components/FormField";
+import FormField from "@/lib/components/FormField";
 import Link from "next/link";
 
 import { z } from "zod";
 import { loginSchema } from "@/server/schemas/users";
-import { login } from "../services";
-import toast from "react-hot-toast";
-import { useRouter } from "next/navigation";
-import { authEvents } from "@/lib/providers/user-provider";
+
+import { useLogin } from "../hooks/useLogin";
 
 export default function LoginForm() {
-  const router = useRouter();
+  const { mutate, isPending } = useLogin();
   const form = useForm<z.infer<typeof loginSchema>, ZodValidator>({
     defaultValues: {
       email: "",
@@ -29,16 +26,8 @@ export default function LoginForm() {
     validators: {
       onChange: loginSchema,
     },
-
-    onSubmit: async ({ value }) => {
-      try {
-        await login(value);
-        toast.success("You logged in successfully");
-        window.dispatchEvent(new Event(authEvents.authChange));
-        router.replace("/");
-      } catch (error: any) {
-        toast.error("Something went wrong \n" + error.message);
-      }
+    onSubmit: ({ value }) => {
+      mutate(value);
     },
   });
 
@@ -84,7 +73,7 @@ export default function LoginForm() {
             <Button
               className="w-full bg-black text-primaryWhite"
               type="submit"
-              disabled={isSubmitting}
+              disabled={isSubmitting || isPending}
             >
               Login
             </Button>

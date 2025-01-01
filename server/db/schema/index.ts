@@ -23,11 +23,16 @@ import {
   sessionTable,
   userRelations,
   profileRelations,
+  accountRelations,
 } from "./users";
 
 import { wishListRelations, wishListTable } from "./wishlist";
 
+import { addressRelations, addressTable } from "./address";
+
 export {
+  accountRelations,
+  addressRelations,
   wishListRelations,
   profileRelations,
   productsRelations,
@@ -41,6 +46,7 @@ export {
   ordersRelations,
   cartItemsRelations,
   cartsRelations,
+  addressTable,
   wishListTable,
   sessionTable,
   profilesTable,

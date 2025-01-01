@@ -26,12 +26,11 @@ export default function ({ product }: { product: ProductDetails }) {
     data: isInWishlist,
     isPending: isLoadingInWishlist,
     isError,
-  } = useIsInWishlist(product.id);
+  } = useIsInWishlist({ productId: product.id });
 
   const { mutate: addToCart, isPending: isAddingToCart } = useAddToCart();
 
-  const { mutate: toggleWishlist, isPending: isTogglingWishlist } =
-    useToggleWishList();
+  const { mutate: toggleWishlist } = useToggleWishList();
 
   const sizes: string[] | undefined = filter?.color
     ? product.colors
