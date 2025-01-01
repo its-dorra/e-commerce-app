@@ -1,4 +1,4 @@
-import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { integer, real, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { cartsTable } from "./carts";
 import { usersTable as users } from "./users";
 import { relations } from "drizzle-orm";
@@ -13,12 +13,16 @@ export const ordersTable = sqliteTable("orders", {
   userId: text("user_id")
     .notNull()
     .references(() => users.id),
+  totalPrice: real("total_price").notNull(),
   phone_number: text("phone_number"),
   wilaya: text("wilaya"),
   city: text("city"),
+
   streetAddress: text("street_address"),
-  status: text("status")
-    .$type<"pending" | "processing" | "shipped" | "delivered" | "cancelled">()
+  status: text("status", {
+    enum: ["pending", "processing", "delivered", "cancelled"],
+  })
+    .$type<"pending" | "processing" | "delivered" | "cancelled">()
     .notNull()
     .default("pending"),
   createdAt: integer("created_at", { mode: "timestamp" }).$default(

@@ -8,10 +8,11 @@ export const useLogin = () => {
   const utils = clientTrpc.useUtils();
 
   return clientTrpc.auth.login.useMutation({
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast.success("You logged in successfully");
       utils.auth.getCurrentUser.invalidate();
-      router.replace("/");
+
+      router.replace(data.user.role === "admin" ? "/admin" : "/products");
     },
     onError: (error) => {
       toast.error("Something went wrong \n" + error.message);

@@ -68,7 +68,10 @@ import tshirt5 from "./images/t-shirt-5.png";
 import tshirt6 from "./images/t-shirt-6.png";
 import cozyBlack from "./images/cozy-black.png";
 
+import adminLogo from "./icons/admin-logo.svg";
+
 export {
+  adminLogo,
   heartIcon,
   googleIcon,
   visaIcon,

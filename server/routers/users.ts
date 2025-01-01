@@ -63,7 +63,11 @@ const authRouter = router({
     }
 
     await setSession(existingUser.id);
-    return { success: true, message: "You logged in successfully" };
+    return {
+      success: true,
+      message: "You logged in successfully",
+      user: existingUser,
+    };
   }),
   signup: procedure.input(signupSchema).mutation(async ({ input }) => {
     const { email, fullName, password } = input;
@@ -89,6 +93,7 @@ const authRouter = router({
     return {
       success: true,
       message: "You created and account and logged in successfully",
+      user,
     };
   }),
   getCurrentUser: authenticatedProcedure.query(async ({ ctx }) => {

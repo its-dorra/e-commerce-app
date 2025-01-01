@@ -46,7 +46,7 @@ export default async function Home() {
   const userRole = user?.role;
 
   if (userRole === "admin") {
-    return redirect("/dashboard");
+    return redirect("/admin/dashboard");
   }
 
   return (
