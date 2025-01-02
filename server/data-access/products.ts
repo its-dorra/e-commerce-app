@@ -1,206 +1,130 @@
 import { PER_PAGE } from "@/lib/constants/app-config";
 import db from "@/server/db";
-import {
-  categoriesTable,
-  colorsTable,
-  imagesTable,
-  productsTable,
-  productVariantsTable,
-  sizesTable,
-} from "@/server/db/schema";
-import { and, eq, exists, gt, inArray, sql, SQL } from "drizzle-orm";
+import { productTable } from "@/server/db/schema";
+import { count } from "drizzle-orm";
 
 import { FilterQuery } from "../types/products";
-import { productColorsTable } from "@/server/db/schema/productVariants";
 
-export const getCategories = async () => {
-  return db.query.categoriesTable.findMany({
+export const getCategories = () => {
+  return db.query.categoryTable.findMany({
     columns: {
       name: true,
-      id: true,
     },
   });
 };
 
-export const getColors = async () => {
-  return db.query.colorsTable.findMany({
+export const getColors = () => {
+  return db.query.colorTable.findMany({
     columns: {
-      id: true,
       name: true,
       hexCode: true,
     },
   });
 };
 
-export const getSizes = async () => {
-  return db.query.sizesTable.findMany({
-    columns: {
-      name: true,
-      id: true,
-    },
-  });
+export const getSizes = () => {
+  return ["XS", "S", "M", "L", "XL", "2XL", "3XL"];
 };
 
-export const getProducts = async (page: number, filters: FilterQuery) => {
-  const productsQuery = db
-    .select({
-      id: productsTable.id,
-      name: productsTable.name,
-      price: productsTable.basePrice,
-      variants: sql<
-        {
-          primaryImage: string;
-          quantity: number;
-        }[]
-      >`
-      GROUP_CONCAT(
-        json_object(
-            'primaryImage', (
-                SELECT ${imagesTable.imagePath}
-                FROM ${imagesTable}
-                WHERE ${imagesTable.productColorId} = ${productColorsTable.id}
-                LIMIT 1
-                ),
-                'quantity', ${productVariantsTable.quantity}
-                )
-                ) AS variants `,
-    })
-    // AND ${imagesTable.isPrimary} = 1
-    .from(productsTable)
-    .leftJoin(categoriesTable, eq(productsTable.categoryId, categoriesTable.id))
-    .leftJoin(
-      productColorsTable,
-      eq(productsTable.id, productColorsTable.productId),
-    )
-    .leftJoin(colorsTable, eq(productColorsTable.colorId, colorsTable.id))
-    .leftJoin(
-      productVariantsTable,
-      eq(productColorsTable.id, productVariantsTable.productColorId),
-    );
+export const getProducts = async (
+  page: number,
+  { categories, colors, sizes }: FilterQuery,
+  perPage: number = PER_PAGE,
+) => {
+  const productsQuery = db.query.productTable.findMany({
+    columns: {
+      description: false,
+      createdAt: false,
+      updatedAt: false,
+      categoryName: false,
+    },
+    limit: perPage,
+    offset: (page - 1) * perPage,
+    ...(categories && {
+      where: (fields, { inArray }) => inArray(fields.categoryName, categories),
+    }),
+    with: {
+      variants: {
+        columns: {
+          colorName: false,
+          createdAt: false,
+          id: false,
+          productId: false,
+          updatedAt: false,
+        },
+        ...(colors && {
+          where: (fields, { inArray }) => inArray(fields.colorName, colors),
+        }),
+        with: {
+          color: {
+            columns: {
+              name: true,
+              hexCode: true,
+            },
+          },
+          images: {
+            limit: 1,
+            orderBy: (fields, { asc }) => asc(fields.displayOrder),
+            columns: {
+              imagePath: true,
+            },
+          },
+          sizes: {
+            ...(sizes && {
+              where: (fields, { inArray }) => inArray(fields.size, sizes),
+            }),
+            columns: {
+              quantity: true,
+            },
+          },
+        },
+      },
+    },
+  });
 
-  const conditions: SQL[] = [];
+  const totalCountQuery = db
+    .select({ totalCount: count() })
+    .from(productTable)
+    .then((res) => res[0]);
 
-  if (filters.categories?.length) {
-    conditions.push(inArray(categoriesTable.name, filters.categories));
-  }
-
-  if (filters.colors?.length) {
-    conditions.push(
-      exists(
-        db
-          .select({ one: sql`1` })
-          .from(productColorsTable)
-          .innerJoin(
-            colorsTable,
-            eq(colorsTable.id, productColorsTable.colorId),
-          )
-          .where(
-            and(
-              eq(productColorsTable.productId, productsTable.id),
-              inArray(colorsTable.name, filters.colors),
-            ),
-          ),
-      ),
-    );
-  }
-
-  if (filters.sizes?.length) {
-    conditions.push(
-      exists(
-        db
-          .select({ one: sql`1` })
-          .from(productVariantsTable)
-          .innerJoin(sizesTable, eq(sizesTable.id, productVariantsTable.sizeId))
-          .innerJoin(
-            productColorsTable,
-            eq(productColorsTable.id, productVariantsTable.productColorId),
-          )
-          .where(
-            and(
-              eq(productColorsTable.productId, productsTable.id),
-              inArray(sizesTable.name, filters.sizes),
-            ),
-          ),
-      ),
-    );
-  }
-
-  // Build final query
-  const finalQuery = productsQuery
-    .where(
-      and(
-        conditions.length > 0 ? and(...conditions) : undefined,
-        // gt(productVariantsTable.quantity, 0),
-      ),
-    )
-    .groupBy(productsTable.id)
-    .orderBy(productsTable.id)
-    .limit(PER_PAGE)
-    .offset((page - 1) * PER_PAGE);
-
-  const countQuery = db
-    .select({
-      count: sql<number>`COUNT(DISTINCT ${productsTable.id})`,
-    })
-    .from(productsTable)
-    .leftJoin(categoriesTable, eq(productsTable.categoryId, categoriesTable.id))
-    .leftJoin(
-      productColorsTable,
-      eq(productsTable.id, productColorsTable.productId),
-    )
-    .leftJoin(colorsTable, eq(productColorsTable.colorId, colorsTable.id))
-    .leftJoin(
-      productVariantsTable,
-      eq(productColorsTable.id, productVariantsTable.productColorId),
-    )
-
-    .where(
-      and(
-        conditions.length > 0 ? and(...conditions) : undefined,
-        // gt(productVariantsTable.quantity, 0),
-      ),
-    );
-  const [products, [{ count }]] = await Promise.all([finalQuery, countQuery]);
+  const [products, { totalCount }] = await Promise.all([
+    productsQuery,
+    totalCountQuery,
+  ]);
 
   const finalProducts = products.map((product) => {
-    const variants: typeof product.variants = product.variants
-      ? JSON.parse(`[${product.variants}]`)
-      : [];
-
-    // Calculate total quantity across all variants
-    const totalQuantity = variants.reduce(
-      (total, variant) => total + variant.quantity,
+    const totalQuantity = product.variants.reduce(
+      (total, variant) =>
+        total + variant.sizes.reduce((total, size) => total + size.quantity, 0),
       0,
     );
 
     return {
       id: product.id,
       name: product.name,
-      basePrice: product.price,
+      basePrice: product.basePrice,
       quantity: totalQuantity,
-      imageUrl: variants[0].primaryImage,
+      imageUrl: product.variants[0]?.images[0]?.imagePath || "",
     };
-    // return product;
   });
 
   return {
     products: finalProducts,
     pagination: {
-      total: Number(count),
+      total: totalCount,
       page,
-      perPage: PER_PAGE,
-      totalPages: Math.ceil(Number(count) / PER_PAGE),
+      perPage,
+      totalPages: Math.ceil(totalCount / PER_PAGE),
     },
   };
 };
 
 export const getProductById = async (id: number) => {
-  const product = await db.query.productsTable.findFirst({
+  const product = await db.query.productTable.findFirst({
     where: (table, { eq }) => eq(table.id, id),
     columns: {
       createdAt: false,
       updatedAt: false,
-      categoryId: false,
     },
     with: {
       category: {
@@ -208,37 +132,27 @@ export const getProductById = async (id: number) => {
           name: true,
         },
       },
-      productColor: {
+      variants: {
         columns: {
-          colorId: false,
           createdAt: false,
           updatedAt: false,
           productId: false,
         },
         with: {
-          productVariants: {
+          sizes: {
             where: (table, { gt }) => gt(table.quantity, 0),
             columns: {
               createdAt: false,
               updatedAt: false,
-            },
-            with: {
-              size: {
-                columns: {
-                  id: true,
-                  name: true,
-                },
-              },
             },
           },
           color: {
             columns: {
               name: true,
               hexCode: true,
-              id: true,
             },
           },
-          image: {
+          images: {
             columns: {
               imagePath: true,
             },
@@ -252,11 +166,11 @@ export const getProductById = async (id: number) => {
 
   let totalQuantity = 0;
   const images: string[] = [];
-  product?.productColor.forEach((color) => {
-    const productImages = color.image.map((path) => path.imagePath);
+  product?.variants.forEach((variant) => {
+    const productImages = variant.images.map((path) => path.imagePath);
     images.push(...productImages);
-    color.productVariants.forEach((variant) => {
-      totalQuantity += variant.quantity;
+    variant.sizes.forEach((size) => {
+      totalQuantity += size.quantity;
     });
   });
 
@@ -264,16 +178,16 @@ export const getProductById = async (id: number) => {
     id: product.id,
     name: product.name,
     category: product.category!.name,
-    colors: product.productColor
-      .map((color) => ({
-        colorName: color.color.name,
-        hexCode: color.color.hexCode,
-        variants: color.productVariants.map((variant) => ({
-          id: variant.id,
+    colors: product.variants
+      .map((variant) => ({
+        colorName: variant.color.name,
+        hexCode: variant.color.hexCode,
+        variants: variant.sizes.map((size) => ({
+          id: size.id,
           size: {
-            name: variant.size.name,
+            name: size.size,
           },
-          quantity: variant.quantity,
+          quantity: size.quantity,
         })),
       }))
       .filter((color) => color.variants.length > 0),
@@ -282,13 +196,13 @@ export const getProductById = async (id: number) => {
   };
 };
 
-export const getProductVarientById = (productVariantId: number) => {
-  return db.query.productVariantsTable.findFirst({
+export const getProductVarientById = (sizeId: number) => {
+  return db.query.sizeTable.findFirst({
     where({ id }, { eq }) {
-      return eq(id, productVariantId);
+      return eq(id, sizeId);
     },
     with: {
-      productColor: {
+      variant: {
         with: {
           product: true,
         },

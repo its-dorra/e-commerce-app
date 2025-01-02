@@ -4,8 +4,8 @@ import {
   sqliteTable,
   text,
 } from "drizzle-orm/sqlite-core";
-import { usersTable } from "./users";
-import { productsTable } from "./products";
+import { userTable } from "./users";
+import { productTable } from "./products";
 import { relations } from "drizzle-orm";
 
 export const wishListTable = sqliteTable(
@@ -13,10 +13,10 @@ export const wishListTable = sqliteTable(
   {
     userId: text("user_id")
       .notNull()
-      .references(() => usersTable.id, { onDelete: "cascade" }),
+      .references(() => userTable.id, { onDelete: "cascade" }),
     productId: integer("product_id")
       .notNull()
-      .references(() => productsTable.id, { onDelete: "cascade" }),
+      .references(() => productTable.id, { onDelete: "cascade" }),
   },
   ({ productId, userId }) => ({
     pk: primaryKey({ columns: [userId, productId] }),
@@ -24,12 +24,12 @@ export const wishListTable = sqliteTable(
 );
 
 export const wishListRelations = relations(wishListTable, ({ one }) => ({
-  user: one(usersTable, {
+  user: one(userTable, {
     fields: [wishListTable.userId],
-    references: [usersTable.id],
+    references: [userTable.id],
   }),
-  product: one(productsTable, {
+  product: one(productTable, {
     fields: [wishListTable.productId],
-    references: [productsTable.id],
+    references: [productTable.id],
   }),
 }));

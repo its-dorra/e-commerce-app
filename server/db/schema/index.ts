@@ -1,25 +1,24 @@
 import {
-  cartsTable,
-  cartItemsTable,
-  cartItemsRelations,
-  cartsRelations,
+  cartTable,
+  cartItemTable,
+  cartItemRelations,
+  cartRelations,
 } from "./carts";
-import { categoriesTable, categoriesRelations } from "./categories";
-import { colorsTable, colorsRelations } from "./colors";
-import { imagesTable, imagesRelations } from "./images";
-import { ordersTable, ordersRelations } from "./orders";
-import { productsTable, productsRelations } from "./products";
+import { categoryTable, categoryRelations } from "./categories";
+import { colorTable, colorRelations } from "./colors";
+import { imageTable, imageRelations } from "./images";
+import { orderTable, orderRelations } from "./orders";
+import { productTable, productRelations } from "./products";
 import {
-  productVariantsTable,
-  productColorsTable,
-  productColorsRelations,
-  productVariantsRelations,
+  productVariantTable,
+  productVariantRelations,
+  sizeRelations,
+  sizeTable,
 } from "./productVariants";
-import { sizesTable, sizesRelations } from "./sizes";
 import {
-  usersTable,
-  accountsTable,
-  profilesTable,
+  userTable,
+  accountTable,
+  profileTable,
   sessionTable,
   userRelations,
   profileRelations,
@@ -31,35 +30,33 @@ import { wishListRelations, wishListTable } from "./wishlist";
 import { addressRelations, addressTable } from "./address";
 
 export {
+  sizeRelations,
   accountRelations,
   addressRelations,
   wishListRelations,
   profileRelations,
-  productsRelations,
-  colorsRelations,
-  imagesRelations,
-  categoriesRelations,
-  productColorsRelations,
-  productVariantsRelations,
-  sizesRelations,
+  productRelations,
+  colorRelations,
+  imageRelations,
+  categoryRelations,
+  productVariantRelations,
   userRelations,
-  ordersRelations,
-  cartItemsRelations,
-  cartsRelations,
+  orderRelations,
+  cartItemRelations,
+  cartRelations,
+  sizeTable,
   addressTable,
   wishListTable,
   sessionTable,
-  profilesTable,
-  cartsTable,
-  cartItemsTable,
-  categoriesTable,
-  colorsTable,
-  imagesTable,
-  ordersTable,
-  productsTable,
-  productColorsTable,
-  productVariantsTable,
-  sizesTable,
-  usersTable,
-  accountsTable,
+  profileTable,
+  productVariantTable,
+  cartTable,
+  cartItemTable,
+  categoryTable,
+  colorTable,
+  imageTable,
+  orderTable,
+  productTable,
+  userTable,
+  accountTable,
 };

@@ -54,8 +54,8 @@ export default async function ProductPage(props: {
   void serverTrpc.products.productById.prefetch({ id: Number(slug) });
 
   return (
-    <main className="container flex w-full grow flex-col items-center space-y-8">
-      <div className="flex flex-col items-center gap-x-12 gap-y-8 lg:max-w-4xl lg:flex-row lg:justify-between">
+    <main className="container flex w-full grow flex-col items-center">
+      <div className="flex w-full flex-col items-center gap-y-8 lg:max-w-4xl lg:flex-row lg:justify-center lg:gap-x-24">
         <ProductImagesSwiper images={product.images} />
         <ProductDetails product={product} />
       </div>

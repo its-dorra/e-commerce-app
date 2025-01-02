@@ -1,16 +1,16 @@
 import { eq } from "drizzle-orm";
 import db from "@/server/db";
 import {
-  accountsTable,
-  profilesTable,
-  usersTable,
+  accountTable,
+  profileTable,
+  userTable,
 } from "@/server/db/schema/users";
 import { generateIdFromEntropySize, UserId } from "lucia";
 import bcrypt from "bcrypt";
 
 export async function getUserByEmail(email: string) {
-  const user = await db.query.usersTable.findFirst({
-    where: eq(usersTable.email, email),
+  const user = await db.query.userTable.findFirst({
+    where: eq(userTable.email, email),
   });
 
   return user;
@@ -19,7 +19,7 @@ export async function getUserByEmail(email: string) {
 export async function createUser(email: string) {
   const id = generateIdFromEntropySize(12);
   const [user] = await db
-    .insert(usersTable)
+    .insert(userTable)
     .values({
       id,
       email,
@@ -32,7 +32,7 @@ export async function createAccount(userId: UserId, password: string) {
   const id = generateIdFromEntropySize(12);
   const hash = await bcrypt.hash(password, 12);
   const [account] = await db
-    .insert(accountsTable)
+    .insert(accountTable)
     .values({
       id,
       userId,
@@ -46,7 +46,7 @@ export async function createAccount(userId: UserId, password: string) {
 export async function createAccountViaGoogle(userId: UserId, googleId: string) {
   const id = generateIdFromEntropySize(12);
   await db
-    .insert(accountsTable)
+    .insert(accountTable)
     .values({
       id,
       userId,
@@ -58,8 +58,8 @@ export async function createAccountViaGoogle(userId: UserId, googleId: string) {
 }
 
 export async function getAccountByUserId(userId: UserId) {
-  const account = await db.query.accountsTable.findFirst({
-    where: eq(accountsTable.userId, userId),
+  const account = await db.query.accountTable.findFirst({
+    where: eq(accountTable.userId, userId),
   });
 
   return account;
@@ -72,7 +72,7 @@ export async function createProfile(
 ) {
   const id = generateIdFromEntropySize(12);
   const [profile] = await db
-    .insert(profilesTable)
+    .insert(profileTable)
     .values({
       id,
       userId,
@@ -85,7 +85,7 @@ export async function createProfile(
 }
 
 export const getUserWithFullDetails = (userId: string) => {
-  return db.query.usersTable.findFirst({
+  return db.query.userTable.findFirst({
     where: ({ id }, { eq }) => eq(id, userId),
     with: {
       profile: true,
@@ -106,20 +106,20 @@ export const updateAccountDetails = async ({
   return db.transaction(async (tx) => {
     if (displayName) {
       await tx
-        .update(profilesTable)
+        .update(profileTable)
         .set({ displayName })
-        .where(eq(profilesTable.userId, userId));
+        .where(eq(profileTable.userId, userId));
     }
     if (password) {
-      const account = await tx.query.accountsTable.findFirst({
+      const account = await tx.query.accountTable.findFirst({
         where: (fields, { eq }) => eq(fields.userId, userId),
       });
       if (account?.accountType !== "email") return true;
       const hash = await bcrypt.hash(password, 12);
       await tx
-        .update(accountsTable)
+        .update(accountTable)
         .set({ password: hash })
-        .where(eq(accountsTable.userId, userId));
+        .where(eq(accountTable.userId, userId));
     }
 
     return true;

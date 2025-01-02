@@ -2,28 +2,27 @@ import {
   sqliteTable,
   integer,
   uniqueIndex,
-  index,
   text,
+  real,
 } from "drizzle-orm/sqlite-core";
-import { productsTable } from "./products";
-import { colorsTable } from "./colors";
-import { sizesTable } from "./sizes";
+import { productTable } from "./products";
+import { colorTable } from "./colors";
 import { relations } from "drizzle-orm";
-import { imagesTable } from "./images";
-import { cartItemsTable } from "./carts";
+import { imageTable } from "./images";
+import { cartItemTable } from "./carts";
 
-export const productColorsTable = sqliteTable(
-  "product_colors",
+export const productVariantTable = sqliteTable(
+  "product_variant",
   {
     id: integer("id", { mode: "number" }).primaryKey({
       autoIncrement: true,
     }),
     productId: integer("product_id", { mode: "number" })
       .notNull()
-      .references(() => productsTable.id, { onDelete: "cascade" }),
-    colorId: integer("color_id", { mode: "number" })
+      .references(() => productTable.id, { onDelete: "cascade" }),
+    colorName: text("color_name")
       .notNull()
-      .references(() => colorsTable.id),
+      .references(() => colorTable.name),
     createdAt: integer("created_at", { mode: "timestamp" }).$default(
       () => new Date(),
     ),
@@ -35,25 +34,25 @@ export const productColorsTable = sqliteTable(
     return {
       productColorUnique: uniqueIndex("product_color_unique_idx").on(
         table.productId,
-        table.colorId,
+        table.colorName,
       ),
     };
   },
 );
 
-export const productVariantsTable = sqliteTable(
-  "product_variants",
+export const sizeTable = sqliteTable(
+  "sizes",
   {
-    id: integer("variant_id", { mode: "number" }).primaryKey({
+    id: integer("id", { mode: "number" }).primaryKey({
       autoIncrement: true,
     }),
-    productColorId: integer("product_color_id", { mode: "number" })
+    productVariantId: integer("product_variant_id", { mode: "number" })
       .notNull()
-      .references(() => productColorsTable.id, { onDelete: "cascade" }),
-    sizeId: integer("size_id", { mode: "number" })
-      .notNull()
-      .references(() => sizesTable.id),
-    priceAdjustment: integer("price_adjustment").default(0),
+      .references(() => productVariantTable.id, { onDelete: "cascade" }),
+    size: text("size", {
+      enum: ["XS", "S", "M", "L", "XL", "2XL", "3XL"],
+    }).notNull(),
+    priceAdjustment: real("price_adjustment").default(0),
     quantity: integer("quantity", { mode: "number" }).notNull().default(0),
     dimensions: text("dimensions"),
     createdAt: integer("created_at", { mode: "timestamp" }).$default(
@@ -66,40 +65,33 @@ export const productVariantsTable = sqliteTable(
   (table) => {
     return {
       variantUnique: uniqueIndex("variant_unique_idx").on(
-        table.productColorId,
-        table.sizeId,
+        table.productVariantId,
+        table.size,
       ),
     };
   },
 );
 
-export const productColorsRelations = relations(
-  productColorsTable,
+export const productVariantRelations = relations(
+  productVariantTable,
   ({ one, many }) => ({
-    product: one(productsTable, {
-      fields: [productColorsTable.productId],
-      references: [productsTable.id],
+    product: one(productTable, {
+      fields: [productVariantTable.productId],
+      references: [productTable.id],
     }),
-    color: one(colorsTable, {
-      fields: [productColorsTable.colorId],
-      references: [colorsTable.id],
+    color: one(colorTable, {
+      fields: [productVariantTable.colorName],
+      references: [colorTable.name],
     }),
-    image: many(imagesTable),
-    productVariants: many(productVariantsTable),
+    images: many(imageTable),
+    sizes: many(sizeTable),
   }),
 );
 
-export const productVariantsRelations = relations(
-  productVariantsTable,
-  ({ one, many }) => ({
-    size: one(sizesTable, {
-      fields: [productVariantsTable.sizeId],
-      references: [sizesTable.id],
-    }),
-    productColor: one(productColorsTable, {
-      fields: [productVariantsTable.productColorId],
-      references: [productColorsTable.id],
-    }),
-    cartItem: many(cartItemsTable),
+export const sizeRelations = relations(sizeTable, ({ one, many }) => ({
+  variant: one(productVariantTable, {
+    fields: [sizeTable.productVariantId],
+    references: [productVariantTable.id],
   }),
-);
+  cartItem: many(cartItemTable),
+}));

@@ -1,8 +1,9 @@
+import { router } from "./trpc";
 import productsRouter from "@/server/routers/products";
 import cartsRouter from "@/server/routers/carts";
 import wishlistsRouter from "@/server/routers/wishlists";
 import addressRouter from "@/server/routers/address";
-import { router } from "./trpc";
+import filtersRouter from "@/server/routers/filters";
 import authRouter from "./routers/users";
 
 export const appRouter = router({
@@ -11,6 +12,7 @@ export const appRouter = router({
   carts: cartsRouter,
   wishlists: wishlistsRouter,
   address: addressRouter,
+  filters: filtersRouter,
 });
 
 export type AppRouter = typeof appRouter;

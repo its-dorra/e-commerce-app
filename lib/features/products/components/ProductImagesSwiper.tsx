@@ -12,9 +12,12 @@ import {
 export default function ProductImagesSwiper({ images }: { images: string[] }) {
   return (
     <Carousel>
-      <CarouselContent>
+      <CarouselContent className="w-[320px]">
         {images.map((image) => (
-          <CarouselItem key={image}>
+          <CarouselItem
+            className="w-[320px]"
+            key={image + Math.random().toString()}
+          >
             <ProductImage imageUrl={image} alt="image product" />
           </CarouselItem>
         ))}

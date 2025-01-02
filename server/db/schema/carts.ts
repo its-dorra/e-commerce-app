@@ -5,17 +5,17 @@ import {
   real,
   index,
 } from "drizzle-orm/sqlite-core";
-import { usersTable as users } from "./users";
-import { productVariantsTable } from "./productVariants";
+import { userTable } from "./users";
 import { relations } from "drizzle-orm";
+import { sizeTable } from "./productVariants";
 
-export const cartsTable = sqliteTable("carts", {
+export const cartTable = sqliteTable("cart", {
   id: integer("id", { mode: "number" }).primaryKey({
     autoIncrement: true,
   }),
   userId: text("user_id")
     .notNull()
-    .references(() => users.id),
+    .references(() => userTable.id, { onDelete: "cascade" }),
   isMigratedToCheckout: integer("is_migrated_to_checkout", { mode: "boolean" })
     .notNull()
     .default(false),
@@ -27,20 +27,20 @@ export const cartsTable = sqliteTable("carts", {
     .$onUpdate(() => new Date()),
 });
 
-export const cartItemsTable = sqliteTable(
+export const cartItemTable = sqliteTable(
   "cart_items",
   {
     id: integer("cart_item_id", { mode: "number" }).primaryKey({
       autoIncrement: true,
     }),
-    productVariantId: integer("product_variant_id")
+    sizeId: integer("size_id")
       .notNull()
-      .references(() => productVariantsTable.id),
+      .references(() => sizeTable.id, { onDelete: "cascade" }),
     quantity: integer("quantity").notNull().default(1),
     itemPrice: real("item_price").notNull(),
     cartId: integer("cart_id")
       .notNull()
-      .references(() => cartsTable.id),
+      .references(() => cartTable.id, { onDelete: "cascade" }),
     createdAt: integer("created_at", { mode: "timestamp" }).$default(
       () => new Date(),
     ),
@@ -49,25 +49,25 @@ export const cartItemsTable = sqliteTable(
       .$onUpdate(() => new Date()),
   },
   (table) => ({
-    productIdIdx: index("product_id_idx").on(table.productVariantId),
+    productIdIdx: index("product_id_idx").on(table.sizeId),
   }),
 );
 
-export const cartsRelations = relations(cartsTable, ({ one, many }) => ({
-  cartItems: many(cartItemsTable),
-  user: one(users, {
-    fields: [cartsTable.userId],
-    references: [users.id],
+export const cartRelations = relations(cartTable, ({ one, many }) => ({
+  cartItems: many(cartItemTable),
+  user: one(userTable, {
+    fields: [cartTable.userId],
+    references: [userTable.id],
   }),
 }));
 
-export const cartItemsRelations = relations(cartItemsTable, ({ one }) => ({
-  productVariant: one(productVariantsTable, {
-    fields: [cartItemsTable.productVariantId],
-    references: [productVariantsTable.id],
+export const cartItemRelations = relations(cartItemTable, ({ one }) => ({
+  size: one(sizeTable, {
+    fields: [cartItemTable.sizeId],
+    references: [sizeTable.id],
   }),
-  cart: one(cartsTable, {
-    fields: [cartItemsTable.cartId],
-    references: [cartsTable.id],
+  cart: one(cartTable, {
+    fields: [cartItemTable.cartId],
+    references: [cartTable.id],
   }),
 }));

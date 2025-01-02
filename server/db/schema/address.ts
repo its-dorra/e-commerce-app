@@ -4,7 +4,7 @@ import {
   text,
   uniqueIndex,
 } from "drizzle-orm/sqlite-core";
-import { usersTable } from "./users";
+import { userTable } from "./users";
 import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
@@ -15,7 +15,7 @@ export const addressTable = sqliteTable(
     id: integer("id").primaryKey({ autoIncrement: true }),
     userId: text("user_id")
       .notNull()
-      .references(() => usersTable.id),
+      .references(() => userTable.id, { onDelete: "cascade" }),
     streetAddress: text("street_address").notNull(),
     city: text("city").notNull(),
     state: text("state").notNull(),
@@ -37,8 +37,8 @@ export const insertAddressSchema = createInsertSchema(addressTable, {
 export type Address = z.infer<typeof insertAddressSchema>;
 
 export const addressRelations = relations(addressTable, ({ one }) => ({
-  user: one(usersTable, {
+  user: one(userTable, {
     fields: [addressTable.userId],
-    references: [usersTable.id],
+    references: [userTable.id],
   }),
 }));

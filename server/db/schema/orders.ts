@@ -1,18 +1,18 @@
 import { integer, real, sqliteTable, text } from "drizzle-orm/sqlite-core";
-import { cartsTable } from "./carts";
-import { usersTable as users } from "./users";
+import { cartTable } from "./carts";
+import { userTable } from "./users";
 import { relations } from "drizzle-orm";
 
-export const ordersTable = sqliteTable("orders", {
+export const orderTable = sqliteTable("orders", {
   id: integer("id", { mode: "number" }).primaryKey({
     autoIncrement: true,
   }),
   cartId: integer("cart_id", { mode: "number" })
     .notNull()
-    .references(() => cartsTable.id),
+    .references(() => cartTable.id),
   userId: text("user_id")
     .notNull()
-    .references(() => users.id),
+    .references(() => userTable.id, { onDelete: "cascade" }),
   totalPrice: real("total_price").notNull(),
   phone_number: text("phone_number"),
   wilaya: text("wilaya"),
@@ -33,13 +33,13 @@ export const ordersTable = sqliteTable("orders", {
     .$onUpdate(() => new Date()),
 });
 
-export const ordersRelations = relations(ordersTable, ({ one }) => ({
-  cart: one(cartsTable, {
-    fields: [ordersTable.cartId],
-    references: [cartsTable.id],
+export const orderRelations = relations(orderTable, ({ one }) => ({
+  cart: one(cartTable, {
+    fields: [orderTable.cartId],
+    references: [cartTable.id],
   }),
-  user: one(users, {
-    fields: [ordersTable.userId],
-    references: [users.id],
+  user: one(userTable, {
+    fields: [orderTable.userId],
+    references: [userTable.id],
   }),
 }));

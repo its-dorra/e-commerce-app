@@ -10,7 +10,7 @@ export default function CategoriesFilter({
     <div className="space-y-2">
       <h5 className="h5 mb-4">Categories</h5>
       {categories.map((category) => (
-        <CategoryFilter key={category.id} name={category.name} />
+        <CategoryFilter key={category.name} name={category.name} />
       ))}
     </div>
   );

@@ -5,7 +5,6 @@ import { cache } from "react";
 import { UserId } from "lucia";
 import { AdminAuthenticationError, AuthenticationError } from "@/lib/utils";
 
-
 export const setSession = async (userId: UserId) => {
   const session = await lucia.createSession(userId, {});
 
@@ -61,24 +60,24 @@ export const getCurrentUser = cache(async () => {
   return user ?? undefined;
 });
 
-export const assertAuthenticated = async () => {
+export const assertAuthenticated = cache(async () => {
   const user = await getCurrentUser();
   if (!user) {
     throw new AuthenticationError();
   }
   return user;
-};
+});
 
-export const assertAdmin = async () => {
+export const assertAdmin = cache(async () => {
   const user = await assertAuthenticated();
 
   if (user.role !== "admin") throw new AdminAuthenticationError();
 
   return user;
-};
+});
 
-export const isAdmin = async () => {
+export const isAdmin = cache(async () => {
   const user = await getCurrentUser();
 
   return user?.role === "admin";
-};
+});

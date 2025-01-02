@@ -10,8 +10,6 @@ import EmptyListMessage from "@/lib/components/EmptyListMessage";
 export default function WishlistContainer() {
   const { data, isPending } = useWishlist();
 
-  console.log({ data, isPending });
-
   if (!data || data.length === 0)
     return <EmptyListMessage listName="Wishlist" />;
 

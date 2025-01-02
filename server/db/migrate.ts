@@ -6,7 +6,7 @@ const migrateDB = async () => {
     console.log("Running migrations ....");
 
     await migrate(db, {
-      migrationsFolder: "./lib/db/migrations",
+      migrationsFolder: "./server/db/migrations",
     });
 
     console.log("Migrations ran successfully.");

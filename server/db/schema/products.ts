@@ -1,19 +1,19 @@
 import { sqliteTable, text, integer, real } from "drizzle-orm/sqlite-core";
-import { categoriesTable } from "./categories";
+import { categoryTable } from "./categories";
 import { relations } from "drizzle-orm";
-import { productColorsTable } from "./productVariants";
+import { productVariantTable } from "./productVariants";
 import { wishListTable } from "./wishlist";
 
-export const productsTable = sqliteTable("products", {
+export const productTable = sqliteTable("products", {
   id: integer("id", { mode: "number" }).primaryKey({
     autoIncrement: true,
   }),
   name: text("name").notNull(),
   description: text("description"),
   basePrice: real("base_price").notNull(),
-  categoryId: integer("category_id", { mode: "number" }).references(
-    () => categoriesTable.id,
-  ),
+  categoryName: text("category_name")
+    .notNull()
+    .references(() => categoryTable.name, { onDelete: "set null" }),
   createdAt: integer("created_at", { mode: "timestamp" }).$default(
     () => new Date(),
   ),
@@ -22,11 +22,11 @@ export const productsTable = sqliteTable("products", {
     .$onUpdate(() => new Date()),
 });
 
-export const productsRelations = relations(productsTable, ({ one, many }) => ({
-  category: one(categoriesTable, {
-    fields: [productsTable.categoryId],
-    references: [categoriesTable.id],
+export const productRelations = relations(productTable, ({ one, many }) => ({
+  category: one(categoryTable, {
+    fields: [productTable.categoryName],
+    references: [categoryTable.name],
   }),
-  productColor: many(productColorsTable),
+  variants: many(productVariantTable),
   wishList: many(wishListTable),
 }));

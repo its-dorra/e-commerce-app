@@ -1,11 +1,11 @@
 import { relations } from "drizzle-orm";
 import { sqliteTable, text, integer, index } from "drizzle-orm/sqlite-core";
-import { cartsTable } from "./carts";
-import { ordersTable } from "./orders";
+import { cartTable } from "./carts";
+import { orderTable } from "./orders";
 import { wishListTable } from "./wishlist";
 import { addressTable } from "./address";
 
-export const usersTable = sqliteTable(
+export const userTable = sqliteTable(
   "users",
   {
     id: text("id").primaryKey(),
@@ -20,14 +20,14 @@ export const usersTable = sqliteTable(
   },
 );
 
-export const accountsTable = sqliteTable(
+export const accountTable = sqliteTable(
   "accounts",
   {
     id: text("id").primaryKey(),
     userId: text("user_id")
       .notNull()
       .unique()
-      .references(() => usersTable.id, { onDelete: "cascade" }),
+      .references(() => userTable.id, { onDelete: "cascade" }),
     password: text("password"),
     googleId: text("google_id").unique(),
     accountType: text("account_type").$type<"email" | "google">(),
@@ -49,7 +49,7 @@ export const sessionTable = sqliteTable(
     id: text("id").primaryKey(),
     userId: text("user_id")
       .notNull()
-      .references(() => usersTable.id, { onDelete: "cascade" }),
+      .references(() => userTable.id, { onDelete: "cascade" }),
     expiresAt: integer("expires_at").notNull(),
   },
   (table) => {
@@ -57,11 +57,11 @@ export const sessionTable = sqliteTable(
   },
 );
 
-export const profilesTable = sqliteTable("profile", {
+export const profileTable = sqliteTable("profile", {
   id: text("id").primaryKey(),
   userId: text("userId")
     .notNull()
-    .references(() => usersTable.id, { onDelete: "cascade" })
+    .references(() => userTable.id, { onDelete: "cascade" })
     .unique(),
   displayName: text("displayName"),
   imageId: text("imageId"),
@@ -75,25 +75,25 @@ export const profilesTable = sqliteTable("profile", {
     .$onUpdate(() => new Date()),
 });
 
-export const userRelations = relations(usersTable, ({ one, many }) => ({
-  carts: many(cartsTable),
-  orders: many(ordersTable),
-  profile: one(profilesTable),
-  account: one(accountsTable),
+export const userRelations = relations(userTable, ({ one, many }) => ({
+  carts: many(cartTable),
+  orders: many(orderTable),
+  profile: one(profileTable),
+  account: one(accountTable),
   wishList: many(wishListTable),
   address: one(addressTable),
 }));
 
-export const profileRelations = relations(profilesTable, ({ one }) => ({
-  user: one(usersTable, {
-    fields: [profilesTable.userId],
-    references: [usersTable.id],
+export const profileRelations = relations(profileTable, ({ one }) => ({
+  user: one(userTable, {
+    fields: [profileTable.userId],
+    references: [userTable.id],
   }),
 }));
 
-export const accountRelations = relations(accountsTable, ({ one }) => ({
-  user: one(usersTable, {
-    fields: [accountsTable.userId],
-    references: [usersTable.id],
+export const accountRelations = relations(accountTable, ({ one }) => ({
+  user: one(userTable, {
+    fields: [accountTable.userId],
+    references: [userTable.id],
   }),
 }));

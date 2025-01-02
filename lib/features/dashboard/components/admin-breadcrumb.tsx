@@ -8,7 +8,6 @@ import {
 } from "@/components/ui/breadcrumb";
 
 interface AdminBreadCrumbProps {
-  href: string;
   to: string;
 }
 

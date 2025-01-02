@@ -67,6 +67,7 @@ async function Products({
   const from = (page - 1) * perPage + 1;
   const to = totalPages > page ? page * perPage : total;
 
+
   return (
     <div className="space-y-4 lg:px-8">
       <div className="flex items-center justify-between lg:block">

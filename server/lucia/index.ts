@@ -2,10 +2,11 @@ import { DrizzleSQLiteAdapter } from "@lucia-auth/adapter-drizzle";
 import { Lucia } from "lucia";
 import { Google } from "arctic";
 import db from "@/server/db";
-import { sessionTable, usersTable } from "@/server/db/schema/users";
+import { sessionTable, userTable } from "@/server/db/schema/users";
 import env from "@/server/env";
+import { baseUrl } from "@/lib/utils";
 
-const adapter = new DrizzleSQLiteAdapter(db, sessionTable, usersTable);
+const adapter = new DrizzleSQLiteAdapter(db, sessionTable, userTable);
 
 export const lucia = new Lucia(adapter, {
   sessionCookie: {
@@ -25,7 +26,7 @@ export const lucia = new Lucia(adapter, {
 export const googleClient = new Google(
   env.GOOGLE_CLIENT_ID,
   env.GOOGLE_CLIENT_SECRET,
-  env.NEXT_PUBLIC_BASE_URL + "api/auth/google/callback",
+  baseUrl + "api/auth/google/callback",
 );
 
 declare module "lucia" {

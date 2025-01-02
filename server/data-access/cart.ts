@@ -1,9 +1,8 @@
 import { catchError } from "@/lib/utils";
 import db from "../db";
 import { getProductVarientById } from "./products";
-import { cartItemsTable, cartsTable } from "../db/schema";
+import { cartItemTable, cartTable } from "../db/schema";
 import { and, eq } from "drizzle-orm";
-import { ErrorWithStatus } from "../types/types";
 import { TRPCError } from "@trpc/server";
 
 export const handleCartItem = ({
@@ -19,32 +18,32 @@ export const handleCartItem = ({
   quantity: number;
 }) => {
   return db.transaction(async (tx) => {
-    const existingItem = await tx.query.cartItemsTable.findFirst({
+    const existingItem = await tx.query.cartItemTable.findFirst({
       where: and(
-        eq(cartItemsTable.cartId, cartId),
-        eq(cartItemsTable.productVariantId, productVariant.id),
+        eq(cartItemTable.cartId, cartId),
+        eq(cartItemTable.sizeId, productVariant.id),
       ),
     });
 
     if (existingItem) {
       const [updatedItem] = await tx
-        .update(cartItemsTable)
+        .update(cartItemTable)
         .set({ quantity })
-        .where(eq(cartItemsTable.id, existingItem.id))
+        .where(eq(cartItemTable.id, existingItem.id))
         .returning();
       return updatedItem;
     }
 
     // Calculate final item price including adjustments
     const finalPrice =
-      productVariant.productColor.product.basePrice +
+      productVariant.variant.product.basePrice +
       (productVariant.priceAdjustment || 0);
 
     const [newItem] = await tx
-      .insert(cartItemsTable)
+      .insert(cartItemTable)
       .values({
         cartId,
-        productVariantId: productVariant.id,
+        sizeId: productVariant.id,
         quantity,
         itemPrice: finalPrice,
       })
@@ -55,20 +54,19 @@ export const handleCartItem = ({
 };
 
 export const getCartItems = (userId: string) => {
-  return db.query.cartsTable.findFirst({
+  return db.query.cartTable.findFirst({
     orderBy: ({ createdAt }, { desc }) => desc(createdAt),
     where: ({ userId: tableUserId, isMigratedToCheckout }, { eq, and }) =>
       and(eq(tableUserId, userId), eq(isMigratedToCheckout, false)),
     with: {
       cartItems: {
         with: {
-          productVariant: {
+          size: {
             with: {
-              size: true,
-              productColor: {
+              variant: {
                 with: {
                   color: true,
-                  image: {
+                  images: {
                     columns: {
                       imagePath: true,
                     },
@@ -89,7 +87,7 @@ export const getCartItems = (userId: string) => {
 
 export const getCart = (userId: string) => {
   return db.transaction(async (tx) => {
-    const existingCart = await tx.query.cartsTable.findFirst({
+    const existingCart = await tx.query.cartTable.findFirst({
       where: ({ userId: tableUserId, isMigratedToCheckout }, { eq, and }) =>
         and(eq(tableUserId, userId), eq(isMigratedToCheckout, false)),
       orderBy: ({ createdAt }, { desc }) => desc(createdAt),
@@ -97,10 +95,7 @@ export const getCart = (userId: string) => {
 
     if (existingCart) return existingCart;
 
-    const [newCart] = await tx
-      .insert(cartsTable)
-      .values({ userId })
-      .returning();
+    const [newCart] = await tx.insert(cartTable).values({ userId }).returning();
 
     return newCart;
   });
@@ -160,11 +155,11 @@ export const deleteCartItem = async ({
   const userCart = await getCart(userId);
 
   return db
-    .delete(cartItemsTable)
+    .delete(cartItemTable)
     .where(
       and(
-        eq(cartItemsTable.id, cartItemId),
-        eq(cartItemsTable.cartId, userCart.id),
+        eq(cartItemTable.id, cartItemId),
+        eq(cartItemTable.cartId, userCart.id),
       ),
     )
     .returning();
@@ -184,12 +179,12 @@ export const updateCartItemQuantity = async ({
   const userCart = await getCart(userId);
 
   return db
-    .update(cartItemsTable)
+    .update(cartItemTable)
     .set({ quantity })
     .where(
       and(
-        eq(cartItemsTable.id, cartItemId),
-        eq(cartItemsTable.cartId, userCart.id),
+        eq(cartItemTable.id, cartItemId),
+        eq(cartItemTable.cartId, userCart.id),
       ),
     )
     .returning();

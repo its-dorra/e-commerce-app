@@ -1,14 +1,11 @@
 import { relations } from "drizzle-orm";
 import { sqliteTable, text, integer, index } from "drizzle-orm/sqlite-core";
-import { productColorsTable } from "./productVariants";
+import { productVariantTable } from "./productVariants";
 
-export const colorsTable = sqliteTable(
+export const colorTable = sqliteTable(
   "colors",
   {
-    id: integer("id", { mode: "number" }).primaryKey({
-      autoIncrement: true,
-    }),
-    name: text("name").notNull(),
+    name: text("name").primaryKey(),
     hexCode: text("hex_code").notNull(),
     createdAt: integer("created_at", { mode: "timestamp" }).$default(
       () => new Date(),
@@ -24,6 +21,6 @@ export const colorsTable = sqliteTable(
   },
 );
 
-export const colorsRelations = relations(colorsTable, ({ one }) => ({
-  productColor: one(productColorsTable),
+export const colorRelations = relations(colorTable, ({ one }) => ({
+  variant: one(productVariantTable),
 }));

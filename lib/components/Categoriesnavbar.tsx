@@ -15,11 +15,11 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 
-import { categories } from "../constants";
 import { Button } from "@/components/ui/button";
+import { clientTrpc } from "../trpc/client";
 
 export default function CategoriesNavBar() {
-  // const categories = await getCategories();
+  const { data: categories } = clientTrpc.filters.categories.useQuery();
 
   return (
     <>
@@ -29,12 +29,12 @@ export default function CategoriesNavBar() {
             Categories
           </AccordionTrigger>
           <AccordionContent className="text my-6 space-y-1 no-underline">
-            {categories.map(({ id, category: name }) => {
+            {categories?.map(({ name }) => {
               return (
                 <Button
                   className="block cursor-pointer"
                   variant="ghost"
-                  key={id}
+                  key={name}
                 >
                   <Link
                     href={`/products/categories=${name}`}
@@ -56,17 +56,16 @@ export default function CategoriesNavBar() {
           <Image src={chevronDownIcon} alt="chevron down" />
         </DropdownMenuTrigger>
         <DropdownMenuContent className="space-y-1 rounded-sm bg-white p-4">
-          {categories.map(({ id, category: name }) => {
+          {categories?.map(({ name }) => {
             return (
               <DropdownMenuItem
-                key={id}
+                key={name}
                 asChild
                 className="text-base font-normal"
               >
                 <Button
-                  className="w-full hover:bg-gray-100"
+                  className="w-full border-none outline-none hover:bg-gray-100"
                   variant="ghost"
-                  key={id}
                 >
                   <Link
                     href={`/products/?categories=${name}`}

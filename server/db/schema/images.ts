@@ -1,16 +1,16 @@
 import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
-import { productColorsTable } from "./productVariants";
 import { relations } from "drizzle-orm";
+import { productVariantTable } from "./productVariants";
 
-export const imagesTable = sqliteTable(
-  "images",
+export const imageTable = sqliteTable(
+  "image",
   {
     id: integer("id", { mode: "number" }).primaryKey({
       autoIncrement: true,
     }),
-    productColorId: integer("product_color_id")
+    productVariantId: integer("product_variant_id")
       .notNull()
-      .references(() => productColorsTable.id, { onDelete: "cascade" }),
+      .references(() => productVariantTable.id, { onDelete: "cascade" }),
     imagePath: text("image_path").notNull(),
     displayOrder: integer("display_order").notNull().default(0),
     imageType: text("image_type")
@@ -27,19 +27,19 @@ export const imagesTable = sqliteTable(
   (table) => {
     return {
       productColorIdx: index("product_color_images_idx").on(
-        table.productColorId,
+        table.productVariantId,
       ),
       orderIdx: index("display_order_idx").on(
-        table.productColorId,
+        table.productVariantId,
         table.displayOrder,
       ),
     };
   },
 );
 
-export const imagesRelations = relations(imagesTable, ({ one }) => ({
-  productColor: one(productColorsTable, {
-    fields: [imagesTable.productColorId],
-    references: [productColorsTable.id],
+export const imageRelations = relations(imageTable, ({ one }) => ({
+  variant: one(productVariantTable, {
+    fields: [imageTable.productVariantId],
+    references: [productVariantTable.id],
   }),
 }));
