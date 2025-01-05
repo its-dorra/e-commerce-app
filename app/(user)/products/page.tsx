@@ -14,6 +14,9 @@ import {
 } from "@/lib/features/products/services";
 import { Suspense } from "react";
 import { baseUrl } from "@/lib/utils";
+import { Size } from "@/server/types/products";
+import { getCurrentUser } from "@/server/lucia/utils";
+import { redirect } from "next/navigation";
 
 export const dynamic = "force-static";
 
@@ -46,7 +49,7 @@ interface ProductsProps {
   searchParams: Promise<{
     categories: string | string[] | undefined;
     colors: string | string[] | undefined;
-    sizes: string | string[] | undefined;
+    sizes: Size | Size[] | undefined;
     page: string | undefined;
   }>;
 }
@@ -56,6 +59,14 @@ async function Products({
 }: {
   searchParams: Awaited<ProductsProps["searchParams"]>;
 }) {
+  const user = await getCurrentUser();
+
+  const userRole = user?.role;
+
+  if (userRole === "admin") {
+    return redirect("/admin/dashboard");
+  }
+
   const {
     products,
     pagination: { totalPages, page, total, perPage },
@@ -66,7 +77,6 @@ async function Products({
 
   const from = (page - 1) * perPage + 1;
   const to = totalPages > page ? page * perPage : total;
-
 
   return (
     <div className="space-y-4 lg:px-8">

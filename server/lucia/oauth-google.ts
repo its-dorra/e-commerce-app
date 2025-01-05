@@ -1,21 +1,21 @@
 import db from "@/server/db";
-import { accountsTable, usersTable } from "@/server/db/schema/users";
+import { accountTable, userTable } from "@/server/db/schema/users";
 import { eq } from "drizzle-orm";
 import { GoogleUser } from "../routers/users";
 import { generateIdFromEntropySize, UserId } from "lucia";
 import { createProfile, createUser } from "@/server/data-access/users";
 
 export async function getUserByEmail(email: string) {
-  const user = await db.query.usersTable.findFirst({
-    where: eq(usersTable.email, email),
+  const user = await db.query.userTable.findFirst({
+    where: eq(userTable.email, email),
   });
 
   return user;
 }
 
 export async function getAccountByGoogleId(googleId: string) {
-  return await db.query.accountsTable.findFirst({
-    where: eq(accountsTable.googleId, googleId),
+  return await db.query.accountTable.findFirst({
+    where: eq(accountTable.googleId, googleId),
   });
 }
 
@@ -23,7 +23,7 @@ export async function createUserViaGoogle(userId: UserId, googleId: string) {
   const id = generateIdFromEntropySize(12);
 
   await db
-    .insert(accountsTable)
+    .insert(accountTable)
     .values({
       id,
       userId,

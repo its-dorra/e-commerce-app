@@ -57,13 +57,13 @@ export const getAllwishlistItems = ({ userId }: { userId: string }) =>
     with: {
       product: {
         with: {
-          productColor: {
+          variants: {
             limit: 1,
             columns: {
               id: true,
             },
             with: {
-              image: {
+              images: {
                 columns: { imagePath: true },
                 orderBy: ({ displayOrder }, { asc }) => asc(displayOrder),
                 limit: 1,

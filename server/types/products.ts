@@ -4,4 +4,4 @@ export type FilterQuery = {
   sizes?: Size[];
 };
 
-type Size = "XS" | "S" | "M" | "L" | "XL" | "2XL" | "3XL";
+export type Size = "XS" | "S" | "M" | "L" | "XL" | "2XL" | "3XL";

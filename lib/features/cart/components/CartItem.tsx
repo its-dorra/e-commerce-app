@@ -15,11 +15,11 @@ export default function CartItem({
     itemPrice,
     id,
 
-    productVariant: {
-      size: { name: size },
+    size: {
+      size,
       quantity: productQuantity,
-      productColor: {
-        image: images,
+      variant: {
+        images,
         color: { hexCode },
         product: { name },
       },

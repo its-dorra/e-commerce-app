@@ -1,4 +1,5 @@
 import { serverTrpc } from "@/lib/trpc/server";
+import { Size } from "@/server/types/products";
 import { cache } from "react";
 
 export const getCategories = async () => {
@@ -22,7 +23,7 @@ export const getSizes = async () => {
 export const getProducts = async (values: {
   categories?: string | string[];
   colors?: string | string[];
-  sizes?: string | string[];
+  sizes?: Size | Size[];
   page?: number;
 }) => {
   const res = await serverTrpc.products.products(values);

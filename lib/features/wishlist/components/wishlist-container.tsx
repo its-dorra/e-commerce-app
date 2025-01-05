@@ -26,7 +26,7 @@ function WishlistItem({ item }: { item: WishlistItem }) {
   return (
     <li className="flex w-[32rem] max-w-full items-center border-b pb-4 last:border-none">
       <ProductImage
-        imageUrl={item.product.productColor[0].image[0].imagePath}
+        imageUrl={item.product.variants[0].images[0].imagePath}
         alt="Product image"
         className="mr-4 size-20"
       />
