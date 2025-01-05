@@ -9,7 +9,7 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { MouseEvent, MouseEventHandler } from "react";
 import { useDeleteQuery } from "../features/products/hooks/useDeleteQuery";
 import { useAppendQuery } from "../features/products/hooks/useAppendQuery";
@@ -24,8 +24,8 @@ export default function PaginationComponent({
   perPage,
 }: PaginationComponentProps) {
   const searchParams = useSearchParams();
-  const deleteQuery = useDeleteQuery();
-  const appendQuery = useAppendQuery();
+  const { replace } = useRouter();
+  const params = new URLSearchParams(searchParams);
   const currentPage = !searchParams.get("page")
     ? 1
     : Number(searchParams.get("page"));
@@ -36,15 +36,15 @@ export default function PaginationComponent({
     e: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>,
   ) => {
     if (currentPage === 1) return;
-    deleteQuery("page");
-    appendQuery("page", `${currentPage - 1}`);
+    params.set("page", `${currentPage - 1}`);
+    replace(`/products?${params.toString()}`);
   };
   const nextPage = (
     e: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>,
   ) => {
     if (currentPage === pageCount) return;
-    deleteQuery("page");
-    appendQuery("page", `${currentPage + 1}`);
+    params.set("page", `${currentPage + 1}`);
+    replace(`/products?${params.toString()}`);
   };
 
   if (pageCount <= 1) return null;
