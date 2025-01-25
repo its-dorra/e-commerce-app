@@ -41,7 +41,7 @@ export default function AddressForm() {
         <form.Field
           name="streetAddress"
           children={(field) => (
-            <FormField field={field} label="Street Address" />
+            <FormField name={field.name} field={field} label="Street Address" />
           )}
         />
       </div>
@@ -49,13 +49,17 @@ export default function AddressForm() {
         <div className="w-full max-w-[600px]">
           <form.Field
             name="city"
-            children={(field) => <FormField field={field} label="City" />}
+            children={(field) => (
+              <FormField name={field.name} field={field} label="City" />
+            )}
           />
         </div>
         <div className="w-full max-w-[600px]">
           <form.Field
             name="state"
-            children={(field) => <FormField field={field} label="State" />}
+            children={(field) => (
+              <FormField name={field.name} field={field} label="State" />
+            )}
           />
         </div>
       </div>

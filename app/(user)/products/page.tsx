@@ -17,8 +17,8 @@ import { baseUrl } from "@/lib/utils";
 import { Size } from "@/server/types/products";
 import { getCurrentUser } from "@/server/lucia/utils";
 import { redirect } from "next/navigation";
-
-export const dynamic = "force-static";
+import { HydrateClient, serverTrpc } from "@/lib/trpc/server";
+import ProductsClient from "@/lib/features/products/components/ProductsClient";
 
 export const metadata = {
   title: "Fashion Haven | Explore Our Products",
@@ -67,34 +67,39 @@ async function Products({
     return redirect("/admin/dashboard");
   }
 
-  const {
-    products,
-    pagination: { totalPages, page, total, perPage },
-  } = await getProducts({
-    ...searchParams,
-    page: searchParams.page ? +searchParams.page : undefined,
-  });
+  const page = Number(searchParams.page || 1);
 
-  const from = (page - 1) * perPage + 1;
-  const to = totalPages > page ? page * perPage : total;
+  const { categories, colors, sizes } = searchParams;
+
+  await Promise.all([
+    serverTrpc.products.products.prefetch({
+      page,
+      perPage: 8,
+      categories,
+      colors,
+      sizes,
+    }),
+    serverTrpc.products.products.prefetch({
+      page: page + 1,
+      perPage: 8,
+      categories,
+      colors,
+      sizes,
+    }),
+    page > 1 &&
+      serverTrpc.products.products.prefetch({
+        page: page - 1,
+        perPage: 8,
+        categories,
+        colors,
+        sizes,
+      }),
+  ]);
 
   return (
-    <div className="space-y-4 lg:px-8">
-      <div className="flex items-center justify-between lg:block">
-        <p className="body-2">
-          Showing {from}-{to} of {total} results
-        </p>
-        <FilterButton />
-      </div>
-      {products.length > 0 ? (
-        <>
-          <ProductsContainer products={products} />
-          <PaginationComponent count={total} perPage={perPage} />
-        </>
-      ) : (
-        <div>No products for this filter</div>
-      )}
-    </div>
+    <HydrateClient>
+      <ProductsClient />
+    </HydrateClient>
   );
 }
 

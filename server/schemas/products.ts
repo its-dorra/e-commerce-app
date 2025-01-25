@@ -1,3 +1,4 @@
+import { PER_PAGE } from "@/lib/constants/app-config";
 import { z } from "zod";
 
 export const productQuerySchema = z.object({
@@ -9,4 +10,5 @@ export const productQuerySchema = z.object({
     .or(z.enum(["XS", "S", "M", "L", "XL", "2XL", "3XL"]))
     .optional(),
   page: z.coerce.number().default(1),
+  perPage: z.number().positive().default(PER_PAGE),
 });

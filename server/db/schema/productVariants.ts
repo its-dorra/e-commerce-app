@@ -10,6 +10,9 @@ import { colorTable } from "./colors";
 import { relations } from "drizzle-orm";
 import { imageTable } from "./images";
 import { cartItemTable } from "./carts";
+import { createInsertSchema } from "drizzle-zod";
+import { z } from "zod";
+import { checkFileType, MAX_FILE_SIZE } from "@/lib/utils";
 
 export const productVariantTable = sqliteTable(
   "product_variant",
@@ -71,6 +74,34 @@ export const sizeTable = sqliteTable(
     };
   },
 );
+
+export const createSizeSchema = createInsertSchema(sizeTable).omit({
+  id: true,
+  createdAt: true,
+  dimensions: true,
+  productVariantId: true,
+  updatedAt: true,
+});
+
+export const createProductVariantSchema = createInsertSchema(
+  productVariantTable,
+)
+  .omit({ id: true, createdAt: true, updatedAt: true, productId: true })
+  .merge(
+    z.object({
+      sizes: z.array(createSizeSchema),
+      images: z.array(
+        z
+          .instanceof(File)
+          .refine((file) => file.size < MAX_FILE_SIZE, "Max size is 5MB")
+          .refine(
+            (file) =>
+              checkFileType(file, ["image/jpg", "image/jpeg", "image/png"]),
+            ".jpg , .jpeg and .png formates are supported",
+          ),
+      ),
+    }),
+  );
 
 export const productVariantRelations = relations(
   productVariantTable,

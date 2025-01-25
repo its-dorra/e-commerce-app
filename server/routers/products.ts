@@ -1,5 +1,6 @@
 import { productQuerySchema } from "../schemas/products";
 import {
+  deleteProductById,
   getCategories,
   getColors,
   getProductById,
@@ -9,6 +10,8 @@ import {
 import { toArray } from "../../lib/utils";
 import { z } from "zod";
 import { procedure, router } from "../trpc";
+import { adminProcedure } from "../middlewares/auth";
+import { TRPCError } from "@trpc/server";
 
 const productsRouter = router({
   categories: procedure.query(async () => {
@@ -19,8 +22,8 @@ const productsRouter = router({
     const colors = await getColors();
     return colors;
   }),
-  sizes: procedure.query(async () => {
-    const sizes = await getSizes();
+  sizes: procedure.query(() => {
+    const sizes = getSizes();
     return sizes;
   }),
   products: procedure.input(productQuerySchema).query(async ({ input }) => {
@@ -43,6 +46,18 @@ const productsRouter = router({
       const product = await getProductById(id);
 
       return product;
+    }),
+  deleteProductById: adminProcedure
+    .input(z.object({ id: z.number().positive() }))
+    .mutation(async ({ input }) => {
+      const deletedProduct = await deleteProductById(input.id);
+      if (!deletedProduct)
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Product not found",
+        });
+
+      return deletedProduct;
     }),
 });
 

@@ -1,3 +1,7 @@
 {
-  "typescript.tsdk": "node_modules\\typescript\\lib"
+  "typescript.tsdk": "node_modules\\typescript\\lib",
+  "typescript.preferences.autoImportFileExcludePatterns": ["@radix-ui/*"],
+  "files.exclude": {
+    "**/node_modules/@radix-ui/react-*": true
+  }
 }

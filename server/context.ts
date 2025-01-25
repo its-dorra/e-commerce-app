@@ -1,5 +1,3 @@
-import { CreateNextContextOptions } from "@trpc/server/adapters/next";
-
 import { cache } from "react";
 import { getCurrentUser } from "./lucia/utils";
 

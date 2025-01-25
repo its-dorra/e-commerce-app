@@ -50,7 +50,9 @@ export default function AccountDetailsForm() {
         <div className="w-full max-w-[600px]">
           <form.Field
             name="displayName"
-            children={(field) => <FormField field={field} label="FullName" />}
+            children={(field) => (
+              <FormField name={field.name} field={field} label="FullName" />
+            )}
           />
         </div>
         {user?.account?.accountType === "email" && (
@@ -59,7 +61,7 @@ export default function AccountDetailsForm() {
               <form.Field
                 name="password"
                 children={(field) => (
-                  <FormField field={field} label="Password" />
+                  <FormField name={field.name} field={field} label="Password" />
                 )}
               />
             </div>
@@ -67,7 +69,11 @@ export default function AccountDetailsForm() {
               <form.Field
                 name="confirmPassword"
                 children={(field) => (
-                  <FormField field={field} label="Confirm password" />
+                  <FormField
+                    name={field.name}
+                    field={field}
+                    label="Confirm password"
+                  />
                 )}
               />
             </div>

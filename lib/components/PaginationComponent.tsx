@@ -5,14 +5,10 @@ import {
   Pagination,
   PaginationContent,
   PaginationItem,
-  PaginationNext,
-  PaginationPrevious,
 } from "@/components/ui/pagination";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { MouseEvent, MouseEventHandler } from "react";
-import { useDeleteQuery } from "../features/products/hooks/useDeleteQuery";
-import { useAppendQuery } from "../features/products/hooks/useAppendQuery";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { MouseEvent } from "react";
 
 interface PaginationComponentProps {
   count: number;
@@ -24,50 +20,51 @@ export default function PaginationComponent({
   perPage,
 }: PaginationComponentProps) {
   const searchParams = useSearchParams();
-  const { replace } = useRouter();
+  const pathname = usePathname();
+  const { push } = useRouter();
   const params = new URLSearchParams(searchParams);
-  const currentPage = !searchParams.get("page")
-    ? 1
-    : Number(searchParams.get("page"));
-
+  const currentPage = Number(searchParams.get("page") || 1);
   const pageCount = Math.ceil(count / perPage);
 
-  const previousPage = (
-    e: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>,
-  ) => {
-    if (currentPage === 1) return;
-    params.set("page", `${currentPage - 1}`);
-    replace(`/products?${params.toString()}`);
+  const navigateToPage = (page: number) => {
+    if (page < 1 || page > pageCount) return;
+    params.set("page", `${page}`);
+    // push(`${pathname}?${params.toString()}`, { scroll: false });
+    window.history.pushState(null, "", `?${params.toString()}`);
   };
-  const nextPage = (
-    e: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>,
-  ) => {
-    if (currentPage === pageCount) return;
-    params.set("page", `${currentPage + 1}`);
-    replace(`/products?${params.toString()}`);
+
+  const handlePreviousPage = (e: MouseEvent<HTMLButtonElement>) => {
+    if (currentPage > 1) navigateToPage(currentPage - 1);
+  };
+
+  const handleNextPage = (e: MouseEvent<HTMLButtonElement>) => {
+    if (currentPage < pageCount) navigateToPage(currentPage + 1);
   };
 
   if (pageCount <= 1) return null;
 
   return (
-    <Pagination>
-      <PaginationContent className="flex w-full justify-between">
+    <Pagination className="mt-4">
+      <PaginationContent className="flex w-full items-center justify-between">
         <PaginationItem>
           <Button
             disabled={currentPage === 1}
+            aria-disabled={currentPage === 1}
             variant="outline"
-            onClick={previousPage}
+            onClick={handlePreviousPage}
             className="flex gap-1.5"
           >
             <ChevronLeft className="h-4 w-4" />
             <span>Previous</span>
           </Button>
         </PaginationItem>
+
         <PaginationItem>
           <Button
             disabled={currentPage === pageCount}
+            aria-disabled={currentPage === pageCount}
             variant="outline"
-            onClick={nextPage}
+            onClick={handleNextPage}
             className="flex gap-1.5"
           >
             <span>Next</span>

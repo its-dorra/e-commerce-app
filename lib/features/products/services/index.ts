@@ -25,6 +25,7 @@ export const getProducts = async (values: {
   colors?: string | string[];
   sizes?: Size | Size[];
   page?: number;
+  perPage?: number;
 }) => {
   const res = await serverTrpc.products.products(values);
 

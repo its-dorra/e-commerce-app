@@ -1,10 +1,9 @@
+import MillionLint from "@million/lint";
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // experimental: {
-  //   staleTimes: {
-  //     dynamic: 0,
-  //   },
-  // },
+  experimental: {
+    reactCompiler: true,
+  },
 };
 
 export default nextConfig;

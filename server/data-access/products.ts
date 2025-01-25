@@ -1,9 +1,9 @@
 import { PER_PAGE } from "@/lib/constants/app-config";
 import db from "@/server/db";
 import { productTable } from "@/server/db/schema";
-import { count } from "drizzle-orm";
+import { count, eq } from "drizzle-orm";
 
-import { FilterQuery } from "../types/products";
+import { FilterQuery, Size } from "../types/products";
 
 export const getCategories = () => {
   return db.query.categoryTable.findMany({
@@ -22,8 +22,8 @@ export const getColors = () => {
   });
 };
 
-export const getSizes = () => {
-  return ["XS", "S", "M", "L", "XL", "2XL", "3XL"];
+export const getSizes = (): Size[] => {
+  return ["XS", "S", "M", "L", "XL", "2XL", "3XL"] as const;
 };
 
 export const getProducts = async (
@@ -40,10 +40,17 @@ export const getProducts = async (
     },
     limit: perPage,
     offset: (page - 1) * perPage,
-    ...(categories && {
-      where: (fields, { inArray }) => inArray(fields.categoryName, categories),
-    }),
+    ...(categories &&
+      categories.length > 0 && {
+        where: (fields, { inArray }) =>
+          inArray(fields.categoryName, categories),
+      }),
     with: {
+      category: {
+        columns: {
+          name: true,
+        },
+      },
       variants: {
         columns: {
           colorName: false,
@@ -52,9 +59,10 @@ export const getProducts = async (
           productId: false,
           updatedAt: false,
         },
-        ...(colors && {
-          where: (fields, { inArray }) => inArray(fields.colorName, colors),
-        }),
+        ...(colors &&
+          colors.length > 0 && {
+            where: (fields, { inArray }) => inArray(fields.colorName, colors),
+          }),
         with: {
           color: {
             columns: {
@@ -70,9 +78,10 @@ export const getProducts = async (
             },
           },
           sizes: {
-            ...(sizes && {
-              where: (fields, { inArray }) => inArray(fields.size, sizes),
-            }),
+            ...(sizes &&
+              sizes.length > 0 && {
+                where: (fields, { inArray }) => inArray(fields.size, sizes),
+              }),
             columns: {
               quantity: true,
             },
@@ -105,6 +114,7 @@ export const getProducts = async (
       basePrice: product.basePrice,
       quantity: totalQuantity,
       imageUrl: product.variants[0]?.images[0]?.imagePath || "",
+      category: product.category.name,
     };
   });
 
@@ -209,6 +219,14 @@ export const getProductVarientById = (sizeId: number) => {
       },
     },
   });
+};
+
+export const deleteProductById = (productId: number) => {
+  return db
+    .delete(productTable)
+    .where(eq(productTable.id, productId))
+    .returning()
+    .then((res) => res?.[0]);
 };
 
 export type ProductDetails = Exclude<
