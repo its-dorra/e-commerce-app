@@ -51,7 +51,7 @@ export default async function ProductPage(props: {
 
   if (!product) return notFound();
 
-  void serverTrpc.products.productById.prefetch({ id: Number(slug) });
+  await serverTrpc.products.productById.prefetch({ id: Number(slug) });
 
   return (
     <main className="container flex w-full grow flex-col items-center">

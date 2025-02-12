@@ -71,11 +71,11 @@ export default function SignupForm() {
         />
         <form.Subscribe
           selector={(state) => [state.canSubmit, state.isSubmitting]}
-          children={([_, isSubmitting]) => (
+          children={([canSubmit, isSubmitting]) => (
             <Button
               className="w-full bg-black text-primaryWhite"
               type="submit"
-              disabled={isSubmitting}
+              disabled={!canSubmit || isSubmitting || isPending}
             >
               Create an account
             </Button>

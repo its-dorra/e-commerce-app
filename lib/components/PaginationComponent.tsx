@@ -29,7 +29,7 @@ export default function PaginationComponent({
   const navigateToPage = (page: number) => {
     if (page < 1 || page > pageCount) return;
     params.set("page", `${page}`);
-    // push(`${pathname}?${params.toString()}`, { scroll: false });
+    // push(`${pathname}?${params.toString()}`);
     window.history.pushState(null, "", `?${params.toString()}`);
   };
 

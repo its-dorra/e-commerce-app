@@ -69,7 +69,7 @@ async function Products({
 
   const page = Number(searchParams.page || 1);
 
-  const { categories, colors, sizes } = searchParams;
+  const { categories = [], colors = [], sizes = [] } = searchParams;
 
   await Promise.all([
     serverTrpc.products.products.prefetch({
@@ -118,10 +118,7 @@ export default async function ProductsListing(props: ProductsProps) {
         <ColorsFilter data={colors} />
         <SizesFilter data={sizes} />
       </FilteringProducts>
-      <Suspense
-        key={JSON.stringify(searchParams)}
-        fallback={<LoadingSpinner size="xl" />}
-      >
+      <Suspense fallback={<LoadingSpinner size="xl" />}>
         <Products searchParams={searchParams} />
       </Suspense>
     </main>

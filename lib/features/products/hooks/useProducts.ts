@@ -11,9 +11,18 @@ export const useProducts = () => {
     ? 1
     : Number(searchParams.get("page"));
 
-  const categories = searchParams.getAll("categories");
-  const colors = searchParams.getAll("colors");
-  const sizes = searchParams.getAll("sizes") as Size[];
+  const categories =
+    searchParams.getAll("categories").length > 0
+      ? searchParams.getAll("categories")
+      : undefined;
+  const colors =
+    searchParams.getAll("colors").length > 0
+      ? searchParams.getAll("colors")
+      : undefined;
+  const sizes =
+    searchParams.getAll("sizes").length > 0
+      ? (searchParams.getAll("sizes") as Size[])
+      : undefined;
 
   const utils = clientTrpc.useUtils();
 

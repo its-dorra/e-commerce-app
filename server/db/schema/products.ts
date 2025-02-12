@@ -3,6 +3,7 @@ import { categoryTable } from "./categories";
 import { relations } from "drizzle-orm";
 import {
   createProductVariantSchema,
+  ProductVariant,
   productVariantTable,
 } from "./productVariants";
 import { wishListTable } from "./wishlist";
@@ -27,15 +28,22 @@ export const productTable = sqliteTable("products", {
     .$onUpdate(() => new Date()),
 });
 
-export const createProductSchema = createInsertSchema(productTable)
+export type Product = typeof productTable.$inferInsert & {
+  categoryName: string;
+  variants: ProductVariant[];
+};
+
+export const createProductSchema = createInsertSchema(productTable, {
+  basePrice: z.coerce.number().min(1, "Put a valid price"),
+  name: z.string().min(1, "Put a valid product name"),
+  description: z.string().min(5, "Put a valid product description"),
+})
   .omit({ id: true, createdAt: true, updatedAt: true })
   .merge(
     z.object({
       variants: z.array(createProductVariantSchema),
     }),
   );
-
-type schema = z.infer<typeof createProductSchema>;
 
 export const productRelations = relations(productTable, ({ one, many }) => ({
   category: one(categoryTable, {

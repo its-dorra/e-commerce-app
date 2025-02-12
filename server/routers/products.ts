@@ -1,4 +1,7 @@
-import { productQuerySchema } from "../schemas/products";
+import {
+  createProductFormDataSchema,
+  productQuerySchema,
+} from "../schemas/products";
 import {
   deleteProductById,
   getCategories,

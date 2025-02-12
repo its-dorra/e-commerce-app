@@ -24,18 +24,12 @@ import {
 import { Ellipsis } from "lucide-react";
 import DeleteProductDialog from "./delete-product-dialog";
 import { useState } from "react";
-import AddProductDialog from "./add-product-dialog";
+import Link from "next/link";
 
 export default function AdminProductsContainer() {
   const { data, isLoading } = useProducts();
   const [productToDelete, setProductToDelete] = useState<number | null>(null);
   // const [productToEdit, setProductToEdit] = useState<number | null>(null);
-
-  const [isAddProductDialogOpen, setIsAddProductDialogOpen] = useState(false);
-
-  const toggleAddProductDialog = (isOpen: boolean) => {
-    setIsAddProductDialogOpen(isOpen);
-  };
 
   const toggleDeleteDialog = (productId: number | null) => {
     setProductToDelete(productId);
@@ -54,19 +48,11 @@ export default function AdminProductsContainer() {
 
   return (
     <main className="flex flex-col gap-y-4 rounded-lg bg-white p-6">
-      <AddProductDialog
-        isOpen={isAddProductDialogOpen}
-        toggleDialog={toggleAddProductDialog}
-      />
       <div className="inline-flex items-center justify-between">
         <h4 className="h4">Products</h4>
-        <Button
-          onClick={() => {
-            setIsAddProductDialogOpen(true);
-          }}
-        >
-          Add product
-        </Button>
+        <Link href="/admin/products/add-product">
+          <Button>Add product</Button>
+        </Link>
       </div>
       <Table>
         <TableHeader>

@@ -45,7 +45,7 @@ const sidebarItems = [
 
 export default function AdminSidebar() {
   return (
-    <aside className="flex flex-col items-center gap-y-16 bg-white px-4 py-8">
+    <aside className="sticky top-0 flex h-dvh flex-col items-center gap-y-16 bg-white px-4 py-8">
       <Image src={adminLogo} alt="admin logo" />
       <ul className="flex w-full flex-col gap-y-4">
         {sidebarItems.map((item) => (

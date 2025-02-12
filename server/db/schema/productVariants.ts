@@ -43,6 +43,11 @@ export const productVariantTable = sqliteTable(
   },
 );
 
+export type ProductVariant = typeof productVariantTable.$inferInsert & {
+  images: string[];
+  sizes: Size[];
+};
+
 export const sizeTable = sqliteTable(
   "sizes",
   {
@@ -75,7 +80,15 @@ export const sizeTable = sqliteTable(
   },
 );
 
-export const createSizeSchema = createInsertSchema(sizeTable).omit({
+export type Size = typeof sizeTable.$inferInsert;
+
+export const createSizeSchema = createInsertSchema(sizeTable, {
+  priceAdjustment: z.coerce
+    .number()
+    .min(0, "Put a valid price adjustment")
+    .default(0),
+  quantity: z.coerce.number().min(1, "Put a valid quantity"),
+}).omit({
   id: true,
   createdAt: true,
   dimensions: true,
@@ -90,16 +103,29 @@ export const createProductVariantSchema = createInsertSchema(
   .merge(
     z.object({
       sizes: z.array(createSizeSchema),
-      images: z.array(
-        z
-          .instanceof(File)
-          .refine((file) => file.size < MAX_FILE_SIZE, "Max size is 5MB")
-          .refine(
-            (file) =>
-              checkFileType(file, ["image/jpg", "image/jpeg", "image/png"]),
-            ".jpg , .jpeg and .png formates are supported",
+      images: z
+        .array(
+          z.custom<File>(
+            (file) => {
+              const isFileInstance = file instanceof File;
+
+              if (!isFileInstance) {
+                return false;
+              }
+
+              if (file.size >= MAX_FILE_SIZE) {
+                return false;
+              }
+              const validTypes = ["image/jpg", "image/jpeg", "image/png"];
+              return checkFileType(file, validTypes);
+            },
+            {
+              message:
+                "Please upload valid images (.jpg, .jpeg, .png) under 5MB",
+            },
           ),
-      ),
+        )
+        .min(1, "Please upload at least one image"),
     }),
   );
 

@@ -6,9 +6,10 @@ import { NextRequest } from "next/server";
 function handler(req: NextRequest) {
   return fetchRequestHandler({
     endpoint: "/api/trpc",
+
     req,
     router: appRouter,
-    createContext: () => createContext(),
+    createContext,
     onError:
       process.env.NODE_ENV === "development"
         ? ({ path, error }) => {

@@ -1,4 +1,4 @@
-import { validateRequest } from "../lucia/utils";
+// import { validateRequest } from "../lucia/utils";
 import { middleware, procedure } from "../trpc";
 import { TRPCError } from "@trpc/server";
 

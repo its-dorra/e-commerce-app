@@ -1,9 +1,15 @@
 import { PER_PAGE } from "@/lib/constants/app-config";
 import db from "@/server/db";
-import { productTable } from "@/server/db/schema";
+import {
+  imageTable,
+  productTable,
+  productVariantTable,
+  sizeTable,
+} from "@/server/db/schema";
 import { count, eq } from "drizzle-orm";
 
 import { FilterQuery, Size } from "../types/products";
+import { Product } from "../db/schema/products";
 
 export const getCategories = () => {
   return db.query.categoryTable.findMany({
@@ -233,3 +239,61 @@ export type ProductDetails = Exclude<
   Awaited<ReturnType<typeof getProductById>>,
   undefined
 >;
+
+export const addProduct = async (product: Product) => {
+  const { variants, ...productData } = product;
+
+  return db.transaction(async (trx) => {
+    try {
+      const [productResult] = await trx
+        .insert(productTable)
+        .values(productData)
+        .returning();
+
+      const createdVariants = await Promise.all(
+        variants.map(async (variant) => {
+          const { images, sizes, ...variantData } = variant;
+          const [variantResult] = await trx
+            .insert(productVariantTable)
+            .values({
+              ...variantData,
+              productId: productResult.id,
+            })
+            .returning();
+
+          const sizeInserts = sizes.map((size) => {
+            return {
+              ...size,
+              productVariantId: variantResult.id,
+            };
+          });
+          const imageInserts = images.map((image, index) => {
+            return {
+              imagePath: image,
+              displayOrder: index + 1,
+              productVariantId: variantResult.id,
+            };
+          });
+          const [createdSizes, createdImages] = await Promise.all([
+            trx.insert(sizeTable).values(sizeInserts).returning(),
+            trx.insert(imageTable).values(imageInserts).returning(),
+          ]);
+          return {
+            ...variantResult,
+            sizes: createdSizes,
+            images: createdImages,
+          };
+        }),
+      );
+      return { ...productResult, variants: createdVariants };
+    } catch (error) {
+      console.error("Failed to add product:", error);
+
+      throw new Error(
+        error instanceof Error
+          ? error.message
+          : "An error occurred while adding the product",
+      );
+    }
+  });
+};

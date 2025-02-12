@@ -18,7 +18,7 @@ export default function ProductImage({
     >
       <img
         className="w-5/6 object-contain mix-blend-color-burn"
-        src={imageUrl}
+        src={imageUrl.length > 0 ? imageUrl : undefined}
         alt={alt}
       />
     </div>
