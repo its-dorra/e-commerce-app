@@ -25,6 +25,7 @@ import { Button } from "@/components/ui/button";
 import { Size } from "@/server/types/products";
 import FileUploader from "./file-uploader";
 import { useAddProduct } from "../hooks/useAddProduct";
+import { Minus } from "lucide-react";
 
 function objectToFormData(
   obj: Record<string, any>,
@@ -64,7 +65,7 @@ function objectToFormData(
 interface AddProductContainerProps {}
 
 export default function AddProductContainer({}: AddProductContainerProps) {
-  const { addProduct, isLoading: isAddingProduct } = useAddProduct();
+  const { data, addProduct, isLoading: isAddingProduct } = useAddProduct();
 
   const form = useForm<z.infer<typeof createProductSchema>, ZodValidator>({
     defaultValues: {
@@ -90,6 +91,7 @@ export default function AddProductContainer({}: AddProductContainerProps) {
       console.dir(value, { depth: null });
 
       addProduct(formData);
+      console.log({ data });
     },
   });
 
@@ -184,45 +186,59 @@ export default function AddProductContainer({}: AddProductContainerProps) {
                       mode="array"
                     >
                       {(field) => (
-                        <div className="flex flex-col gap-4 rounded border p-4">
-                          <form.Field
-                            name={`variants[${variantIndex}].colorName`}
-                          >
-                            {(field) => (
-                              <Select
-                                name={field.name}
-                                value={field.state.value}
-                                disabled={isGettingColors}
-                                onValueChange={field.handleChange}
-                              >
-                                <SelectTrigger className="w-full focus:ring-0">
-                                  <SelectValue placeholder="Select a color" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectGroup>
-                                    {colors?.map((color) => (
-                                      <SelectItem
-                                        key={color.hexCode}
-                                        value={color.name}
-                                      >
-                                        <div className="grid grid-flow-row grid-cols-[10ch_1fr] items-center">
-                                          <span className="grow">
-                                            {color.name}
-                                          </span>
-                                          <div
-                                            className="h-4 w-8 rounded-lg border shadow-md"
-                                            style={{
-                                              backgroundColor: color.hexCode,
-                                            }}
-                                          />
-                                        </div>
-                                      </SelectItem>
-                                    ))}
-                                  </SelectGroup>
-                                </SelectContent>
-                              </Select>
-                            )}
-                          </form.Field>
+                        <div className="relative flex flex-col gap-4 rounded border p-4">
+                          <div className="flex items-center gap-3">
+                            <form.Field
+                              name={`variants[${variantIndex}].colorName`}
+                            >
+                              {(field) => (
+                                <Select
+                                  name={field.name}
+                                  value={field.state.value}
+                                  disabled={isGettingColors}
+                                  onValueChange={field.handleChange}
+                                >
+                                  <SelectTrigger className="w-full focus:ring-0">
+                                    <SelectValue placeholder="Select a color" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectGroup>
+                                      {colors?.map((color) => (
+                                        <SelectItem
+                                          key={color.hexCode}
+                                          value={color.name}
+                                        >
+                                          <div className="grid grid-flow-row grid-cols-[10ch_1fr] items-center">
+                                            <span className="grow">
+                                              {color.name}
+                                            </span>
+                                            <div
+                                              className="h-4 w-8 rounded-lg border shadow-md"
+                                              style={{
+                                                backgroundColor: color.hexCode,
+                                              }}
+                                            />
+                                          </div>
+                                        </SelectItem>
+                                      ))}
+                                    </SelectGroup>
+                                  </SelectContent>
+                                </Select>
+                              )}
+                            </form.Field>
+                            <Button
+                              variant="destructive"
+                              size="icon"
+                              className="aspect-square w-fit"
+                              onClick={() => {
+                                if (variantsField.state.value.length === 1)
+                                  return;
+                                variantsField.removeValue(variantIndex);
+                              }}
+                            >
+                              <Minus className="size-2" />
+                            </Button>
+                          </div>
                           {field.state.value.map((_, sizeIndex) => (
                             <div
                               className="flex items-start justify-between gap-8"
@@ -284,6 +300,17 @@ export default function AddProductContainer({}: AddProductContainerProps) {
                                   />
                                 )}
                               </form.Field>
+                              <Button
+                                variant="destructive"
+                                className="aspect-square w-fit p-0.5"
+                                size="icon"
+                                onClick={() => {
+                                  if (field.state.value.length === 1) return;
+                                  field.removeValue(sizeIndex);
+                                }}
+                              >
+                                <Minus className="h-4 w-4" />
+                              </Button>
                             </div>
                           ))}
                           <Button
@@ -292,7 +319,7 @@ export default function AddProductContainer({}: AddProductContainerProps) {
                             onClick={() => {
                               field.pushValue({
                                 priceAdjustment: 0,
-                                quantity: 0,
+                                quantity: 1,
                                 size: "S",
                               });
                             }}
@@ -315,7 +342,11 @@ export default function AddProductContainer({}: AddProductContainerProps) {
                                       Array.from(e.target.files || []),
                                     )
                                   }
-                                  onRemove={() => {}}
+                                  onRemove={(file) => {
+                                    field.handleChange((value) =>
+                                      value.filter((image) => image !== file),
+                                    );
+                                  }}
                                 />
                               )}
                             </form.Field>

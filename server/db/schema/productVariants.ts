@@ -43,11 +43,6 @@ export const productVariantTable = sqliteTable(
   },
 );
 
-export type ProductVariant = typeof productVariantTable.$inferInsert & {
-  images: string[];
-  sizes: Size[];
-};
-
 export const sizeTable = sqliteTable(
   "sizes",
   {
@@ -79,8 +74,6 @@ export const sizeTable = sqliteTable(
     };
   },
 );
-
-export type Size = typeof sizeTable.$inferInsert;
 
 export const createSizeSchema = createInsertSchema(sizeTable, {
   priceAdjustment: z.coerce

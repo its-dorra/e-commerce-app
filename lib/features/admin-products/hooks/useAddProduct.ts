@@ -3,6 +3,7 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 
 export const useAddProduct = () => {
+  const [data, setData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -14,7 +15,8 @@ export const useAddProduct = () => {
         body: product,
       });
 
-      await res.json();
+      const result = await res.json();
+      setData(result);
 
       toast.success("Product added successfully");
     } catch (error) {
@@ -26,6 +28,7 @@ export const useAddProduct = () => {
 
   return {
     addProduct,
+    data,
     isLoading,
     error,
   } as const;

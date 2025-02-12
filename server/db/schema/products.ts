@@ -3,7 +3,6 @@ import { categoryTable } from "./categories";
 import { relations } from "drizzle-orm";
 import {
   createProductVariantSchema,
-  ProductVariant,
   productVariantTable,
 } from "./productVariants";
 import { wishListTable } from "./wishlist";
@@ -27,11 +26,6 @@ export const productTable = sqliteTable("products", {
     .$default(() => new Date())
     .$onUpdate(() => new Date()),
 });
-
-export type Product = typeof productTable.$inferInsert & {
-  categoryName: string;
-  variants: ProductVariant[];
-};
 
 export const createProductSchema = createInsertSchema(productTable, {
   basePrice: z.coerce.number().min(1, "Put a valid price"),

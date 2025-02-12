@@ -10,7 +10,7 @@ interface FileInputProps {
   multiple?: boolean;
   onChange: (event: ChangeEvent<HTMLInputElement>) => void;
   uploadedImages: File[];
-  onRemove: (index: number) => void;
+  onRemove: (file: File) => void;
 }
 
 export default function FileUploader({
@@ -18,7 +18,6 @@ export default function FileUploader({
   multiple,
   onChange,
   uploadedImages,
-
   onRemove,
 }: FileInputProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -47,18 +46,18 @@ export default function FileUploader({
       {uploadedImages.length > 0 && (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
           {images.map((image, index) => (
-            <div key={index} className="group relative">
+            <div key={image} className="group relative">
               <img
-                src={image || "/placeholder.svg"}
+                src={image}
                 alt={`Uploaded image ${index + 1}`}
-                className="h-32 w-full rounded object-cover"
+                className="h-52 w-full rounded object-cover"
               />
               <Button
                 type="button"
                 variant="destructive"
                 size="icon"
                 className="absolute right-1 top-1 opacity-0 transition-opacity group-hover:opacity-100"
-                onClick={() => onRemove(index)}
+                onClick={() => onRemove(uploadedImages[index])}
               >
                 <X className="h-4 w-4" />
               </Button>

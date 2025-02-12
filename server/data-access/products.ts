@@ -240,7 +240,22 @@ export type ProductDetails = Exclude<
   undefined
 >;
 
-export const addProduct = async (product: Product) => {
+export const addProduct = async (product: {
+  variants: {
+    images: string[];
+    colorName: string;
+    sizes: {
+      size: "XS" | "S" | "M" | "L" | "XL" | "2XL" | "3XL";
+      priceAdjustment: number;
+      quantity: number;
+      dimensions?: string | undefined;
+    }[];
+  }[];
+  name: string;
+  description: string;
+  basePrice: number;
+  categoryName: string;
+}) => {
   const { variants, ...productData } = product;
 
   return db.transaction(async (trx) => {
