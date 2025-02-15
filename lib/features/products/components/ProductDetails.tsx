@@ -13,7 +13,7 @@ import { useIsInWishlist } from "../../wishlist/hooks/useIsInWishlist";
 import { HeartIcon } from "lucide-react";
 import { useToggleWishList } from "../../wishlist/hooks/useToggleWishlist";
 
-export default function ({ product }: { product: ProductDetails }) {
+export default function ProductDetailsComponent ({ product }: { product: ProductDetails }) {
   const [filter, setFilter] = useState<{
     color?: string;
     size?: string;

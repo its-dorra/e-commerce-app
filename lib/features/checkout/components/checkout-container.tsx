@@ -16,7 +16,7 @@ export default function CheckoutContainer() {
     return cartData?.cart?.cartItems.reduce((acc, item) => {
       return acc + item.itemPrice * item.quantity;
     }, 0);
-  }, []);
+  }, [cartData?.cart?.cartItems]);
 
   if(isGettingCart) return <div className='w-full flex justify-center'><LoadingSpinner size='xl'/></div>
 
@@ -41,7 +41,9 @@ export default function CheckoutContainer() {
               </Link>
             </>
           ) : (
-            <></>
+            <>
+              <div></div>
+            </>
           )}
         </div>
       </div>

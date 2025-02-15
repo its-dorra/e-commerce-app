@@ -5,14 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f36f1e17-59af-489c-9d96-fd97b0cad85c" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/lib/components/EmptyListMessage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/lib/components/EmptyListMessage.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/components/Navbar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/lib/components/Navbar.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/components/UserPageLayout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/lib/components/UserPageLayout.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/address/components/address-form.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/address/components/address-form.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/cart/components/CartButton.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/cart/components/CartButton.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/providers/user-provider.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/lib/providers/user-provider.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/trpc/query-client.ts" beforeDir="false" afterPath="$PROJECT_DIR$/lib/trpc/query-client.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/db/schema/productVariants.ts" beforeDir="false" afterPath="$PROJECT_DIR$/server/db/schema/productVariants.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/features/checkout/components/checkout-container.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/checkout/components/checkout-container.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/features/products/components/ProductDetails.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/products/components/ProductDetails.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -43,22 +38,22 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "main",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "prettierjs.PrettierConfiguration.Package": "C:\\Users\\Dorra\\Documents\\dev\\web\\e-commerce-app\\node_modules\\prettier",
-    "settings.editor.selected.configurable": "reference.settingsdialog.IDE.editor.colors.TypeScript",
-    "ts.external.directory.path": "C:\\Users\\Dorra\\Documents\\dev\\web\\e-commerce-app\\node_modules\\typescript\\lib",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;prettierjs.PrettierConfiguration.Package&quot;: &quot;C:\\Users\\Dorra\\Documents\\dev\\web\\e-commerce-app\\node_modules\\prettier&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settingsdialog.IDE.editor.colors.TypeScript&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;C:\\Users\\Dorra\\Documents\\dev\\web\\e-commerce-app\\node_modules\\typescript\\lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\Dorra\Documents\dev\web\e-commerce-app\app\(user)\checkout" />
@@ -99,6 +94,7 @@
       <workItem from="1739545346928" duration="126000" />
       <workItem from="1739545523420" duration="546000" />
       <workItem from="1739546094582" duration="5241000" />
+      <workItem from="1739655047757" duration="759000" />
     </task>
     <servers />
   </component>
