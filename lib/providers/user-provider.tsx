@@ -28,6 +28,7 @@ const UserContext = createContext<UserContext | null>(null);
 export default function UserProvider({ children }: PropsWithChildren) {
   const { data: user } = useUserQuery();
 
+
   return (
     <UserContext.Provider value={{ user }}>{children}</UserContext.Provider>
   );

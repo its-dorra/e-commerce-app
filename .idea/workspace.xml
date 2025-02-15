@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="f36f1e17-59af-489c-9d96-fd97b0cad85c" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/lib/components/EmptyListMessage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/lib/components/EmptyListMessage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/components/Navbar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/lib/components/Navbar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/components/UserPageLayout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/lib/components/UserPageLayout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/features/address/components/address-form.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/address/components/address-form.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/features/cart/components/CartButton.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/cart/components/CartButton.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/providers/user-provider.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/lib/providers/user-provider.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/trpc/query-client.ts" beforeDir="false" afterPath="$PROJECT_DIR$/lib/trpc/query-client.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/db/schema/productVariants.ts" beforeDir="false" afterPath="$PROJECT_DIR$/server/db/schema/productVariants.ts" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;its-dorra&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/its-dorra/e-commerce-app&quot;,
+    &quot;accountId&quot;: &quot;4166fcf8-7058-4193-b7de-0066f9ff9825&quot;
+  }
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 5
+}</component>
+  <component name="ProjectId" id="2t2LhngXzuM624nH4s3ewfTmVNB" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "main",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "prettierjs.PrettierConfiguration.Package": "C:\\Users\\Dorra\\Documents\\dev\\web\\e-commerce-app\\node_modules\\prettier",
+    "settings.editor.selected.configurable": "reference.settingsdialog.IDE.editor.colors.TypeScript",
+    "ts.external.directory.path": "C:\\Users\\Dorra\\Documents\\dev\\web\\e-commerce-app\\node_modules\\typescript\\lib",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Dorra\Documents\dev\web\e-commerce-app\app\(user)\checkout" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration default="true" type="ShConfigurationType">
+      <option name="SCRIPT_TEXT" value="" />
+      <option name="INDEPENDENT_SCRIPT_PATH" value="true" />
+      <option name="SCRIPT_PATH" value="" />
+      <option name="SCRIPT_OPTIONS" value="" />
+      <option name="INDEPENDENT_SCRIPT_WORKING_DIRECTORY" value="true" />
+      <option name="SCRIPT_WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="INDEPENDENT_INTERPRETER_PATH" value="true" />
+      <option name="INTERPRETER_PATH" value="powershell.exe" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="EXECUTE_IN_TERMINAL" value="true" />
+      <option name="EXECUTE_SCRIPT_FILE" value="true" />
+      <envs />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-822845ee3bb5-JavaScript-WS-243.23654.157" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="f36f1e17-59af-489c-9d96-fd97b0cad85c" name="Changes" comment="" />
+      <created>1739545344553</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1739545344553</updated>
+      <workItem from="1739545346928" duration="126000" />
+      <workItem from="1739545523420" duration="546000" />
+      <workItem from="1739546094582" duration="5241000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>

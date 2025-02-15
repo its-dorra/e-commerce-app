@@ -41,7 +41,12 @@ export default function AddressForm() {
         <form.Field
           name="streetAddress"
           children={(field) => (
-            <FormField name={field.name} field={field} label="Street Address" />
+            <FormField
+              inputType="text"
+              name={field.name}
+              field={field}
+              label="Street Address"
+            />
           )}
         />
       </div>
@@ -50,7 +55,12 @@ export default function AddressForm() {
           <form.Field
             name="city"
             children={(field) => (
-              <FormField name={field.name} field={field} label="City" />
+              <FormField
+                inputType="text"
+                name={field.name}
+                field={field}
+                label="City"
+              />
             )}
           />
         </div>
@@ -58,7 +68,12 @@ export default function AddressForm() {
           <form.Field
             name="state"
             children={(field) => (
-              <FormField name={field.name} field={field} label="State" />
+              <FormField
+                inputType="text"
+                name={field.name}
+                field={field}
+                label="State"
+              />
             )}
           />
         </div>

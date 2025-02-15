@@ -32,19 +32,47 @@ export default function NavBar() {
             className={`${isNavigationOpen ? "flex bg-white" : "hidden"} fixed bottom-0 left-0 right-0 top-[4.5rem] z-50 mx-auto flex-col items-center justify-center gap-8 bg-transparent text-sm lg:static lg:flex lg:flex-row lg:gap-4`}
           >
             <li className="rounded-lg px-2 py-1 text-2xl font-semibold uppercase tracking-wider hover:bg-black/5 lg:text-base lg:font-normal lg:normal-case lg:tracking-normal">
-              <Link href="/#home">Home</Link>
+              <Link
+                onClick={() => {
+                  setIsNavigationOpen(false);
+                }}
+                href="/#home"
+              >
+                Home
+              </Link>
             </li>
             <li>
               <CategoriesNavBar />
             </li>
             <li className="rounded-lg px-2 py-1 text-2xl font-semibold uppercase tracking-wider hover:bg-black/5 lg:text-base lg:font-normal lg:normal-case lg:tracking-normal">
-              <Link href="#about">About</Link>
+              <Link
+                onClick={() => {
+                  setIsNavigationOpen(false);
+                }}
+                href="#about"
+              >
+                About
+              </Link>
             </li>
             <li className="rounded-lg px-2 py-1 text-2xl font-semibold uppercase tracking-wider hover:bg-black/5 lg:text-base lg:font-normal lg:normal-case">
-              <Link href="/cart">Cart</Link>
+              <Link
+                onClick={() => {
+                  setIsNavigationOpen(false);
+                }}
+                href="/cart"
+              >
+                Cart
+              </Link>
             </li>
             <li className="rounded-lg px-2 py-1 text-2xl font-semibold uppercase tracking-wider hover:bg-black/5 lg:hidden">
-              <Link href="/account">User</Link>
+              <Link
+                onClick={() => {
+                  setIsNavigationOpen(false);
+                }}
+                href="/account"
+              >
+                User
+              </Link>
             </li>
           </ul>
           <div className="hidden items-center gap-x-4 lg:flex">

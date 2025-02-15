@@ -5,8 +5,8 @@ export default function UserPageLayout({
   children,
 }: PropsWithChildren<{ title: string }>) {
   return (
-    <div className="flex h-full flex-col items-start gap-4">
-      <h4 className="h4">{title}</h4>
+    <div className="container flex h-full max-w-6xl flex-col items-start gap-16 py-8">
+      <h2 className="h3">{title}</h2>
       {children}
     </div>
   );

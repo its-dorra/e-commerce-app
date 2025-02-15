@@ -89,9 +89,7 @@ export const createSizeSchema = createInsertSchema(sizeTable, {
   updatedAt: true,
 });
 
-export const createProductVariantSchema = createInsertSchema(
-  productVariantTable,
-)
+export var createProductVariantSchema = createInsertSchema(productVariantTable)
   .omit({ id: true, createdAt: true, updatedAt: true, productId: true })
   .merge(
     z.object({

@@ -89,11 +89,11 @@ export default function CartButton() {
             )}
           </div>
           <Button disabled={!totalPrice}>
-            <Link href="/account/cart">View Cart</Link>
+            <Link href='/cart'>View Cart</Link>
           </Button>
           <Button variant="link" disabled={!totalPrice}>
             <Link
-              href="/account/checkout"
+              href="/checkout"
               className="text-center text-sm text-muted-foreground"
             >
               Checkout

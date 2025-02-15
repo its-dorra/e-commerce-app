@@ -8,7 +8,7 @@ export function makeQueryClient() {
   return new QueryClient({
     defaultOptions: {
       queries: {
-        staleTime: 60 * 1000,
+        staleTime: 5 * 60 * 1000,
       },
       dehydrate: {
         serializeData: superjson.serialize,
