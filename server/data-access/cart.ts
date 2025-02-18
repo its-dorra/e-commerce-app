@@ -1,9 +1,11 @@
 import { catchError } from "@/lib/utils";
 import db from "../db";
-import { getProductVarientById } from "./products";
+import {checkInventoryAvailibilty, getProductVarientById} from "./products";
 import { cartItemTable, cartTable } from "../db/schema";
 import { and, eq } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
+import {createOrder} from './orders'
+
 
 export const handleCartItem = ({
   cartId,
@@ -189,3 +191,29 @@ export const updateCartItemQuantity = async ({
     )
     .returning();
 };
+
+export const updateCartStatus = (cartId : number) => {
+  return db.update(cartTable).set({isMigratedToCheckout: true}).where(eq(cartTable.id,cartId));
+}
+
+export const cartToOrder = async ({userId} : {userId: string}) => {
+
+  try {
+
+
+  const cart = await getCartItems(userId);
+
+  if (!cart || cart.cartItems.length === 0) {
+    throw new Error('Your cart is empty , Plz fill it')}
+
+  await Promise.all(cart.cartItems.map(item => checkInventoryAvailibilty({sizeId : item.sizeId , quantity : item.quantity})))
+
+  const totalPrice = cart.cartItems.reduce((cur,item) => cur + (item.itemPrice * item.quantity) , 0)
+
+    return createOrder({userId,cartId : cart.id,totalPrice})
+
+  } catch (e) {
+    throw e;
+  }
+
+}

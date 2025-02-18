@@ -50,10 +50,10 @@ export default function CartContainer() {
           <p className="font-medium">Total</p>
           <p className="font-medium">$ {subtotalPrice.toFixed(2)}</p>
         </div>
-        {/* 
-          TODO : checkout
-        */}
-        <Button className="mt-8">Checkout</Button>
+        <Link className='block w-full' href='/checkout' >
+
+        <Button className="mt-8 w-full">Checkout</Button>
+        </Link>
         <Link className="mt-8 text-center" href="/products">
           <Button className="text-black underline" variant="link">
             Continue Shopping

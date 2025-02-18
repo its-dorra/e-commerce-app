@@ -1,4 +1,4 @@
-import { integer, real, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import {index, integer, real, sqliteTable, text} from "drizzle-orm/sqlite-core";
 import { cartTable } from "./carts";
 import { userTable } from "./users";
 import { relations } from "drizzle-orm";
@@ -14,11 +14,7 @@ export const orderTable = sqliteTable("orders", {
     .notNull()
     .references(() => userTable.id, { onDelete: "cascade" }),
   totalPrice: real("total_price").notNull(),
-  phone_number: text("phone_number"),
-  wilaya: text("wilaya"),
-  city: text("city"),
 
-  streetAddress: text("street_address"),
   status: text("status", {
     enum: ["pending", "processing", "delivered", "cancelled"],
   })
@@ -31,7 +27,10 @@ export const orderTable = sqliteTable("orders", {
   updatedAt: integer("updated_at", { mode: "timestamp" })
     .$default(() => new Date())
     .$onUpdate(() => new Date()),
-});
+}, (table) => ({
+  cartIdx : index('cart_idx').on(table.cartId),
+  userIdx : index('user_idx').on(table.userId),
+}));
 
 export const orderRelations = relations(orderTable, ({ one }) => ({
   cart: one(cartTable, {

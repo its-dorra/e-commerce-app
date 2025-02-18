@@ -9,7 +9,7 @@ import {
 import { count, eq } from "drizzle-orm";
 
 import { FilterQuery, Size } from "../types/products";
-import { Product } from "../db/schema/products";
+import {getCartItems} from "@/server/data-access/cart";
 
 export const getCategories = () => {
   return db.query.categoryTable.findMany({
@@ -312,3 +312,35 @@ export const addProduct = async (product: {
     }
   });
 };
+
+export const checkInventoryAvailibilty = async ({sizeId , quantity } : {sizeId: number , quantity : number}) => {
+  if(quantity <= 0) throw new Error('Quantity can\'t be less or equal to 0');
+  const size = await db.query.sizeTable.findFirst({
+    where : (fields , {eq}) => eq(fields.id,sizeId),
+    columns : {
+      quantity : true
+    }
+  })
+
+  if(!size || size.quantity < quantity) throw new Error('There\'s no product or the quantity is more than what we have')
+
+  return true;
+
+}
+
+
+export const updateUnventoryAfterPurchase = async ({sizeId , quantity} : {sizeId : number , quantity : number}) => {
+  const oldSize = await db.query.sizeTable.findFirst({
+    where : (fields , {eq}) => eq(fields.id,sizeId),
+    columns : {
+      quantity : true
+    }
+  })
+
+  if(!oldSize || oldSize.quantity < quantity) throw new Error('There\'s no product or the quantity is more than what we have')
+
+  return db.update(sizeTable).set({quantity : oldSize.quantity - quantity}).where(eq(sizeTable.id,sizeId))
+}
+
+
+
