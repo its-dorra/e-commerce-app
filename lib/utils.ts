@@ -39,11 +39,6 @@ export const AdminAuthenticationError = class AdminAuthenticationError extends E
   }
 };
 
-export const baseUrl = (() => {
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
-  return "http://localhost:3000";
-})();
-
 export const MAX_FILE_SIZE = 5000000;
 
 export function checkFileType(file: File, types: string[]) {

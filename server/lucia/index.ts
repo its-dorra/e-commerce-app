@@ -26,7 +26,7 @@ export const lucia = new Lucia(adapter, {
 export const googleClient = new Google(
   env.GOOGLE_CLIENT_ID,
   env.GOOGLE_CLIENT_SECRET,
-  baseUrl + "api/auth/google/callback",
+  env.BASE_URL + "api/auth/google/callback",
 );
 
 declare module "lucia" {
