@@ -2,7 +2,7 @@ import ProductDetails from "@/lib/features/products/components/ProductDetails";
 import ProductImagesSwiper from "@/lib/features/products/components/ProductImagesSwiper";
 import { getProductById } from "@/lib/features/products/services";
 import { serverTrpc } from "@/lib/trpc/server";
-import { baseUrl } from "@/lib/utils";
+import env from "@/server/env";
 import { notFound } from "next/navigation";
 
 export const dynamic = "force-static";
@@ -24,7 +24,7 @@ export async function generateMetadata(props: {
     openGraph: {
       title: `Fashion Haven | ${product.name}`,
       description: `Discover ${product.name} at Fashion Haven.`,
-      url: `${baseUrl}/products/${product.id}`,
+      url: `${env.BASE_URL}/products/${product.id}`,
       siteName: "Fashion Haven",
       locale: "en_US",
     },

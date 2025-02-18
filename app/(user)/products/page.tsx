@@ -13,7 +13,7 @@ import {
   getSizes,
 } from "@/lib/features/products/services";
 import { Suspense } from "react";
-import { baseUrl } from "@/lib/utils";
+import env from "@/server/env";
 import { Size } from "@/server/types/products";
 import { getCurrentUser } from "@/server/lucia/utils";
 import { redirect } from "next/navigation";
@@ -28,7 +28,7 @@ export const metadata = {
     title: "Fashion Haven | Explore Our Products",
     description:
       "Browse the Fashion Haven collection to find trendy and high-quality clothing for every style. Shop now and elevate your wardrobe.",
-    url: `${baseUrl}/products`,
+    url: `${env.BASE_URL}/products`,
     siteName: "Fashion Haven",
     locale: "en_US",
     type: "website",

@@ -4,7 +4,6 @@ import { Google } from "arctic";
 import db from "@/server/db";
 import { sessionTable, userTable } from "@/server/db/schema/users";
 import env from "@/server/env";
-import { baseUrl } from "@/lib/utils";
 
 const adapter = new DrizzleSQLiteAdapter(db, sessionTable, userTable);
 

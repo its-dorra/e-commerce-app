@@ -5,8 +5,7 @@ import HeroSection from "@/lib/components/HeroSection";
 import LatestProducts from "@/lib/components/LatestProducts";
 import { getCurrentUser } from "@/server/lucia/utils";
 import { redirect } from "next/navigation";
-import { baseUrl } from "@/lib/utils";
-
+import env from "@/server/env";
 export const metadata = {
   title: "Fashion Haven | Trendy Clothing for Every Style",
   description:
@@ -23,7 +22,7 @@ export const metadata = {
     title: "Fashion Haven | Trendy Clothing for Every Style",
     description:
       "Discover a curated selection of clothing that combines style and comfort. Explore this portfolio project showcasing modern web design and development.",
-    url: baseUrl,
+    url: env.BASE_URL,
     siteName: "Fashion Haven",
     locale: "en_US",
     type: "website",

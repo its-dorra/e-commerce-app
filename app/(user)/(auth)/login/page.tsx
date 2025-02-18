@@ -1,7 +1,7 @@
 import LoginForm from "@/lib/features/user/components/LoginForm";
 import { getCurrentUser } from "@/server/lucia/utils";
 import { redirect } from "next/navigation";
-import { baseUrl } from "@/lib/utils";
+import env from "@/server/env";
 
 export const metadata = {
   title: "Fashion Haven | Login to Your Account",
@@ -11,7 +11,7 @@ export const metadata = {
     title: "Fashion Haven | Login to Your Account",
     description:
       "Access your Fashion Haven account to explore the latest trends and manage your wardrobe with ease.",
-    url: `${baseUrl}/login`,
+    url: `${env.BASE_URL}/login`,
     siteName: "Fashion Haven",
     locale: "en_US",
     type: "website",
