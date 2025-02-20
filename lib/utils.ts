@@ -44,3 +44,7 @@ export const MAX_FILE_SIZE = 5000000;
 export function checkFileType(file: File, types: string[]) {
   return types.includes(file.type);
 }
+
+export function capitalizeWords(str: string): string {
+  return str.replace(/\b\w/g, (char) => char.toUpperCase());
+}

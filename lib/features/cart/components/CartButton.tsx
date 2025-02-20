@@ -11,7 +11,7 @@ import {
 import { useUser } from "@/lib/providers/user-provider";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import { useCart } from "../hooks/useCart";
 import LoadingSpinner from "@/lib/components/LoadingSpinner";
@@ -22,12 +22,15 @@ export default function CartButton() {
   const [isOpen, setIsOpen] = useState(false);
   const { data, isLoading, isError } = useCart();
 
-  const totalPrice =
-    data?.cart &&
-    data?.cart.cartItems.reduce(
-      (acc, cur) => acc + cur.quantity * cur.itemPrice,
-      0,
+  const totalPrice = useMemo(() => {
+    return (
+      data?.cart &&
+      data?.cart.cartItems.reduce(
+        (acc, cur) => acc + cur.quantity * cur.itemPrice,
+        0,
+      )
     );
+  }, [data])?.toFixed(2);
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -89,7 +92,7 @@ export default function CartButton() {
             )}
           </div>
           <Button disabled={!totalPrice}>
-            <Link href='/cart'>View Cart</Link>
+            <Link href="/cart">View Cart</Link>
           </Button>
           <Button variant="link" disabled={!totalPrice}>
             <Link

@@ -12,11 +12,8 @@ export const imageTable = sqliteTable(
       .notNull()
       .references(() => productVariantTable.id, { onDelete: "cascade" }),
     imagePath: text("image_path").notNull(),
-    displayOrder: integer("display_order").notNull().default(0),
-    imageType: text("image_type")
-      .$type<"product" | "gallery">()
-      .notNull()
-      .default("gallery"),
+    displayOrder: integer("display_order").notNull().default(1),
+
     createdAt: integer("created_at", { mode: "timestamp" }).$default(
       () => new Date(),
     ),

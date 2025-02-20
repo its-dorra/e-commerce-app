@@ -9,7 +9,9 @@ import {
 import { count, eq } from "drizzle-orm";
 
 import { FilterQuery, Size } from "../types/products";
-import {getCartItems} from "@/server/data-access/cart";
+
+import { getCartItems } from "@/server/data-access/cart";
+import { Transaction } from "@/server/types/db";
 
 export const getCategories = () => {
   return db.query.categoryTable.findMany({
@@ -130,7 +132,7 @@ export const getProducts = async (
       total: totalCount,
       page,
       perPage,
-      totalPages: Math.ceil(totalCount / PER_PAGE),
+      totalPages: Math.ceil(totalCount / perPage),
     },
   };
 };
@@ -158,6 +160,10 @@ export const getProductById = async (id: number) => {
           sizes: {
             where: (table, { gt }) => gt(table.quantity, 0),
             columns: {
+              priceAdjustment: true,
+              quantity: true,
+              id: true,
+              size: true,
               createdAt: false,
               updatedAt: false,
             },
@@ -193,6 +199,7 @@ export const getProductById = async (id: number) => {
   return {
     id: product.id,
     name: product.name,
+    basePrice: product.basePrice,
     category: product.category!.name,
     colors: product.variants
       .map((variant) => ({
@@ -203,6 +210,7 @@ export const getProductById = async (id: number) => {
           size: {
             name: size.size,
           },
+          priceAdjustment: size.priceAdjustment,
           quantity: size.quantity,
         })),
       }))
@@ -313,34 +321,52 @@ export const addProduct = async (product: {
   });
 };
 
-export const checkInventoryAvailibilty = async ({sizeId , quantity } : {sizeId: number , quantity : number}) => {
-  if(quantity <= 0) throw new Error('Quantity can\'t be less or equal to 0');
+export const checkInventoryAvailibilty = async ({
+  sizeId,
+  quantity,
+}: {
+  sizeId: number;
+  quantity: number;
+}) => {
+  if (quantity <= 0) throw new Error("Quantity can't be less or equal to 0");
   const size = await db.query.sizeTable.findFirst({
-    where : (fields , {eq}) => eq(fields.id,sizeId),
-    columns : {
-      quantity : true
-    }
-  })
+    where: (fields, { eq }) => eq(fields.id, sizeId),
+    columns: {
+      quantity: true,
+    },
+  });
 
-  if(!size || size.quantity < quantity) throw new Error('There\'s no product or the quantity is more than what we have')
+  if (!size || size.quantity < quantity)
+    throw new Error(
+      "There's no product or the quantity is more than what we have",
+    );
 
   return true;
+};
 
-}
+export const updateInventoryAfterPurchase = async ({
+  sizeId,
+  quantity,
+  tx,
+}: {
+  sizeId: number;
+  quantity: number;
+  tx: Transaction;
+}) => {
+  const oldSize = await tx.query.sizeTable.findFirst({
+    where: (fields, { eq }) => eq(fields.id, sizeId),
+    columns: {
+      quantity: true,
+    },
+  });
 
+  if (!oldSize || oldSize.quantity < quantity)
+    throw new Error(
+      "There's no product or the quantity is more than what we have",
+    );
 
-export const updateUnventoryAfterPurchase = async ({sizeId , quantity} : {sizeId : number , quantity : number}) => {
-  const oldSize = await db.query.sizeTable.findFirst({
-    where : (fields , {eq}) => eq(fields.id,sizeId),
-    columns : {
-      quantity : true
-    }
-  })
-
-  if(!oldSize || oldSize.quantity < quantity) throw new Error('There\'s no product or the quantity is more than what we have')
-
-  return db.update(sizeTable).set({quantity : oldSize.quantity - quantity}).where(eq(sizeTable.id,sizeId))
-}
-
-
-
+  return tx
+    .update(sizeTable)
+    .set({ quantity: oldSize.quantity - quantity })
+    .where(eq(sizeTable.id, sizeId));
+};

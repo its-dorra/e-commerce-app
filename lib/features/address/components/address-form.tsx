@@ -78,9 +78,18 @@ export default function AddressForm() {
           />
         </div>
       </div>
-      <Button className="mt-8 w-fit" disabled={isUpdatingAddress} type="submit">
-        Save Changes
-      </Button>
+      <form.Subscribe
+        selector={(state) => [state.canSubmit, state.isSubmitting]}
+        children={([canSubmit, isSubmitting]) => (
+          <Button
+            className="mt-8 w-fit"
+            disabled={isUpdatingAddress || !canSubmit || isSubmitting}
+            type="submit"
+          >
+            Save Changes
+          </Button>
+        )}
+      />
     </form>
   );
 }

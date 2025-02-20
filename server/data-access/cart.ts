@@ -1,11 +1,10 @@
 import { catchError } from "@/lib/utils";
 import db from "../db";
-import {checkInventoryAvailibilty, getProductVarientById} from "./products";
+import { checkInventoryAvailibilty, getProductVarientById } from "./products";
 import { cartItemTable, cartTable } from "../db/schema";
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
-import {createOrder} from './orders'
-
+import { Transaction } from "@/server/types/db";
 
 export const handleCartItem = ({
   cartId,
@@ -58,8 +57,7 @@ export const handleCartItem = ({
 export const getCartItems = (userId: string) => {
   return db.query.cartTable.findFirst({
     orderBy: ({ createdAt }, { desc }) => desc(createdAt),
-    where: ({ userId: tableUserId, isMigratedToCheckout }, { eq, and }) =>
-      and(eq(tableUserId, userId), eq(isMigratedToCheckout, false)),
+    where: ({ userId: tableUserId }, { eq }) => eq(tableUserId, userId),
     with: {
       cartItems: {
         with: {
@@ -90,8 +88,7 @@ export const getCartItems = (userId: string) => {
 export const getCart = (userId: string) => {
   return db.transaction(async (tx) => {
     const existingCart = await tx.query.cartTable.findFirst({
-      where: ({ userId: tableUserId, isMigratedToCheckout }, { eq, and }) =>
-        and(eq(tableUserId, userId), eq(isMigratedToCheckout, false)),
+      where: ({ userId: tableUserId }, { eq }) => eq(tableUserId, userId),
       orderBy: ({ createdAt }, { desc }) => desc(createdAt),
     });
 
@@ -192,28 +189,24 @@ export const updateCartItemQuantity = async ({
     .returning();
 };
 
-export const updateCartStatus = (cartId : number) => {
-  return db.update(cartTable).set({isMigratedToCheckout: true}).where(eq(cartTable.id,cartId));
-}
+export const deleteCart = async ({
+  cartId,
+  tx,
+}: {
+  tx: Transaction;
+  cartId: number;
+}) => {
+  return tx.delete(cartTable).where(eq(cartTable.id, cartId));
+};
 
-export const cartToOrder = async ({userId} : {userId: string}) => {
-
-  try {
-
-
-  const cart = await getCartItems(userId);
-
-  if (!cart || cart.cartItems.length === 0) {
-    throw new Error('Your cart is empty , Plz fill it')}
-
-  await Promise.all(cart.cartItems.map(item => checkInventoryAvailibilty({sizeId : item.sizeId , quantity : item.quantity})))
-
-  const totalPrice = cart.cartItems.reduce((cur,item) => cur + (item.itemPrice * item.quantity) , 0)
-
-    return createOrder({userId,cartId : cart.id,totalPrice})
-
-  } catch (e) {
-    throw e;
-  }
-
-}
+export const deleteCartItems = async ({
+  cartItemsIds,
+  tx,
+}: {
+  cartItemsIds: number[];
+  tx: Transaction;
+}) => {
+  return tx
+    .delete(cartItemTable)
+    .where(inArray(cartItemTable.id, cartItemsIds));
+};

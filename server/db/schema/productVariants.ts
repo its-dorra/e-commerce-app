@@ -13,6 +13,7 @@ import { cartItemTable } from "./carts";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { checkFileType, MAX_FILE_SIZE } from "@/lib/utils";
+import { orderItemTable } from "@/server/db/schema/orders";
 
 export const productVariantTable = sqliteTable(
   "product_variant",
@@ -142,4 +143,5 @@ export const sizeRelations = relations(sizeTable, ({ one, many }) => ({
     references: [productVariantTable.id],
   }),
   cartItem: many(cartItemTable),
+  orderItem: many(orderItemTable),
 }));

@@ -4,4 +4,5 @@
 - [x] Add checkout
 - [ ] Add orders
 - [ ] Fix google OAuth
-- [ ] add orderItem table
+- [x] add orderItem table
+- [ ] fix removing category from url

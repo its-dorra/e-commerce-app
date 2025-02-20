@@ -21,7 +21,7 @@ export const addressTable = sqliteTable(
     state: text("state").notNull(),
   },
   (table) => ({
-    userIdx: uniqueIndex("user_idx").on(table.userId),
+    userIdx: uniqueIndex("address_user_idx").on(table.userId),
   }),
 );
 

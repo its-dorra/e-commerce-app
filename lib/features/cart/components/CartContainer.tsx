@@ -26,12 +26,12 @@ export default function CartContainer() {
 
   return (
     <div className="grid w-full grid-flow-row justify-center gap-x-16 gap-y-12 md:grid-flow-col lg:grid-cols-[1fr_auto] lg:justify-between">
-      <ul className="border-t pt-8">
+      <ul className="space-y-4 border-t pt-8">
         {data.cart.cartItems.map((item) => (
           <CartItem key={item.id} item={item} />
         ))}
       </ul>
-      <div className="flex w-[320px] flex-col rounded-md border px-4 py-8">
+      <div className="flex h-fit w-[320px] flex-col rounded-md border px-4 py-8 md:sticky md:top-20">
         <h4 className="h4">Order Summary</h4>
         <div className="mt-8 flex items-center justify-between">
           <p className="text-muted-foreground">Subtotal</p>
@@ -50,9 +50,8 @@ export default function CartContainer() {
           <p className="font-medium">Total</p>
           <p className="font-medium">$ {subtotalPrice.toFixed(2)}</p>
         </div>
-        <Link className='block w-full' href='/checkout' >
-
-        <Button className="mt-8 w-full">Checkout</Button>
+        <Link className="block w-full" href="/checkout">
+          <Button className="mt-8 w-full">Checkout</Button>
         </Link>
         <Link className="mt-8 text-center" href="/products">
           <Button className="text-black underline" variant="link">

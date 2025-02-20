@@ -21,7 +21,7 @@ function ProductItem({
           <p className="body-1">{name}</p>
           <div className="flex items-center gap-x-2">
             <InStock quantity={quantity} />
-            <p className="body-2 text-black/60">${basePrice}.00</p>
+            <p className="body-2 text-black/60">${basePrice}</p>
           </div>
         </div>
       </Link>

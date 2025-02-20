@@ -28,7 +28,7 @@ export function CategoryFilter({ name }: CategoryProps) {
         checked={isActive}
         onCheckedChange={() => {
           isActive
-            ? deleteQuery("categories", name)
+            ? deleteQuery("categories")
             : appendQuery("categories", name);
 
           setIsActive(!isActive);

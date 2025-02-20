@@ -13,7 +13,11 @@ import { useIsInWishlist } from "../../wishlist/hooks/useIsInWishlist";
 import { HeartIcon } from "lucide-react";
 import { useToggleWishList } from "../../wishlist/hooks/useToggleWishlist";
 
-export default function ProductDetailsComponent ({ product }: { product: ProductDetails }) {
+export default function ProductDetailsComponent({
+  product,
+}: {
+  product: ProductDetails;
+}) {
   const [filter, setFilter] = useState<{
     color?: string;
     size?: string;
@@ -45,6 +49,13 @@ export default function ProductDetailsComponent ({ product }: { product: Product
           ?.variants.find((variant) => variant.size.name === filter.size)
           ?.quantity
       : undefined;
+
+  // TODO : add price adjustment
+  const priceAdjustment =
+    product.colors
+      .find((color) => color.colorName === filter.color)
+      ?.variants.find((variant) => variant.size.name === filter.size)
+      ?.priceAdjustment || 0;
 
   const handleChangeQuantity = (val: number) => {
     setFilter((prev) => ({ ...prev, quantity: val }));
@@ -83,9 +94,15 @@ export default function ProductDetailsComponent ({ product }: { product: Product
 
   return (
     <div className="flex flex-col items-start justify-between gap-y-8">
-      <div className="flex items-center justify-between gap-x-4">
-        <h3 className="h3">{product.name}</h3>
-        <InStock quantity={product.totalQuantity} />
+      <div className="space-y-2">
+        <div className="flex items-center justify-between gap-x-4">
+          <h3 className="h3">{product.name}</h3>
+          <InStock quantity={product.totalQuantity} />
+        </div>
+        <p className="space-x-2 font-semibold">
+          <span>${product.basePrice}</span>
+          {priceAdjustment > 0 && <span>(+ ${priceAdjustment})</span>}
+        </p>
       </div>
       {product.totalQuantity > 0 && (
         <div className="space-y-2">

@@ -51,7 +51,12 @@ export default function AccountDetailsForm() {
           <form.Field
             name="displayName"
             children={(field) => (
-              <FormField name={field.name} field={field} label="FullName" />
+              <FormField
+                inputType="text"
+                name={field.name}
+                field={field}
+                label="FullName"
+              />
             )}
           />
         </div>
@@ -61,7 +66,12 @@ export default function AccountDetailsForm() {
               <form.Field
                 name="password"
                 children={(field) => (
-                  <FormField name={field.name} field={field} label="Password" />
+                  <FormField
+                    inputType="password"
+                    name={field.name}
+                    field={field}
+                    label="Password"
+                  />
                 )}
               />
             </div>
@@ -70,6 +80,7 @@ export default function AccountDetailsForm() {
                 name="confirmPassword"
                 children={(field) => (
                   <FormField
+                    inputType="password"
                     name={field.name}
                     field={field}
                     label="Confirm password"

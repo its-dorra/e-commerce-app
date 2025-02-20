@@ -16,9 +16,6 @@ export const cartTable = sqliteTable("cart", {
   userId: text("user_id")
     .notNull()
     .references(() => userTable.id, { onDelete: "cascade" }),
-  isMigratedToCheckout: integer("is_migrated_to_checkout", { mode: "boolean" })
-    .notNull()
-    .default(false),
   createdAt: integer("created_at", { mode: "timestamp" }).$default(
     () => new Date(),
   ),
@@ -30,7 +27,7 @@ export const cartTable = sqliteTable("cart", {
 export const cartItemTable = sqliteTable(
   "cart_items",
   {
-    id: integer("cart_item_id", { mode: "number" }).primaryKey({
+    id: integer("id", { mode: "number" }).primaryKey({
       autoIncrement: true,
     }),
     sizeId: integer("size_id")
@@ -49,7 +46,7 @@ export const cartItemTable = sqliteTable(
       .$onUpdate(() => new Date()),
   },
   (table) => ({
-    productIdIdx: index("product_id_idx").on(table.sizeId),
+    productIdIdx: index("cart_product_id_idx").on(table.sizeId),
   }),
 );
 

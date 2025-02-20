@@ -72,9 +72,9 @@ const authRouter = router({
   signup: procedure.input(signupSchema).mutation(async ({ input }) => {
     const { email, fullName, password } = input;
 
-    const exisitingUser = await getUserByEmail(email);
+    const existingUser = await getUserByEmail(email);
 
-    if (exisitingUser) {
+    if (existingUser) {
       throw new TRPCError({
         message: "Account already exists",
         code: "UNAUTHORIZED",

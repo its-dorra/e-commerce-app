@@ -52,20 +52,39 @@ export default function SignupForm() {
         <form.Field
           name="fullName"
           children={(field) => {
-            return <FormField name={field.name} field={field} label="Name" />;
+            return (
+              <FormField
+                inputType="text"
+                name={field.name}
+                field={field}
+                label="Name"
+              />
+            );
           }}
         />
         <form.Field
           name="email"
           children={(field) => {
-            return <FormField name={field.name} field={field} label="Email" />;
+            return (
+              <FormField
+                inputType="text"
+                name={field.name}
+                field={field}
+                label="Email"
+              />
+            );
           }}
         />
         <form.Field
           name="password"
           children={(field) => {
             return (
-              <FormField name={field.name} field={field} label="Password" />
+              <FormField
+                inputType="password"
+                name={field.name}
+                field={field}
+                label="Password"
+              />
             );
           }}
         />

@@ -20,9 +20,7 @@ export function ColorFilter({ name, hexCode }: ColorFilterProps) {
   return (
     <div
       onClick={() => {
-        isQueryParamInUrl
-          ? deleteQuery("colors", name)
-          : appendQuery("colors", name);
+        isQueryParamInUrl ? deleteQuery("colors") : appendQuery("colors", name);
       }}
       className={`flex h-7 w-7 cursor-pointer items-center justify-center rounded-full p-0.5 shadow-lg ${isQueryParamInUrl ? "border-[1px] border-black" : ""}`}
     >

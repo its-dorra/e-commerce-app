@@ -1,11 +1,8 @@
 import ProductDetails from "@/lib/features/products/components/ProductDetails";
 import ProductImagesSwiper from "@/lib/features/products/components/ProductImagesSwiper";
 import { getProductById } from "@/lib/features/products/services";
-import { serverTrpc } from "@/lib/trpc/server";
 import env from "@/server/env";
 import { notFound } from "next/navigation";
-
-export const dynamic = "force-static";
 
 export async function generateMetadata(props: {
   params: Promise<{ slug: string }>;
@@ -50,8 +47,6 @@ export default async function ProductPage(props: {
   const product = await getProductById(Number(slug));
 
   if (!product) return notFound();
-
-  await serverTrpc.products.productById.prefetch({ id: Number(slug) });
 
   return (
     <main className="container flex w-full grow flex-col items-center">

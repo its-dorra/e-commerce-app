@@ -88,10 +88,7 @@ export default function AddProductContainer({}: AddProductContainerProps) {
     onSubmit: ({ value }) => {
       const formData = objectToFormData(value);
 
-      console.dir(value, { depth: null });
-
       addProduct(formData);
-      console.log({ data });
     },
   });
 

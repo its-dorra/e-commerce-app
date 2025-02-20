@@ -7,7 +7,12 @@ import {
 import { categoryTable, categoryRelations } from "./categories";
 import { colorTable, colorRelations } from "./colors";
 import { imageTable, imageRelations } from "./images";
-import { orderTable, orderRelations } from "./orders";
+import {
+  orderTable,
+  orderRelations,
+  orderItemRelations,
+  orderItemTable,
+} from "./orders";
 import { productTable, productRelations } from "./products";
 import {
   productVariantTable,
@@ -30,6 +35,7 @@ import { wishListRelations, wishListTable } from "./wishlist";
 import { addressRelations, addressTable } from "./address";
 
 export {
+  orderItemRelations,
   sizeRelations,
   accountRelations,
   addressRelations,
@@ -44,6 +50,7 @@ export {
   orderRelations,
   cartItemRelations,
   cartRelations,
+  orderItemTable,
   sizeTable,
   addressTable,
   wishListTable,
