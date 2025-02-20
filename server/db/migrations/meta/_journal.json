@@ -1,0 +1,41 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1740003480601,
+      "tag": "0000_open_lockjaw",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1740004339728,
+      "tag": "0001_lowly_old_lace",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1740060751776,
+      "tag": "0002_foamy_the_professor",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1740061601673,
+      "tag": "0003_lush_jane_foster",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1740088288350,
+      "tag": "0004_tricky_sharon_carter",
+      "breakpoints": true
+    }
+  ]
+}
