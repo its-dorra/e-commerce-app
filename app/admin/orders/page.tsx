@@ -16,7 +16,12 @@ export default async function OrdersPage({ searchParams }: OrdersPageProps) {
 
   const page = Number(OrdersPageParams.page || 1);
 
-  await serverTrpc.orders.getOrders.prefetch({ page, perPage: 6 });
+  await serverTrpc.orders.getOrders.prefetch({ page, perPage: 8 });
+
+  serverTrpc.orders.getOrders.prefetch({ page: page + 1, perPage: 8 });
+  if (page > 1) {
+    serverTrpc.orders.getOrders.prefetch({ page: page - 1, perPage: 8 });
+  }
 
   return (
     <AdminPageLayout to="Orders">

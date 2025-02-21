@@ -3,6 +3,8 @@ import { adminProcedure, authenticatedProcedure } from "../middlewares/auth";
 import { router } from "../trpc";
 import { TRPCError } from "@trpc/server";
 import {
+  acceptOrder,
+  cancelOrder,
   createOrder,
   getOrders,
   getOrdersByUser,
@@ -44,6 +46,32 @@ const ordersRouter = router({
     .query(async ({ input }) => {
       try {
         return await getOrders(input);
+      } catch (e) {
+        throw new TRPCError({
+          message: (e as Error).message,
+          code: "INTERNAL_SERVER_ERROR",
+        });
+      }
+    }),
+  acceptOrder: adminProcedure
+    .input(z.object({ orderId: z.number() }))
+    .mutation(async ({ input }) => {
+      try {
+        await acceptOrder(input);
+        return { success: true, message: "Order accepted" };
+      } catch (e) {
+        throw new TRPCError({
+          message: (e as Error).message,
+          code: "INTERNAL_SERVER_ERROR",
+        });
+      }
+    }),
+  cancelOrder: adminProcedure
+    .input(z.object({ orderId: z.number() }))
+    .mutation(async ({ input }) => {
+      try {
+        await cancelOrder(input);
+        return { success: true, message: "Order canceled" };
       } catch (e) {
         throw new TRPCError({
           message: (e as Error).message,

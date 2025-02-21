@@ -40,7 +40,47 @@ export const getOrders = async ({
     offset: (page - 1) * perPage,
     orderBy: (fields, { desc }) => desc(fields.createdAt),
     with: {
-      orderItems: true,
+      orderItems: {
+        with: {
+          size: {
+            columns: {
+              size: true,
+              quantity: true,
+              priceAdjustment: true,
+            },
+            with: {
+              variant: {
+                columns: {
+                  id: true,
+                },
+                with: {
+                  color: {
+                    columns: {
+                      hexCode: true,
+                    },
+                  },
+                  images: {
+                    columns: {
+                      imagePath: true,
+                    },
+                    orderBy(fields, operators) {
+                      return operators.asc(fields.displayOrder);
+                    },
+                    limit: 1,
+                  },
+                  product: {
+                    columns: {
+                      id: true,
+                      name: true,
+                      basePrice: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     },
   });
 
@@ -241,4 +281,40 @@ export const acceptOrder = async ({ orderId }: { orderId: number }) => {
       throw e;
     }
   });
+};
+
+export const cancelOrder = async ({ orderId }: { orderId: number }) => {
+  const order = await getOrder(orderId);
+
+  if (!order) throw new Error("Order not found");
+
+  if (order.status === "pending") {
+    return db
+      .update(orderTable)
+      .set({ status: "canceled" })
+      .where(eq(orderTable.id, orderId));
+  } else if (order.status === "processing") {
+    return db.transaction(async (tx) => {
+      try {
+        await Promise.all([
+          tx
+            .update(orderTable)
+            .set({ status: "canceled" })
+            .where(eq(orderTable.id, orderId)),
+          ...order.orderItems.map((item) =>
+            updateInventoryAfterPurchase({
+              sizeId: item.sizeId,
+              quantity: -item.quantity,
+              tx,
+            }),
+          ),
+        ]);
+        return true;
+      } catch (e) {
+        throw e;
+      }
+    });
+  } else {
+    return null;
+  }
 };

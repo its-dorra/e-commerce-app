@@ -29,9 +29,9 @@ export const orderTable = sqliteTable(
     phoneNumber: text("phone_number").notNull(),
 
     status: text("status", {
-      enum: ["pending", "processing", "delivered", "cancelled"],
+      enum: ["pending", "processing", "delivered", "canceled"],
     })
-      .$type<"pending" | "processing" | "delivered" | "cancelled">()
+      .$type<"pending" | "processing" | "delivered" | "canceled">()
       .notNull()
       .default("pending"),
 
