@@ -69,30 +69,30 @@ async function Products({
 
   const page = Number(searchParams.page || 1);
 
-  const { categories = [], colors = [], sizes = [] } = searchParams;
+  const { categories, colors, sizes } = searchParams;
 
   await Promise.all([
     serverTrpc.products.products.prefetch({
       page,
       perPage: 8,
-      categories,
-      colors,
-      sizes,
+      ...(categories && { categories }),
+      ...(colors && { colors }),
+      ...(sizes && { sizes }),
     }),
     serverTrpc.products.products.prefetch({
       page: page + 1,
       perPage: 8,
-      categories,
-      colors,
-      sizes,
+      ...(categories && { categories }),
+      ...(colors && { colors }),
+      ...(sizes && { sizes }),
     }),
     page > 1 &&
       serverTrpc.products.products.prefetch({
         page: page - 1,
         perPage: 8,
-        categories,
-        colors,
-        sizes,
+        ...(categories && { categories }),
+        ...(colors && { colors }),
+        ...(sizes && { sizes }),
       }),
   ]);
 

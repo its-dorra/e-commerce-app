@@ -14,6 +14,7 @@ export const useAppendQuery = () => {
     [searchParams],
   );
   return (name: string, value: string) => {
-    router.push(pathname + "?" + appendQueryString(name, value));
+    window.history.pushState(null, "", `?${appendQueryString(name, value)}`);
+    // router.push(pathname + "?" + appendQueryString(name, value));
   };
 };

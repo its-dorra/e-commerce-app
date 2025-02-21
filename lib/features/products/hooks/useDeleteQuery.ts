@@ -6,10 +6,12 @@ export const useDeleteQuery = () => {
   const searchParams = useSearchParams();
   const deleteQueryString = (name: string) => {
     const params = new URLSearchParams(searchParams);
+    params.delete(name);
     return params.toString();
   };
 
   return (name: string) => {
-    router.replace(pathname + "?" + deleteQueryString(name));
+    window.history.pushState(null, "", `?${deleteQueryString(name)}`);
+    // router.replace(pathname + "?" + deleteQueryString(name));
   };
 };

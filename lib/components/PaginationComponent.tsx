@@ -20,8 +20,6 @@ export default function PaginationComponent({
   perPage,
 }: PaginationComponentProps) {
   const searchParams = useSearchParams();
-  const pathname = usePathname();
-  const { push } = useRouter();
   const params = new URLSearchParams(searchParams);
   const currentPage = Number(searchParams.get("page") || 1);
   const pageCount = Math.ceil(count / perPage);
