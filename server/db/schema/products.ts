@@ -31,6 +31,7 @@ export const createProductSchema = createInsertSchema(productTable, {
   basePrice: z.coerce.number().min(1, "Put a valid price"),
   name: z.string().min(1, "Put a valid product name"),
   description: z.string().min(5, "Put a valid product description"),
+  categoryName: z.string().min(1, "Put a valid category name"),
 })
   .omit({ id: true, createdAt: true, updatedAt: true })
   .merge(

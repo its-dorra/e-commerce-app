@@ -1,7 +1,4 @@
 "use client";
-
-import { serialize } from "object-to-formdata";
-
 import { createProductSchema } from "@/server/db/schema/products";
 import { useForm } from "@tanstack/react-form";
 import { zodValidator, ZodValidator } from "@tanstack/zod-form-adapter";
@@ -26,6 +23,7 @@ import { Size } from "@/server/types/products";
 import FileUploader from "./file-uploader";
 import { useAddProduct } from "../hooks/useAddProduct";
 import { Minus } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 function objectToFormData(
   obj: Record<string, any>,
@@ -66,6 +64,7 @@ interface AddProductContainerProps {}
 
 export default function AddProductContainer({}: AddProductContainerProps) {
   const { data, addProduct, isLoading: isAddingProduct } = useAddProduct();
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof createProductSchema>, ZodValidator>({
     defaultValues: {
@@ -89,6 +88,8 @@ export default function AddProductContainer({}: AddProductContainerProps) {
       const formData = objectToFormData(value);
 
       addProduct(formData);
+
+      router.push("/admin/products");
     },
   });
 
@@ -140,7 +141,7 @@ export default function AddProductContainer({}: AddProductContainerProps) {
                 disabled={isGettingCategories}
                 onValueChange={field.handleChange}
               >
-                <SelectTrigger>
+                <SelectTrigger className="focus:ring-0">
                   <SelectValue placeholder="Select a category" />
                 </SelectTrigger>
                 <SelectContent>
@@ -224,7 +225,6 @@ export default function AddProductContainer({}: AddProductContainerProps) {
                               )}
                             </form.Field>
                             <Button
-                              variant="destructive"
                               size="icon"
                               className="aspect-square w-fit"
                               onClick={() => {
@@ -298,7 +298,6 @@ export default function AddProductContainer({}: AddProductContainerProps) {
                                 )}
                               </form.Field>
                               <Button
-                                variant="destructive"
                                 className="aspect-square w-fit p-0.5"
                                 size="icon"
                                 onClick={() => {
@@ -335,9 +334,10 @@ export default function AddProductContainer({}: AddProductContainerProps) {
                                   multiple
                                   uploadedImages={field.state.value}
                                   onChange={(e) =>
-                                    field.handleChange(
-                                      Array.from(e.target.files || []),
-                                    )
+                                    field.handleChange((value) => [
+                                      ...value,
+                                      ...Array.from(e.target.files || []),
+                                    ])
                                   }
                                   onRemove={(file) => {
                                     field.handleChange((value) =>

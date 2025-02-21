@@ -37,7 +37,6 @@ export default function ProductsContainer({
   return (
     <div className="flex w-full flex-wrap gap-x-8 gap-y-12">
       {products.map((product) => {
-        if (product.imageUrl.length === 0) return <></>;
         return (
           <ProductItem
             key={product.id}

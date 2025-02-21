@@ -14,7 +14,7 @@ interface SidebarItemProps {
 
 export default function SidebarItem({ title, icon, href }: SidebarItemProps) {
   const pathName = usePathname();
-  const isCurrentPage = pathName === href;
+  const isCurrentPage = pathName.includes(href);
 
   const { mutate, isPending } = useLogout();
 

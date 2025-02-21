@@ -12,12 +12,12 @@ export default function ProductImage({
   return (
     <div
       className={cn(
-        "grid h-[350px] w-full place-items-center rounded-sm bg-secondaryWhite",
+        "grid h-[350px] w-full place-items-center rounded-sm bg-secondaryWhite/50",
         className,
       )}
     >
       <img
-        className="w-5/6 object-contain mix-blend-color-burn"
+        className="w-5/6 object-contain mix-blend-multiply"
         src={imageUrl.length > 0 ? imageUrl : undefined}
         alt={alt}
       />

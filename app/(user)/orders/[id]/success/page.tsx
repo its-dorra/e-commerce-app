@@ -18,7 +18,6 @@ export default async function OrderSuccess({
   const order = await getOrder(+id);
 
   if (!order || order.isSeen) {
-    console.log("here ------------ here");
     return redirect("/account");
   }
 
