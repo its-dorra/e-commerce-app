@@ -20,11 +20,17 @@ import PaginationComponent from "@/lib/components/PaginationComponent";
 import { capitalizeWords } from "@/lib/utils";
 import LoadingSpinner from "@/lib/components/LoadingSpinner";
 import ProductImage from "../../products/components/ProductImage";
+import { useAcceptOrder } from "../hooks/useAcceptOrder";
+import { useCancelOrder } from "../hooks/useCancelOrder";
 
 interface OrderItemProps {
   item: NonNullable<
     ReturnType<typeof useAdminOrders>["data"]
   >["data"][number]["orderItems"][number];
+}
+
+interface OrderProps {
+  order: NonNullable<ReturnType<typeof useAdminOrders>["data"]>["data"][number];
 }
 
 export default function OrdersAdminContainer() {
@@ -72,100 +78,123 @@ export default function OrdersAdminContainer() {
 
         <Accordion type="single" collapsible>
           <div className="flex flex-col gap-y-2" role="rowgroup">
-            {data?.data.map((order) => (
-              <AccordionItem
-                className="w-full rounded-sm border-none"
-                key={order.id}
-                value={`${order.id}`}
-              >
-                <AccordionTrigger className="w-full text-left hover:bg-gray-50 hover:no-underline">
-                  <div
-                    className="grid w-full grid-flow-col grid-cols-[100px_2fr_1fr_1fr_1fr_1fr] gap-x-2"
-                    role="row"
-                  >
-                    <div className="text-ellipsis" role="cell">
-                      {order.id}
-                    </div>
-                    <div role="cell">
-                      {order.createdAt?.toLocaleString(undefined, {
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric",
-                        hour: "numeric",
-                        minute: "numeric",
-                      })}
-                    </div>
-                    <div className="" role="cell">
-                      ${order.totalPrice.toLocaleString("en-US")}
-                    </div>
-                    <div className="" role="cell">
-                      {capitalizeWords(order.status)}
-                    </div>
-                    <div className="" role="cell">
-                      {order.phoneNumber}
-                    </div>
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent className="p-4">
-                  <div className="flex items-center justify-between gap-x-2 hover:bg-gray-50">
-                    <div className="flex w-full flex-col gap-y-2">
-                      {order.orderItems.map((item) => (
-                        <OrderItem key={item.id} item={item} />
-                      ))}
-                    </div>
-                    <div className="ml-auto">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="outline"
-                            className="cursor-pointer border-black/40"
-                          >
-                            <Ellipsis />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                          <DropdownMenuGroup>
-                            <DropdownMenuItem
-                              disabled={
-                                order.status === "canceled" ||
-                                order.status === "delivered" ||
-                                order.status === "processing"
-                              }
-                              className="cursor-pointer"
-                            >
-                              Accept
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              disabled={
-                                order.status === "canceled" ||
-                                order.status === "delivered"
-                              }
-                              className="cursor-pointer"
-                            >
-                              Cancel
-                            </DropdownMenuItem>
-                          </DropdownMenuGroup>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-            ))}
+            {data?.data.map((order) => <Order key={order.id} order={order} />)}
           </div>
         </Accordion>
       </div>
       <PaginationComponent
-        count={data?.pagination.totalCount || 0}
-        perPage={data?.pagination.perPage || 0}
+        count={data.pagination.totalCount}
+        perPage={data.pagination.perPage}
       />
     </main>
   );
 }
 
+function Order({ order }: OrderProps) {
+  const acceptOrderMutation = useAcceptOrder();
+  const cancelOrderMutation = useCancelOrder();
+
+  const allItemsAvailable = order.orderItems.every(
+    (item) =>
+      item.itemPrice ===
+        item.size.variant.product.basePrice +
+          (item.size.priceAdjustment ?? 0) &&
+      item.quantity <= item.size.quantity,
+  );
+
+  return (
+    <AccordionItem
+      className="w-full rounded-sm border-none"
+      value={`${order.id}`}
+    >
+      <AccordionTrigger className="w-full text-left hover:bg-gray-50 hover:no-underline">
+        <div
+          className="grid w-full grid-flow-col grid-cols-[100px_2fr_1fr_1fr_1fr_1fr] gap-x-2"
+          role="row"
+        >
+          <div className="text-ellipsis" role="cell">
+            {order.id}
+          </div>
+          <div role="cell">
+            {order.createdAt?.toLocaleString(undefined, {
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+              hour: "numeric",
+              minute: "numeric",
+            })}
+          </div>
+          <div className="" role="cell">
+            ${order.totalPrice.toLocaleString("en-US")}
+          </div>
+          <div className="" role="cell">
+            {capitalizeWords(order.status)}
+          </div>
+          <div className="" role="cell">
+            {order.phoneNumber}
+          </div>
+        </div>
+      </AccordionTrigger>
+      <AccordionContent className="p-4">
+        <div className="flex items-center justify-between gap-x-6">
+          <div className="flex w-full flex-col gap-y-2">
+            {order.orderItems.map((item) => (
+              <OrderItem key={item.id} item={item} />
+            ))}
+          </div>
+          <div className="ml-auto">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="cursor-pointer border-black/40"
+                >
+                  <Ellipsis />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuGroup>
+                  <DropdownMenuItem
+                    disabled={
+                      order.status === "canceled" ||
+                      order.status === "delivered" ||
+                      order.status === "processing" ||
+                      acceptOrderMutation.isPending ||
+                      !allItemsAvailable
+                    }
+                    className="cursor-pointer"
+                    onClick={() =>
+                      acceptOrderMutation.mutate({ orderId: order.id })
+                    }
+                  >
+                    Accept
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    disabled={
+                      order.status === "canceled" ||
+                      order.status === "delivered" ||
+                      cancelOrderMutation.isPending
+                    }
+                    className="cursor-pointer"
+                    onClick={() =>
+                      cancelOrderMutation.mutate({ orderId: order.id })
+                    }
+                  >
+                    Cancel
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
+      </AccordionContent>
+    </AccordionItem>
+  );
+}
+
 function OrderItem({ item }: OrderItemProps) {
   return (
-    <div className="flex w-full items-center gap-x-12 border-b py-3">
+    <div className="flex w-full items-center gap-x-12 border-b px-2 py-3 last:border-none hover:bg-gray-50">
       <ProductImage
         className="size-16"
         imageUrl={item.size.variant.images[0].imagePath}
@@ -202,7 +231,7 @@ function OrderItem({ item }: OrderItemProps) {
           </p>
         )}
         {item.quantity > item.size.quantity && (
-          <p className="text- rounded-sm bg-red-200 p-0.5 text-red-500">
+          <p className="rounded-sm bg-red-200 p-0.5 text-red-500">
             Quantity not available
           </p>
         )}

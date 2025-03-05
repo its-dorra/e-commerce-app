@@ -310,8 +310,6 @@ export const addProduct = async (product: {
       );
       return { ...productResult, variants: createdVariants };
     } catch (error) {
-      console.error("Failed to add product:", error);
-
       throw new Error(
         error instanceof Error
           ? error.message

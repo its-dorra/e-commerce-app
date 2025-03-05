@@ -1,11 +1,10 @@
-// import BestSellingSection from "@/lib/components/BestSellingSection";
 import BrowseFashion from "@/lib/components/BrowseFashionSection";
 import FeaturesSection from "@/lib/components/FeaturesSection";
 import HeroSection from "@/lib/components/HeroSection";
-import LatestProducts from "@/lib/components/LatestProducts";
 import { getCurrentUser } from "@/server/lucia/utils";
 import { redirect } from "next/navigation";
 import env from "@/server/env";
+
 export const metadata = {
   title: "Fashion Haven | Trendy Clothing for Every Style",
   description:
@@ -52,9 +51,7 @@ export default async function Home() {
     <main>
       <HeroSection />
       <FeaturesSection />
-      {/*<BestSellingSection />*/}
       <BrowseFashion />
-      <LatestProducts />
     </main>
   );
 }

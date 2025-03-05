@@ -24,7 +24,6 @@ export const useUpdateCartItemQuantity = () => {
       return { previousState };
     },
     onError: (error, variables, context) => {
-      console.error({ error });
       utils.carts.getCart.setData(undefined, context?.previousState);
       toast.error("Can't update cart item. Plz try again");
     },

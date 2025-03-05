@@ -4,8 +4,6 @@ import {
   logoutIcon,
   ordersIcon,
   productIcon,
-  settingsIcon,
-  usersIcon,
 } from "@/assets";
 import SidebarItem from "@/lib/components/SidebarItem";
 import Image from "next/image";
@@ -25,16 +23,6 @@ const sidebarItems = [
     href: "/admin/orders",
     title: "Orders",
     icon: ordersIcon,
-  },
-  {
-    href: "/admin/customers",
-    title: "Customers",
-    icon: usersIcon,
-  },
-  {
-    href: "/admin/settings",
-    title: "Settings",
-    icon: settingsIcon,
   },
   {
     href: "/admin/logout",

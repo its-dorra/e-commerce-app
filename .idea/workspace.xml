@@ -5,40 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f36f1e17-59af-489c-9d96-fd97b0cad85c" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/lib/features/orders/hooks/useCreateOrder.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/server/types/db.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(user)/account/orders/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(user)/account/orders/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(user)/products/[slug]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(user)/products/[slug]/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/address/components/address-form.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/address/components/address-form.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/cart/components/CartButton.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/cart/components/CartButton.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/cart/components/CartContainer.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/cart/components/CartContainer.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/checkout/components/checkout-container.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/checkout/components/checkout-container.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/products/components/CategoryFilter.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/products/components/CategoryFilter.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/products/components/ColorFilter.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/products/components/ColorFilter.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/products/components/FilteringProducts.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/products/components/FilteringProducts.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/products/components/ProductDetails.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/products/components/ProductDetails.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/user/components/SignupForm.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/user/components/SignupForm.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/user/components/account-details-form.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/user/components/account-details-form.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/utils.ts" beforeDir="false" afterPath="$PROJECT_DIR$/lib/utils.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/data-access/cart.ts" beforeDir="false" afterPath="$PROJECT_DIR$/server/data-access/cart.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/data-access/orders.ts" beforeDir="false" afterPath="$PROJECT_DIR$/server/data-access/orders.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/data-access/products.ts" beforeDir="false" afterPath="$PROJECT_DIR$/server/data-access/products.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/db/migrations/0000_third_roland_deschain.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/db/migrations/meta/0000_snapshot.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/db/migrations/meta/_journal.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/db/schema/address.ts" beforeDir="false" afterPath="$PROJECT_DIR$/server/db/schema/address.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/db/schema/carts.ts" beforeDir="false" afterPath="$PROJECT_DIR$/server/db/schema/carts.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/db/schema/images.ts" beforeDir="false" afterPath="$PROJECT_DIR$/server/db/schema/images.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/db/schema/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/server/db/schema/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/db/schema/orders.ts" beforeDir="false" afterPath="$PROJECT_DIR$/server/db/schema/orders.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/db/schema/productVariants.ts" beforeDir="false" afterPath="$PROJECT_DIR$/server/db/schema/productVariants.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/env.ts" beforeDir="false" afterPath="$PROJECT_DIR$/server/env.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/main.ts" beforeDir="false" afterPath="$PROJECT_DIR$/server/main.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/routers/orders.ts" beforeDir="false" afterPath="$PROJECT_DIR$/server/routers/orders.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/routers/users.ts" beforeDir="false" afterPath="$PROJECT_DIR$/server/routers/users.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -140,6 +107,8 @@
       <workItem from="1740059346770" duration="2900000" />
       <workItem from="1740063386905" duration="2000" />
       <workItem from="1740063717974" duration="3344000" />
+      <workItem from="1740843176832" duration="1400000" />
+      <workItem from="1741192668480" duration="2000" />
     </task>
     <servers />
   </component>
