@@ -6,6 +6,7 @@ export const useAddProduct = () => {
   const [data, setData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const utils = clientTrpc.useUtils();
 
   const addProduct = async (product: FormData) => {
     setIsLoading(true);
@@ -19,6 +20,7 @@ export const useAddProduct = () => {
       setData(result);
 
       toast.success("Product added successfully");
+      utils.products.products.invalidate();
     } catch (error) {
       setError((error as Error).message);
     } finally {
