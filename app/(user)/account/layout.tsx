@@ -1,8 +1,15 @@
 import AccountSidebar from "@/lib/features/user/components/Sidebar";
 import { ReactNode } from "react";
 import AccountSidebarButton from "@/lib/features/user/components/AccountSidebarButton";
+import { assertAuthenticated } from "@/server/lucia/utils";
 
-export default function AccountLayout({ children }: { children: ReactNode }) {
+export default async function AccountLayout({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  await assertAuthenticated();
+
   return (
     <section className="container grid grid-cols-1 justify-self-center lg:grid-cols-[auto_1fr] lg:gap-x-4">
       <AccountSidebar />

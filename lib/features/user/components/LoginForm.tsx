@@ -39,12 +39,6 @@ export default function LoginForm() {
 
   return (
     <div className="mt-24 flex w-full flex-col gap-y-8 md:mt-0 md:w-[380px] lg:w-[420px]">
-      <div className="flex items-center gap-x-2">
-        <div className="h-[1px] w-full bg-black/30" />
-        <p>OR</p>
-        <div className="h-[1px] w-full bg-black/30" />
-      </div>
-
       <form onSubmit={onSubmit} className="space-y-8">
         <form.Field
           name="email"
