@@ -38,10 +38,6 @@ export default function SignupForm() {
 
   return (
     <div className="mt-24 flex w-full flex-col gap-y-8 md:mt-0 md:w-[380px] lg:w-[420px]">
-      <Button className="flex items-center justify-center gap-x-2 border bg-transparent py-2">
-        <Image src={googleIcon} alt="google icon" />
-        <p className="text-black/80">Continue with google</p>
-      </Button>
       <div className="flex items-center gap-x-2">
         <div className="h-[1px] w-full bg-black/30" />
         <p>OR</p>

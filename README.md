@@ -8,7 +8,7 @@ Fashion Haven is a comprehensive e-commerce platform designed to provide a seaml
 
 - User Authentication
   - Create and manage personal accounts
-  - Secure login with email/password or Google OAuth
+  - Secure login with email/password
 - Shopping Experience
   - Interactive shopping cart
   - Personal wishlist management
@@ -48,14 +48,12 @@ Fashion Haven is a comprehensive e-commerce platform designed to provide a seaml
 ### Authentication
 
 - Email/Password Login
-- Google OAuth
 
 ## 🔐 Authentication
 
 The application supports two authentication methods:
 
 - Standard email/password registration
-- Google OAuth for quick login
 
 ## 💾 Database
 
