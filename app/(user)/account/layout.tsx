@@ -8,8 +8,6 @@ export default async function AccountLayout({
 }: {
   children: ReactNode;
 }) {
-  await assertAuthenticated();
-
   return (
     <section className="container grid grid-cols-1 justify-self-center lg:grid-cols-[auto_1fr] lg:gap-x-4">
       <AccountSidebar />
