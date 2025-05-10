@@ -13,6 +13,16 @@ import { useIsInWishlist } from "../../wishlist/hooks/useIsInWishlist";
 import { HeartIcon } from "lucide-react";
 import { useToggleWishList } from "../../wishlist/hooks/useToggleWishlist";
 
+const sizesOrdering: Record<string, number> = {
+  XS: 1,
+  S: 2,
+  M: 3,
+  L: 4,
+  XL: 5,
+  "2XL": 6,
+  "3XL": 7,
+};
+
 export default function ProductDetailsComponent({
   product,
 }: {
@@ -40,6 +50,7 @@ export default function ProductDetailsComponent({
     ? product.colors
         .find((color) => color.colorName === filter.color)
         ?.variants.reduce((acc, cur) => [...acc, cur.size.name], [] as string[])
+        .sort((a, b) => sizesOrdering[a] - sizesOrdering[b])
     : undefined;
 
   const maxValue: number | undefined =

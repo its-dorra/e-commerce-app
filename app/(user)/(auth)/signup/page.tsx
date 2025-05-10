@@ -37,9 +37,5 @@ export default async function SignupPage() {
     return redirect(userRole === "admin" ? "/dashboard" : "/");
   }
 
-  return (
-    <main className="flex items-center justify-center">
-      <SignupForm />
-    </main>
-  );
+  return <SignupForm />;
 }

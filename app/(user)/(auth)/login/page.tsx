@@ -37,9 +37,5 @@ export default async function LoginPage() {
     return redirect(userRole === "admin" ? "/dashboard" : "/");
   }
 
-  return (
-    <main className="flex items-center justify-center">
-      <LoginForm />
-    </main>
-  );
+  return <LoginForm />;
 }
