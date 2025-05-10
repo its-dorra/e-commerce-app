@@ -48,40 +48,46 @@ export default function OrdersAdminContainer() {
   return (
     <main className="flex flex-col gap-y-4 rounded-lg bg-white p-6">
       <h4 className="h4">Orders</h4>
-      <div className="flex w-full flex-col gap-4" role="table">
-        <div
-          className="grid grid-flow-col grid-cols-[100px_2fr_1fr_1fr_1fr_1fr] border-b border-t border-gray-200 py-2"
-          role="row"
-        >
-          <div className="table-cell font-semibold" role="columnheader">
-            ID
-          </div>
-          <div className="table-cell font-semibold" role="columnheader">
-            Date
-          </div>
-          <div className="table-cell font-semibold" role="columnheader">
-            Total
-          </div>
-          <div className="table-cell font-semibold" role="columnheader">
-            Status
-          </div>
-          <div className="table-cell font-semibold" role="columnheader">
-            PhoneNumber
-          </div>
+      {data.pagination.totalCount === 0 ? (
+        <h4 className="h4">There's no orders to show</h4>
+      ) : (
+        <div className="flex w-full flex-col gap-4" role="table">
           <div
-            className="table-cell text-right font-semibold"
-            role="columnheader"
+            className="grid grid-flow-col grid-cols-[100px_2fr_1fr_1fr_1fr_1fr] border-b border-t border-gray-200 py-2"
+            role="row"
           >
-            Actions
+            <div className="table-cell font-semibold" role="columnheader">
+              ID
+            </div>
+            <div className="table-cell font-semibold" role="columnheader">
+              Date
+            </div>
+            <div className="table-cell font-semibold" role="columnheader">
+              Total
+            </div>
+            <div className="table-cell font-semibold" role="columnheader">
+              Status
+            </div>
+            <div className="table-cell font-semibold" role="columnheader">
+              PhoneNumber
+            </div>
+            <div
+              className="table-cell text-right font-semibold"
+              role="columnheader"
+            >
+              Actions
+            </div>
           </div>
-        </div>
 
-        <Accordion type="single" collapsible>
-          <div className="flex flex-col gap-y-2" role="rowgroup">
-            {data?.data.map((order) => <Order key={order.id} order={order} />)}
-          </div>
-        </Accordion>
-      </div>
+          <Accordion type="single" collapsible>
+            <div className="flex flex-col gap-y-2" role="rowgroup">
+              {data?.data.map((order) => (
+                <Order key={order.id} order={order} />
+              ))}
+            </div>
+          </Accordion>
+        </div>
+      )}
       <PaginationComponent
         count={data.pagination.totalCount}
         perPage={data.pagination.perPage}

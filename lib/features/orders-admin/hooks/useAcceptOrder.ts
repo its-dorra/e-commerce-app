@@ -7,6 +7,7 @@ export const useAcceptOrder = () => {
   return clientTrpc.orders.acceptOrder.useMutation({
     onSuccess: () => {
       utils.orders.getOrders.invalidate();
+      utils.products.products.invalidate();
       toast.success("Order accepted");
     },
     onError: (error) => {

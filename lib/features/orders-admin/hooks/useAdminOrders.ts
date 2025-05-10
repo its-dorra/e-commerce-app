@@ -12,5 +12,8 @@ export const useAdminOrders = () => {
     utils.orders.getOrders.prefetch({ page: page - 1, perPage: 8 });
   }
 
-  return clientTrpc.orders.getOrders.useQuery({ page, perPage: 8 });
+  return clientTrpc.orders.getOrders.useQuery(
+    { page, perPage: 8 },
+    { refetchInterval: 30 * 1000 },
+  );
 };

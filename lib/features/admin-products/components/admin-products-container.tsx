@@ -27,17 +27,12 @@ import { useState } from "react";
 import Link from "next/link";
 
 export default function AdminProductsContainer() {
-  const { data, isLoading } = useProducts();
+  const { data, isLoading, isError } = useProducts();
   const [productToDelete, setProductToDelete] = useState<number | null>(null);
-  // const [productToEdit, setProductToEdit] = useState<number | null>(null);
 
   const toggleDeleteDialog = (productId: number | null) => {
     setProductToDelete(productId);
   };
-
-  // const toggleEditDialog = (productId: number | null) => {
-  //   setProductToEdit(productId);
-  // };
 
   if (isLoading)
     return (
@@ -45,6 +40,8 @@ export default function AdminProductsContainer() {
         <LoadingSpinner size="xl" />
       </div>
     );
+
+  if (isError) return <div>Something went wrong</div>;
 
   return (
     <main className="flex flex-col gap-y-4 rounded-lg bg-white p-6">
@@ -54,80 +51,84 @@ export default function AdminProductsContainer() {
           <Button>Add product</Button>
         </Link>
       </div>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead></TableHead>
-            <TableHead>Name</TableHead>
-            <TableHead>Price</TableHead>
-            <TableHead>Stock</TableHead>
-            <TableHead>Category</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {data?.products.map((product) => (
-            <TableRow key={product.id}>
-              <TableCell>
-                <ProductImage
-                  className="size-10"
-                  imageUrl={product.imageUrl}
-                  alt="product image"
-                />
-              </TableCell>
-              <TableCell>{product.name}</TableCell>
-              <TableCell>{product.basePrice}</TableCell>
-              <TableCell>
-                {product.quantity > 0 ? "In stock" : "Out of stock"}
-              </TableCell>
-              <TableCell>{product.category}</TableCell>
-              <TableCell className="text-right">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost">
-                      <Ellipsis />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuGroup>
-                      <DropdownMenuItem>
-                        <Button
-                          variant="ghost"
-                          className="w-full justify-start border-none outline-none"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            // toggleEditDialog(product.id);
-                          }}
-                        >
-                          Edit
-                        </Button>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <Button
-                          variant="ghost"
-                          className="w-full justify-start border-none outline-none"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            toggleDeleteDialog(product.id);
-                          }}
-                        >
-                          Delete
-                        </Button>
-                        {productToDelete === product.id && (
-                          <DeleteProductDialog
-                            productId={product.id}
-                            handleToggle={toggleDeleteDialog}
-                          />
-                        )}
-                      </DropdownMenuItem>
-                    </DropdownMenuGroup>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </TableCell>
+      {data?.pagination.total === 0 ? (
+        <h4 className="h4">There's no product to show</h4>
+      ) : (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead></TableHead>
+              <TableHead>Name</TableHead>
+              <TableHead>Price</TableHead>
+              <TableHead>Stock</TableHead>
+              <TableHead>Category</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {data?.products.map((product) => (
+              <TableRow key={product.id}>
+                <TableCell>
+                  <ProductImage
+                    className="size-10"
+                    imageUrl={product.imageUrl}
+                    alt="product image"
+                  />
+                </TableCell>
+                <TableCell>{product.name}</TableCell>
+                <TableCell>{product.basePrice}</TableCell>
+                <TableCell>
+                  {product.quantity > 0 ? "In stock" : "Out of stock"}
+                </TableCell>
+                <TableCell>{product.category}</TableCell>
+                <TableCell className="text-right">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost">
+                        <Ellipsis />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuGroup>
+                        <DropdownMenuItem>
+                          <Button
+                            variant="ghost"
+                            className="w-full justify-start border-none outline-none"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              // toggleEditDialog(product.id);
+                            }}
+                          >
+                            Edit
+                          </Button>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                          <Button
+                            variant="ghost"
+                            className="w-full justify-start border-none outline-none"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              toggleDeleteDialog(product.id);
+                            }}
+                          >
+                            Delete
+                          </Button>
+                          {productToDelete === product.id && (
+                            <DeleteProductDialog
+                              productId={product.id}
+                              handleToggle={toggleDeleteDialog}
+                            />
+                          )}
+                        </DropdownMenuItem>
+                      </DropdownMenuGroup>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      )}
       <PaginationComponent
         count={data?.pagination.total || 0}
         perPage={data?.pagination.perPage || 0}
