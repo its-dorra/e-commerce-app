@@ -6,11 +6,11 @@ import {
   productVariantTable,
   sizeTable,
 } from "@/server/db/schema";
-import { count, eq } from "drizzle-orm";
+
+import { and, count, countDistinct, eq, inArray } from "drizzle-orm";
 
 import { FilterQuery, Size } from "../types/products";
 
-import { getCartItems } from "@/server/data-access/cart";
 import { Transaction } from "@/server/types/db";
 
 export const getCategories = () => {
@@ -99,9 +99,30 @@ export const getProducts = async (
     },
   });
 
+  const filtersWhereClause = [
+    categories && categories.length > 0
+      ? inArray(productTable.categoryName, categories)
+      : null,
+    colors && colors.length > 0
+      ? inArray(productVariantTable.colorName, colors)
+      : null,
+    sizes && sizes.length > 0 ? inArray(sizeTable.size, sizes) : null,
+  ].filter((ele) => ele !== null);
+
   const totalCountQuery = db
-    .select({ totalCount: count() })
+    .select({ totalCount: countDistinct(productTable.id) })
     .from(productTable)
+    .innerJoin(
+      productVariantTable,
+      eq(productTable.id, productVariantTable.productId),
+    )
+    .innerJoin(
+      sizeTable,
+      eq(productVariantTable.id, sizeTable.productVariantId),
+    )
+    .where(
+      filtersWhereClause.length > 0 ? and(...filtersWhereClause) : undefined,
+    )
     .then((res) => res[0]);
 
   const [products, { totalCount }] = await Promise.all([

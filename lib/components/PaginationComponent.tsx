@@ -19,6 +19,8 @@ export default function PaginationComponent({
   count,
   perPage,
 }: PaginationComponentProps) {
+  console.log({ count, perPage });
+
   const searchParams = useSearchParams();
   const params = new URLSearchParams(searchParams);
   const currentPage = Number(searchParams.get("page") || 1);

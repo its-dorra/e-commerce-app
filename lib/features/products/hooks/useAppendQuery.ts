@@ -8,6 +8,7 @@ export const useAppendQuery = () => {
   const appendQueryString = useCallback(
     (name: string, value: string) => {
       const params = new URLSearchParams(searchParams.toString());
+      params.delete("page");
       params.append(name, value);
       return params.toString();
     },

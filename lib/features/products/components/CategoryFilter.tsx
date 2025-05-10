@@ -19,19 +19,18 @@ export function CategoryFilter({ name }: CategoryProps) {
 
   const deleteQuery = useDeleteQuery();
   const appendQuery = useAppendQuery();
-  const [isActive, setIsActive] = useState(isQueryParamInUrl);
 
   return (
     <div className="flex items-center gap-x-3 border-b-[0.5px] py-2">
       <Checkbox
         id={name}
-        checked={isActive}
+        checked={isQueryParamInUrl}
         onCheckedChange={() => {
-          isActive
-            ? deleteQuery("categories")
+          isQueryParamInUrl
+            ? deleteQuery("categories", name)
             : appendQuery("categories", name);
 
-          setIsActive(!isActive);
+          // setIsActive(!isActive);
         }}
       />
       <Label htmlFor={name}>{name}</Label>
