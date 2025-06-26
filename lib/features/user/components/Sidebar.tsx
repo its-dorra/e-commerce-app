@@ -26,7 +26,7 @@ export const accountSidebarItems = [
   },
   {
     id: 2,
-    href: "/account/cart",
+    href: "/cart",
     title: "Cart",
     icon: cartIcon,
   },

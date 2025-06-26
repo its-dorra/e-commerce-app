@@ -64,7 +64,10 @@
       <recent name="C:\Users\Dorra\Documents\dev\web\e-commerce-app\app\(user)\checkout" />
     </key>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="npm.Next.js: server-side">
+    <configuration name="Next.js: debug client-side" type="JavascriptDebugType" uri="http://localhost:3000/">
+      <method v="2" />
+    </configuration>
     <configuration default="true" type="ShConfigurationType">
       <option name="SCRIPT_TEXT" value="" />
       <option name="INDEPENDENT_SCRIPT_PATH" value="true" />
@@ -77,6 +80,16 @@
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="EXECUTE_IN_TERMINAL" value="true" />
       <option name="EXECUTE_SCRIPT_FILE" value="true" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <configuration name="Next.js: server-side" type="js.build_tools.npm">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="dev" />
+      </scripts>
+      <node-interpreter value="project" />
       <envs />
       <method v="2" />
     </configuration>

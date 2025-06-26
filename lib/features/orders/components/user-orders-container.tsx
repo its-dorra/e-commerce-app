@@ -13,6 +13,7 @@ import { capitalizeWords } from "@/lib/utils";
 import ProductImage from "../../products/components/ProductImage";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import EmptyListMessage from "@/lib/components/EmptyListMessage";
 
 type OrderProps = Exclude<
   ReturnType<typeof useGetOrdersByUser>["data"],
@@ -39,6 +40,7 @@ export default function UserOrdersContainer() {
   return (
     <div className="flex w-full flex-col gap-y-8">
       <div className="flex flex-col space-y-4">
+        {data.data.length === 0 && <EmptyListMessage listName="Orders" />}
         <Accordion className="rounded border" type="single" collapsible>
           {data.data.map((order) => {
             return <Order key={order.id} order={order} />;
