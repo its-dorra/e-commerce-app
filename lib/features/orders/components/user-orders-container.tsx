@@ -41,11 +41,13 @@ export default function UserOrdersContainer() {
     <div className="flex w-full flex-col gap-y-8">
       <div className="flex flex-col space-y-4">
         {data.data.length === 0 && <EmptyListMessage listName="Orders" />}
-        <Accordion className="rounded border" type="single" collapsible>
-          {data.data.map((order) => {
-            return <Order key={order.id} order={order} />;
-          })}
-        </Accordion>
+        {data.data.length > 0 && (
+          <Accordion className="rounded border" type="single" collapsible>
+            {data.data.map((order) => {
+              return <Order key={order.id} order={order} />;
+            })}
+          </Accordion>
+        )}
       </div>
 
       <PaginationComponent count={data.pagination.totalCount} perPage={6} />
