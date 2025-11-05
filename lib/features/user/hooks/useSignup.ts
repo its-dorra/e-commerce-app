@@ -10,7 +10,7 @@ export const useSignup = () => {
     onSuccess: () => {
       toast.success("You created an account successfully , Enjoy your session");
       utils.auth.getCurrentUser.invalidate();
-      router.replace("/");
+      router.replace("/products");
     },
     onError: (error) => {
       toast.error("Something went wrong \n" + error.message);
