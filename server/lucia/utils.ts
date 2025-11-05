@@ -18,8 +18,7 @@ export const setSession = async (userId: UserId) => {
   );
 };
 
-export const validateRequest = cache(
-  async (): Promise<
+export const validateRequest = async (): Promise<
     { user: User; session: Session } | { user: null; session: null }
   > => {
     const sessionId =
@@ -53,13 +52,13 @@ export const validateRequest = cache(
       }
     } catch {}
     return result;
-  },
-);
+};
 
-export const getCurrentUser = cache(async () => {
+
+export const getCurrentUser = async () => {
   const { user } = await validateRequest();
   return user ?? undefined;
-});
+}
 
 export const assertAuthenticated = cache(async () => {
   const user = await getCurrentUser();
