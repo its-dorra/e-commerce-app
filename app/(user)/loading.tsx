@@ -1,5 +1,5 @@
 import LoadingSpinner from "@/lib/components/LoadingSpinner";
 
 export default function LoadingPage() {
-  return <LoadingSpinner size="xl" />;
+  return <div className='h-full flex items-center justify-center' ><LoadingSpinner size="xl" /></div>;
 }
