@@ -60,7 +60,7 @@ export const getCurrentUser = async () => {
   return user ?? undefined;
 }
 
-export const assertAuthenticated = casync () => {
+export const assertAuthenticated = async () => {
   const user = await getCurrentUser();
   if (!user) {
     redirect("/login");
