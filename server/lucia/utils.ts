@@ -60,24 +60,24 @@ export const getCurrentUser = async () => {
   return user ?? undefined;
 }
 
-export const assertAuthenticated = cache(async () => {
+export const assertAuthenticated = casync () => {
   const user = await getCurrentUser();
   if (!user) {
     redirect("/login");
   }
   return user;
-});
+}
 
-export const assertAdmin = cache(async () => {
+export const assertAdmin = async () => {
   const user = await assertAuthenticated();
 
   if (user.role !== "admin") redirect("/");
 
   return user;
-});
+}
 
-export const isAdmin = cache(async () => {
+export const isAdmin = async () => {
   const user = await getCurrentUser();
 
   return user?.role === "admin";
-});
+}
