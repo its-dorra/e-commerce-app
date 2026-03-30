@@ -24,11 +24,11 @@ export default function SidebarItem({ title, icon, href }: SidebarItemProps) {
         variant="ghost"
         disabled={isPending}
         onClick={() => mutate()}
-        className={`${isCurrentPage ? "bg-gray-100" : ""} group flex h-12 w-full items-center justify-start gap-x-3 rounded-md px-4 py-2 transition-colors hover:bg-gray-100`}
+        className={`${isCurrentPage ? "bg-zinc-900 text-zinc-50" : ""} group flex h-11 w-full items-center justify-start gap-x-3 rounded-xl px-4 py-2 transition-colors hover:bg-zinc-200/80`}
       >
         <Image width={24} height={24} src={icon} alt="sidebar icon" />
         <p
-          className={`${isCurrentPage ? "" : "text-gray-500"} text-base font-semibold transition-colors group-hover:text-black`}
+          className={`${isCurrentPage ? "text-zinc-50" : "text-zinc-600"} text-sm font-semibold transition-colors group-hover:text-zinc-900`}
         >
           {title}
         </p>
@@ -37,12 +37,12 @@ export default function SidebarItem({ title, icon, href }: SidebarItemProps) {
 
   return (
     <Link
-      className={`${isCurrentPage ? "bg-gray-100" : ""} group flex h-12 w-full items-center justify-start gap-x-3 rounded-md px-4 py-2 transition-colors hover:bg-gray-100`}
+      className={`${isCurrentPage ? "bg-zinc-900" : ""} group flex h-11 w-full items-center justify-start gap-x-3 rounded-xl px-4 py-2 transition-colors hover:bg-zinc-200/80`}
       href={href}
     >
       <Image width={24} height={24} src={icon} alt="sidebar icon" />
       <p
-        className={`${isCurrentPage ? "" : "text-gray-500"} font-semibold transition-colors group-hover:text-black`}
+        className={`${isCurrentPage ? "text-zinc-50" : "text-zinc-600"} text-sm font-semibold transition-colors group-hover:text-zinc-900`}
       >
         {title}
       </p>

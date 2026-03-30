@@ -35,7 +35,7 @@ export default function AddressForm() {
         e.stopPropagation();
         form.handleSubmit();
       }}
-      className="mt-4 flex w-full max-w-[600px] flex-col gap-y-4"
+      className="section-muted mt-2 flex w-full max-w-[700px] flex-col gap-y-4 p-5 md:p-6"
     >
       <div className="w-full max-w-[600px]">
         <form.Field
@@ -82,7 +82,8 @@ export default function AddressForm() {
         selector={(state) => [state.canSubmit, state.isSubmitting]}
         children={([canSubmit, isSubmitting]) => (
           <Button
-            className="mt-8 w-fit"
+            className="mt-4 w-fit"
+            variant="primary"
             disabled={isUpdatingAddress || !canSubmit || isSubmitting}
             type="submit"
           >

@@ -28,13 +28,20 @@ export default function FormField<T>({
     })
   | (SharedProps & { type?: "textArea"; rows?: number })) {
   return (
-    <div className="w-full space-y-1">
-      {withLabel && <Label htmlFor={name}>{label}</Label>}
+    <div className="w-full space-y-2">
+      {withLabel && (
+        <Label
+          htmlFor={name}
+          className="text-xs uppercase tracking-[0.14em] text-zinc-600"
+        >
+          {label}
+        </Label>
+      )}
 
       {type === "textArea" && (
         <Textarea
           rows={4}
-          className="resize-none px-2 focus-visible:ring-0"
+          className="resize-none px-3 focus-visible:ring-accent"
           id={name}
           name={name}
           value={field.state.value}
@@ -44,7 +51,7 @@ export default function FormField<T>({
       )}
       {type === "input" && (
         <Input
-          className="px-2 focus-visible:ring-0"
+          className="px-3 focus-visible:ring-accent"
           type={inputType}
           id={name}
           name={field.name}
@@ -54,7 +61,7 @@ export default function FormField<T>({
         />
       )}
       {field.state.meta.isTouched && field.state.meta.errors.length ? (
-        <p className="body-2 text-red-500">
+        <p className="text-xs text-red-500">
           {field.state.meta.errors.join(", ")}
         </p>
       ) : null}

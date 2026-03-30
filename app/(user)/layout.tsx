@@ -4,9 +4,9 @@ import { ReactNode } from "react";
 
 export default function UserLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="grid min-h-screen w-screen grid-flow-row grid-rows-[auto_auto_1fr_auto] px-8 py-1 md:px-12 lg:px-16 xl:px-20">
+    <div className="flex min-h-screen w-full flex-col bg-background">
       <NavBar />
-      <div>{children}</div>
+      <div className="flex-1 pb-16 pt-6 md:pt-8">{children}</div>
       <Footer />
     </div>
   );

@@ -25,36 +25,42 @@ export default function CartContainer() {
   );
 
   return (
-    <div className="grid w-full grid-flow-row justify-center gap-x-16 gap-y-12 md:grid-flow-col lg:grid-cols-[1fr_auto] lg:justify-between">
-      <ul className="space-y-4 border-t pt-8">
+    <div className="grid w-full grid-cols-1 gap-8 lg:grid-cols-[1fr_340px] lg:items-start">
+      <ul className="space-y-4">
         {data.cart.cartItems.map((item) => (
           <CartItem key={item.id} item={item} />
         ))}
       </ul>
-      <div className="flex h-fit w-[320px] flex-col rounded-md border px-4 py-8 md:sticky md:top-20">
+      <div className="section-muted flex h-fit w-full flex-col px-5 py-6 md:sticky md:top-24">
         <h4 className="h4">Order Summary</h4>
         <div className="mt-8 flex items-center justify-between">
-          <p className="text-muted-foreground">Subtotal</p>
-          <p className="font-medium">$ {subtotalPrice.toFixed(2)}</p>
+          <p className="text-sm text-zinc-500">Subtotal</p>
+          <p className="font-medium text-zinc-900">
+            $ {subtotalPrice.toFixed(2)}
+          </p>
         </div>
         <div className="mt-4 flex items-center justify-between">
-          <p className="text-muted-foreground">Shipping</p>
-          <p className="font-medium">Free</p>
+          <p className="text-sm text-zinc-500">Shipping</p>
+          <p className="font-medium text-zinc-900">Free</p>
         </div>
         <div className="mt-4 flex items-center justify-between">
-          <p className="text-muted-foreground">Tax</p>
-          <p className="font-medium">$ 0.00</p>
+          <p className="text-sm text-zinc-500">Tax</p>
+          <p className="font-medium text-zinc-900">$ 0.00</p>
         </div>
-        <hr className="mt-8" />
+        <hr className="mt-8 border-zinc-200" />
         <div className="mt-4 flex items-center justify-between">
-          <p className="font-medium">Total</p>
-          <p className="font-medium">$ {subtotalPrice.toFixed(2)}</p>
+          <p className="font-medium text-zinc-900">Total</p>
+          <p className="font-medium text-zinc-900">
+            $ {subtotalPrice.toFixed(2)}
+          </p>
         </div>
         <Link className="block w-full" href="/checkout">
-          <Button className="mt-8 w-full">Checkout</Button>
+          <Button variant="primary" className="mt-8 w-full">
+            Checkout
+          </Button>
         </Link>
-        <Link className="mt-8 text-center" href="/products">
-          <Button className="text-black underline" variant="link">
+        <Link className="mt-6 text-center" href="/products">
+          <Button className="text-zinc-700" variant="link">
             Continue Shopping
           </Button>
         </Link>
@@ -100,44 +106,48 @@ function CartItem({
     updateQuantity({ quantity: quantity - 1, cartItemId: id });
   };
   return (
-    <li className="flex flex-col items-center justify-between gap-y-4 lg:flex-row">
-      <div className="flex w-full items-center justify-between gap-x-4 lg:w-fit">
-        <ProductImage
-          imageUrl={images[0].imagePath}
-          alt="product image"
-          className="size-28 flex-none"
-        />
-        <div className="inline-flex flex-col justify-between gap-3">
-          <p>{name}</p>
-          <div className="inline-flex items-center gap-3">
-            <span className="text-sm text-muted-foreground">Color:</span>
-            <div
-              className="size-4 rounded-full border p-0.5"
-              style={{ backgroundColor: hexCode }}
-            />
+    <li className="rounded-2xl border border-zinc-200/70 bg-zinc-50 p-4 shadow-sm">
+      <div className="flex flex-col items-center justify-between gap-y-4 lg:flex-row">
+        <div className="flex w-full items-center justify-between gap-x-4 lg:w-fit">
+          <ProductImage
+            imageUrl={images[0].imagePath}
+            alt="product image"
+            className="size-28 flex-none bg-zinc-100"
+          />
+          <div className="inline-flex flex-col justify-between gap-3">
+            <p className="text-base font-semibold text-zinc-800">{name}</p>
+            <div className="inline-flex items-center gap-3">
+              <span className="text-sm text-zinc-500">Color:</span>
+              <div
+                className="size-4 rounded-full border p-0.5"
+                style={{ backgroundColor: hexCode }}
+              />
 
-            <Image src={minusIcon} alt="minus icon" />
-            <span className="text-sm text-muted-foreground">Size:</span>
-            <p className="text-muted-foreground">{size}</p>
+              <Image src={minusIcon} alt="minus icon" />
+              <span className="text-sm text-zinc-500">Size:</span>
+              <p className="text-zinc-600">{size}</p>
+            </div>
           </div>
         </div>
-      </div>
-      <div className="inline-flex items-center gap-5">
-        <p className="text-lg font-semibold">${itemPrice.toFixed(2)}</p>
-        <QuantitySelector
-          handleDecreaseQuantity={handleDecreaseQuantity}
-          handleIncreaseQuantity={handleIncreaseQuantity}
-          value={quantity}
-          maxValue={productQuantity}
-        />
-        <Button
-          onClick={handleDeleteItem}
-          disabled={isDeleting}
-          className="size-12 p-0"
-          variant="secondary"
-        >
-          <Image src={xIcon} width={28} height={28} alt="x icon" />
-        </Button>
+        <div className="inline-flex w-full flex-wrap items-center justify-between gap-3 sm:w-auto sm:flex-nowrap sm:gap-5">
+          <p className="text-lg font-semibold text-zinc-900">
+            ${itemPrice.toFixed(2)}
+          </p>
+          <QuantitySelector
+            handleDecreaseQuantity={handleDecreaseQuantity}
+            handleIncreaseQuantity={handleIncreaseQuantity}
+            value={quantity}
+            maxValue={productQuantity}
+          />
+          <Button
+            onClick={handleDeleteItem}
+            disabled={isDeleting}
+            className="size-10 rounded-xl p-0 sm:size-12"
+            variant="secondary"
+          >
+            <Image src={xIcon} width={24} height={24} alt="x icon" />
+          </Button>
+        </div>
       </div>
     </li>
   );

@@ -10,13 +10,13 @@ export default function EmptyListMessage({
   message?: string;
 }) {
   return (
-    <div className="flex h-full w-full grow flex-col items-center justify-center gap-y-4">
-      <p className="text-muted-foreground">
+    <div className="section-muted flex h-full w-full grow flex-col items-center justify-center gap-y-5 p-8 text-center">
+      <p className="text-sm text-zinc-600">
         {message
           ? message
           : `Your ${listName} list is waiting for you to be filled`}
       </p>
-      <Button>
+      <Button variant="primary">
         <Link className="flex items-center gap-2" href="/products">
           <span>Start Shopping</span>
           <Image

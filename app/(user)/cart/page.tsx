@@ -16,7 +16,7 @@ export default async function CartPage() {
   await serverTrpc.carts.getCart.prefetch();
 
   return (
-    <main className="container mt-8">
+    <main className="page-shell section-shell">
       <UserPageLayout title="Your Cart">
         <HydrateClient>
           <CartContainer />

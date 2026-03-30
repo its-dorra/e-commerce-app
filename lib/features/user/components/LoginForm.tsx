@@ -1,12 +1,10 @@
 "use client";
 
-import { googleIcon } from "@/assets";
 import { Button } from "@/components/ui/button";
 import { ZodValidator, zodValidator } from "@tanstack/zod-form-adapter";
 
 import { useForm } from "@tanstack/react-form";
 
-import Image from "next/image";
 import FormField from "@/lib/components/FormField";
 import Link from "next/link";
 
@@ -38,8 +36,16 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="mt-24 flex w-full flex-col gap-y-8 md:mt-0 md:w-[380px] lg:w-[420px]">
-      <form onSubmit={onSubmit} className="space-y-8">
+    <div className="mx-auto flex w-full max-w-md flex-col gap-y-8">
+      <div className="space-y-2">
+        <p className="eyebrow">Welcome back</p>
+        <h1 className="h3">Log in to continue shopping</h1>
+        <p className="text-sm text-zinc-600">
+          Access your wishlist, cart, and order updates in one place.
+        </p>
+      </div>
+
+      <form onSubmit={onSubmit} className="space-y-5">
         <form.Field
           name="email"
           children={(field) => {
@@ -70,7 +76,8 @@ export default function LoginForm() {
           selector={(state) => [state.canSubmit, state.isSubmitting]}
           children={([canSubmit, isSubmitting]) => (
             <Button
-              className="w-full bg-black text-primaryWhite"
+              className="mt-2 w-full"
+              variant="primary"
               type="submit"
               disabled={!canSubmit || isSubmitting || isPending}
             >
@@ -79,9 +86,9 @@ export default function LoginForm() {
           )}
         />
       </form>
-      <div className="flex items-center justify-center gap-x-1">
-        <p className="body-1 text-black/60">Don't have an account ?</p>
-        <Link className="body-2" href="/signup">
+      <div className="flex items-center justify-center gap-x-1 text-sm">
+        <p className="text-zinc-600">Don&apos;t have an account?</p>
+        <Link className="font-medium text-zinc-900" href="/signup">
           Sign up
         </Link>
       </div>

@@ -21,7 +21,7 @@ export function CategoryFilter({ name }: CategoryProps) {
   const appendQuery = useAppendQuery();
 
   return (
-    <div className="flex items-center gap-x-3 border-b-[0.5px] py-2">
+    <div className="flex items-center gap-x-3 rounded-xl border border-zinc-200/70 bg-zinc-100/70 px-3 py-2">
       <Checkbox
         id={name}
         checked={isQueryParamInUrl}
@@ -33,7 +33,9 @@ export function CategoryFilter({ name }: CategoryProps) {
           // setIsActive(!isActive);
         }}
       />
-      <Label htmlFor={name}>{name}</Label>
+      <Label htmlFor={name} className="text-sm text-zinc-700">
+        {name}
+      </Label>
     </div>
   );
 }

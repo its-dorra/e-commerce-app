@@ -42,7 +42,7 @@ export default function UserOrdersContainer() {
       <div className="flex flex-col space-y-4">
         {data.data.length === 0 && <EmptyListMessage listName="Orders" />}
         {data.data.length > 0 && (
-          <Accordion className="rounded border" type="single" collapsible>
+          <Accordion className="space-y-3" type="single" collapsible>
             {data.data.map((order) => {
               return <Order key={order.id} order={order} />;
             })}
@@ -57,8 +57,11 @@ export default function UserOrdersContainer() {
 
 function Order({ order }: { order: OrderProps }) {
   return (
-    <AccordionItem className="mb-2" value={`${order.id}`}>
-      <AccordionTrigger className="flex flex-wrap justify-between gap-x-4 rounded-lg bg-gray-100 p-4 hover:bg-gray-200 hover:no-underline">
+    <AccordionItem
+      className="overflow-hidden rounded-2xl border border-zinc-200/70 bg-zinc-50"
+      value={`${order.id}`}
+    >
+      <AccordionTrigger className="flex flex-wrap justify-between gap-x-4 p-4 hover:bg-zinc-100 hover:no-underline">
         <div>
           <span className="font-bold">Order ID:</span> {order.id}
         </div>
@@ -79,7 +82,7 @@ function Order({ order }: { order: OrderProps }) {
           })}
         </div>
       </AccordionTrigger>
-      <AccordionContent>
+      <AccordionContent className="space-y-3 px-4 pb-4">
         {order.orderItems.map((item) => (
           <OrderItem key={item.id} item={item} />
         ))}
@@ -90,15 +93,17 @@ function Order({ order }: { order: OrderProps }) {
 
 function OrderItem({ item }: { item: OrderItemProps }) {
   return (
-    <div className="flex items-center gap-x-4 border-b px-4 py-3 last:border-none md:gap-x-8 lg:gap-x-12">
+    <div className="flex items-center gap-x-4 rounded-xl border border-zinc-200/70 bg-zinc-50 px-4 py-3 md:gap-x-8 lg:gap-x-12">
       <ProductImage
         imageUrl={item.size.variant.images[0].imagePath}
         alt="Product image"
-        className="size-20"
+        className="size-20 bg-zinc-100"
       />
       <div className="flex flex-col justify-between gap-y-4">
-        <p className="font-semibold">{item.size.variant.product.name}</p>
-        <p>
+        <p className="font-semibold text-zinc-800">
+          {item.size.variant.product.name}
+        </p>
+        <p className="text-sm text-zinc-600">
           ${item.itemPrice} x {item.quantity} = $
           {item.quantity * item.itemPrice}
         </p>
@@ -107,7 +112,7 @@ function OrderItem({ item }: { item: OrderItemProps }) {
         className="ml-auto"
         href={`/products/${item.size.variant.product.id}`}
       >
-        <Button variant="outline" className="border border-black">
+        <Button variant="outline" className="rounded-xl border-zinc-300">
           View Item
         </Button>
       </Link>

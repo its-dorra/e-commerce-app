@@ -11,9 +11,9 @@ export default async function AccountLayout({
   await assertAuthenticated();
 
   return (
-    <section className="container grid grid-cols-1 justify-self-center lg:grid-cols-[auto_1fr] lg:gap-x-4">
+    <section className="page-shell section-shell grid grid-cols-1 gap-6 lg:grid-cols-[280px_1fr] lg:items-start">
       <AccountSidebar />
-      <main className="mg:px-4 mt-8 px-2 lg:px-8">
+      <main className="section-muted min-h-[28rem] p-4 md:p-6 lg:p-8">
         <AccountSidebarButton />
         {children}
       </main>

@@ -1,12 +1,10 @@
 "use client";
 
-import { googleIcon } from "@/assets";
 import { Button } from "@/components/ui/button";
 import { ZodValidator, zodValidator } from "@tanstack/zod-form-adapter";
 
 import { useForm } from "@tanstack/react-form";
 
-import Image from "next/image";
 import FormField from "../../../components/FormField";
 import Link from "next/link";
 import { signupSchema } from "@/server/schemas/users";
@@ -37,8 +35,16 @@ export default function SignupForm() {
   };
 
   return (
-    <div className="mt-24 flex w-full flex-col gap-y-8 md:mt-0 md:w-[380px] lg:w-[420px]">
-      <form onSubmit={onSubmit} className="space-y-8">
+    <div className="mx-auto flex w-full max-w-md flex-col gap-y-8">
+      <div className="space-y-2">
+        <p className="eyebrow">Create account</p>
+        <h1 className="h3">Join the Fashion Haven community</h1>
+        <p className="text-sm text-zinc-600">
+          Build your personalized style profile and track your orders with ease.
+        </p>
+      </div>
+
+      <form onSubmit={onSubmit} className="space-y-5">
         <form.Field
           name="fullName"
           children={(field) => {
@@ -82,7 +88,8 @@ export default function SignupForm() {
           selector={(state) => [state.canSubmit, state.isSubmitting]}
           children={([canSubmit, isSubmitting]) => (
             <Button
-              className="w-full bg-black text-primaryWhite"
+              className="mt-2 w-full"
+              variant="primary"
               type="submit"
               disabled={!canSubmit || isSubmitting || isPending}
             >
@@ -91,9 +98,9 @@ export default function SignupForm() {
           )}
         />
       </form>
-      <div className="flex items-center justify-center gap-x-2">
-        <p className="body-1 text-black/60">Already have an account ?</p>
-        <Link className="body-2" href="/login">
+      <div className="flex items-center justify-center gap-x-2 text-sm">
+        <p className="text-zinc-600">Already have an account?</p>
+        <Link className="font-medium text-zinc-900" href="/login">
           Login
         </Link>
       </div>

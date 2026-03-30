@@ -14,6 +14,7 @@ import { z } from "zod";
 import { insertAddressSchema } from "@/server/db/schema/address";
 import { ZodValidator, zodValidator } from "@tanstack/zod-form-adapter";
 import FormField from "@/lib/components/FormField";
+import Link from "next/link";
 
 const checkOutShippingInformation = insertAddressSchema.merge(
   z.object({
@@ -78,9 +79,9 @@ export default function CheckoutContainer() {
     );
 
   return (
-    <div className="grid w-full grid-cols-1 items-start justify-between gap-16 lg:grid-cols-[2fr_1fr]">
-      <div className="space-y-6">
-        <h4 className="h4 font-bold">Shipping Information</h4>
+    <div className="grid w-full grid-cols-1 items-start justify-between gap-8 lg:grid-cols-[2fr_1fr]">
+      <div className="section-muted space-y-6 p-5 md:p-6">
+        <h4 className="h4">Shipping Information</h4>
         <div className="flex flex-col space-y-2">
           <div className="flex w-full max-w-[600px] flex-col gap-x-4 gap-y-4 lg:flex-row">
             <div className="w-full max-w-[600px]">
@@ -140,14 +141,14 @@ export default function CheckoutContainer() {
           </div>
         </div>
       </div>
-      <div className="inline-flex flex-col gap-y-6">
-        <h4 className="h4 font-bold">Your Order</h4>
+      <div className="section-muted inline-flex flex-col gap-y-6 p-5 md:sticky md:top-24 md:p-6">
+        <h4 className="h4">Your Order</h4>
         <div className="inline-flex flex-col gap-y-4">
-          <div className="inline-flex items-center justify-between">
+          <div className="inline-flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-x-2">
               {cartData.cart.cartItems.map((item) => (
                 <div
-                  className="size-8 rounded-full bg-gray-300 p-[6px]"
+                  className="size-8 rounded-full bg-zinc-200 p-[6px]"
                   key={item.id}
                 >
                   <img
@@ -157,21 +158,28 @@ export default function CheckoutContainer() {
                 </div>
               ))}
             </div>
-            <Button variant="outline">Edit Cart</Button>
+            <Link href="/cart">
+              <Button
+                variant="outline"
+                className="h-10 rounded-xl border-zinc-200 bg-zinc-50"
+              >
+                Edit Cart
+              </Button>
+            </Link>
           </div>
           <div className="inline-flex items-center justify-between">
-            <p className="body-1 text-black/70">Subtotal:</p>
+            <p className="body-1 text-zinc-600">Subtotal:</p>
             <p className="body-1">$ {totalPrice}</p>
           </div>
           <div className="inline-flex items-center justify-between">
-            <p className="body-1 text-black/70">Shipping:</p>
+            <p className="body-1 text-zinc-600">Shipping:</p>
             <p className="body-1">Free</p>
           </div>
           <div className="inline-flex items-center justify-between">
-            <p className="body-1 text-black/70">Tax:</p>
+            <p className="body-1 text-zinc-600">Tax:</p>
             <p className="body-1">0</p>
           </div>
-          <hr />
+          <hr className="border-zinc-200" />
           <div className="inline-flex items-center justify-between">
             <p className="body-1 font-bold">Total:</p>
             <p className="body-1 font-bold">$ {totalPrice}</p>
@@ -193,6 +201,8 @@ export default function CheckoutContainer() {
                     return value === "";
                   })
                 }
+                variant="primary"
+                className="h-11"
               >
                 Place Order
               </Button>

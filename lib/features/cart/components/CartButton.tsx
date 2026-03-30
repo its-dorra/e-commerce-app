@@ -42,11 +42,11 @@ export default function CartButton() {
           }
           setIsOpen(true);
         }}
-        className="ml-auto mr-4 cursor-pointer rounded-full p-2 hover:bg-gray-100 lg:ml-4"
+        className="ml-auto mr-4 cursor-pointer rounded-full border border-zinc-200 bg-zinc-50 p-2 transition-colors hover:bg-zinc-100 lg:ml-4"
       >
         <Image src={cartIcon} alt="user icon" />
       </button>
-      <SheetContent className="flex min-w-fit max-w-xl flex-col">
+      <SheetContent className="flex w-full max-w-full flex-col bg-zinc-50 sm:max-w-xl">
         <SheetHeader>
           <SheetTitle>Shopping cart</SheetTitle>
         </SheetHeader>
@@ -73,7 +73,7 @@ export default function CartButton() {
                   </div>
                 </div>
               ) : (
-                <ul className="space-y-5">
+                <ul className="w-full space-y-4 pr-1">
                   {data.cart.cartItems.map((item) => (
                     <CartItem key={item.id} item={item} />
                   ))}
@@ -91,7 +91,7 @@ export default function CartButton() {
               </>
             )}
           </div>
-          <Button disabled={!totalPrice}>
+          <Button disabled={!totalPrice} variant="primary">
             <Link href="/cart">View Cart</Link>
           </Button>
           <Button variant="link" disabled={!totalPrice}>

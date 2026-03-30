@@ -8,7 +8,11 @@ export default function AccountSidebarButton() {
 
   return (
     <div className="flex w-full justify-end">
-      <Button className="lg:hidden" variant="outline" onClick={toggleSidebar}>
+      <Button
+        className="rounded-xl border-zinc-200 bg-zinc-50 lg:hidden"
+        variant="outline"
+        onClick={toggleSidebar}
+      >
         Menu
       </Button>
     </div>

@@ -7,8 +7,8 @@ export default function CategoriesFilter({
   data: ICategories;
 }) {
   return (
-    <div className="space-y-2">
-      <h5 className="h5 mb-4">Categories</h5>
+    <div className="space-y-3">
+      <h5 className="h5 mb-2 text-zinc-800">Categories</h5>
       {categories.map((category) => (
         <CategoryFilter key={category.name} name={category.name} />
       ))}

@@ -33,14 +33,14 @@ export default function AccountDetailsForm() {
   });
 
   return (
-    <div className="mt-4 space-y-4">
+    <div className="mt-2 space-y-6">
       <CircleAvatar
         name={user?.profile?.displayName || ""}
         imageUrl={user?.profile?.image || ""}
       />
 
       <form
-        className="flex flex-col gap-y-4"
+        className="section-muted flex flex-col gap-y-4 p-5 md:p-6"
         onSubmit={(e) => {
           e.preventDefault();
           e.stopPropagation();
@@ -90,7 +90,12 @@ export default function AccountDetailsForm() {
             </div>
           </div>
         )}
-        <Button className="mt-8 w-fit" type="submit" disabled={isPending}>
+        <Button
+          variant="primary"
+          className="mt-4 w-fit"
+          type="submit"
+          disabled={isPending}
+        >
           Save Changes
         </Button>
       </form>

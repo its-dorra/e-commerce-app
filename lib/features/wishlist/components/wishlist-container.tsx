@@ -24,17 +24,21 @@ export default function WishlistContainer() {
 
 function WishlistItem({ item }: { item: WishlistItem }) {
   return (
-    <li className="flex w-[32rem] max-w-full items-center border-b pb-4 last:border-none">
+    <li className="flex w-[38rem] max-w-full items-center rounded-2xl border border-zinc-200/70 bg-zinc-50 p-4 shadow-sm">
       <ProductImage
         imageUrl={item.product.variants[0].images[0].imagePath}
         alt="Product image"
-        className="mr-4 size-20"
+        className="mr-4 size-20 bg-zinc-100"
       />
       <div className="mr-auto space-y-2">
-        <p className="text-base font-medium">{item.product.name}</p>
-        <p className="text-sm font-semibold">${item.product.basePrice}</p>
+        <p className="text-base font-semibold text-zinc-800">
+          {item.product.name}
+        </p>
+        <p className="text-sm font-semibold text-zinc-600">
+          ${item.product.basePrice}
+        </p>
       </div>
-      <Button variant="outline">
+      <Button variant="outline" className="rounded-xl border-zinc-300">
         <Link href={`/products/${item.productId}`}>View Item</Link>
       </Button>
     </li>

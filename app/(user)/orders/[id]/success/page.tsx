@@ -24,17 +24,20 @@ export default async function OrderSuccess({
   setOrderAsSeen({ orderId: +id });
 
   return (
-    <div className="container flex h-full max-w-6xl flex-col items-center justify-center gap-y-8 py-8">
-      <Image className="size-32" src={ordersIcon} alt="order icon" />
+    <main className="page-shell section-shell">
+      <div className="mx-auto flex max-w-3xl flex-col items-center justify-center gap-y-6 rounded-[2rem] border border-zinc-200/80 bg-zinc-50 px-6 py-12 text-center shadow-sm md:px-10">
+        <Image className="size-24" src={ordersIcon} alt="order icon" />
 
-      <h2 className="h2">Thank you for shopping</h2>
-      <p className="text-center">
-        Your order has been successfully placed and is now <br /> being
-        processed
-      </p>
-      <Link href="/account">
-        <Button>Go to my account</Button>
-      </Link>
-    </div>
+        <p className="eyebrow">Order confirmed</p>
+        <h2 className="h2">Thank you for shopping with us</h2>
+        <p className="max-w-lg text-sm text-zinc-600 md:text-base">
+          Your order has been placed successfully and is now being processed by
+          our fulfillment team.
+        </p>
+        <Link href="/account">
+          <Button variant="primary">Go to my account</Button>
+        </Link>
+      </div>
+    </main>
   );
 }

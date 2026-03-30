@@ -24,7 +24,7 @@ export function ColorFilter({ name, hexCode }: ColorFilterProps) {
           ? deleteQuery("colors", name)
           : appendQuery("colors", name);
       }}
-      className={`flex h-7 w-7 cursor-pointer items-center justify-center rounded-full p-0.5 shadow-lg ${isQueryParamInUrl ? "border-[1px] border-black" : ""}`}
+      className={`flex h-8 w-8 cursor-pointer items-center justify-center rounded-full p-0.5 transition-all duration-200 ${isQueryParamInUrl ? "border-2 border-zinc-900 shadow" : "border border-zinc-200 shadow-sm"}`}
     >
       <div
         className="h-full w-full rounded-full"

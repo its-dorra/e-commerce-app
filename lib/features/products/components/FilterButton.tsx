@@ -8,7 +8,11 @@ import Image from "next/image";
 export default function FilterButton() {
   const { toggle } = useToggleFilter();
   return (
-    <Button className="space-x-2 lg:hidden" onClick={toggle} variant="outline">
+    <Button
+      className="space-x-2 rounded-xl border-zinc-200 bg-zinc-50 lg:hidden"
+      onClick={toggle}
+      variant="outline"
+    >
       <Image src={filterIcon} className="h-4 w-4" alt="filter icon" />
       <span className="body-2">Filter</span>
     </Button>

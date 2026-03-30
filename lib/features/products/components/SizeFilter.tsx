@@ -25,7 +25,7 @@ export default function SizeFilter({ name }: SizeFilterProps) {
           ? deleteQuery("sizes", name)
           : appendQuery("sizes", name);
       }}
-      className={`w-10 border ${isQueryParamInUrl ? "border-black" : "border-gray-300"}`}
+      className={`w-10 rounded-xl border ${isQueryParamInUrl ? "border-zinc-900 bg-zinc-900 text-zinc-50" : "border-zinc-300 bg-zinc-50 text-zinc-700"}`}
     >
       {name}
     </Button>

@@ -13,7 +13,7 @@ export const useAccountSidebarStore = create<AccountSidebarStore>((set) => ({
       if (state.isSidebarOpen) {
         scrollLock.enablePageScroll();
       } else {
-        scrollLock.disablePageScroll;
+        scrollLock.disablePageScroll();
       }
       return { isSidebarOpen: !state.isSidebarOpen };
     });

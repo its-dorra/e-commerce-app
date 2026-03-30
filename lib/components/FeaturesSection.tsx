@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { features } from "../constants";
+import { Card } from "@/components/ui/card";
 
 interface FeatureInterface {
   featureIcon: any;
@@ -13,22 +14,29 @@ function Feature({
   featureContent,
 }: FeatureInterface) {
   return (
-    <div className="space-y-2">
-      <div className="grid aspect-square w-10 place-items-center rounded-full bg-secondaryWhite p-0.5">
+    <Card className="h-full space-y-4 p-5 md:p-6">
+      <div className="grid aspect-square w-11 place-items-center rounded-full bg-zinc-100 p-1">
         <Image src={featureIcon} alt="icon" />
       </div>
-      <h3 className="h3">{featureTitle}</h3>
-      <p className="body-2 text-black/60">{featureContent}</p>
-    </div>
+      <h3 className="h4">{featureTitle}</h3>
+      <p className="text-sm text-zinc-600">{featureContent}</p>
+    </Card>
   );
 }
 
 export default function FeaturesSection() {
   return (
-    <section className="container mx-auto grid grid-cols-[280px] justify-around gap-y-12 py-16 lg:grid-cols-[repeat(3,280px)]">
-      {features.map((feature) => {
-        return <Feature {...feature} key={feature.id} />;
-      })}
+    <section className="page-shell section-shell">
+      <div className="section-heading">
+        <p className="eyebrow">Why shop with us</p>
+        <h2 className="h2">Premium service for every order.</h2>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {features.map((feature) => {
+          return <Feature {...feature} key={feature.id} />;
+        })}
+      </div>
     </section>
   );
 }

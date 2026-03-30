@@ -12,10 +12,10 @@ export default function FilteringProducts({ children }: PropsWithChildren) {
 
   return (
     <aside
-      className={`${isFilterAsideOpen ? "-translate-x-6" : "-translate-x-[125%]"} absolute bottom-0 left-6 top-0 z-[5] flex h-fit w-60 flex-col gap-y-8 rounded-sm border bg-white p-6 transition-transform duration-700 lg:sticky lg:top-28 lg:translate-x-0 lg:border-r-[0.5px] [&>*]:flex-shrink-0`}
+      className={`${isFilterAsideOpen ? "translate-x-0" : "-translate-x-[120%]"} fixed bottom-4 left-4 top-24 z-[60] flex max-h-[calc(100vh-7rem)] w-[calc(100vw-2rem)] max-w-[20rem] flex-col gap-y-8 overflow-y-auto rounded-2xl border border-zinc-200 bg-zinc-50 p-5 shadow-lg transition-transform duration-300 lg:sticky lg:top-28 lg:z-10 lg:max-h-none lg:w-full lg:max-w-none lg:translate-x-0 lg:self-start lg:overflow-visible lg:shadow-sm [&>*]:flex-shrink-0`}
     >
       <Button
-        className="absolute right-3 top-3 px-2 lg:hidden"
+        className="absolute right-3 top-3 rounded-full px-2 lg:hidden"
         variant="outline"
         onClick={toggle}
       >

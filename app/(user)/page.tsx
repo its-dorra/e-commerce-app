@@ -1,6 +1,8 @@
 import BrowseFashion from "@/lib/components/BrowseFashionSection";
+import BestSellingSection from "@/lib/components/BestSellingSection";
 import FeaturesSection from "@/lib/components/FeaturesSection";
 import HeroSection from "@/lib/components/HeroSection";
+import { getProducts } from "@/lib/features/products/services";
 import { getCurrentUser } from "@/server/lucia/utils";
 import { redirect } from "next/navigation";
 import env from "@/server/env";
@@ -41,6 +43,11 @@ export const metadata = {
 export default async function Home() {
   const user = await getCurrentUser();
 
+  const [featuredProducts, newArrivals] = await Promise.all([
+    getProducts({ page: 1, perPage: 4 }),
+    getProducts({ page: 2, perPage: 4 }),
+  ]);
+
   const userRole = user?.role;
 
   if (userRole === "admin") {
@@ -50,8 +57,18 @@ export default async function Home() {
   return (
     <main>
       <HeroSection />
-      <FeaturesSection />
+      <BestSellingSection
+        eyebrow="Featured"
+        title="Most wanted this week"
+        products={featuredProducts.products}
+      />
       <BrowseFashion />
+      <BestSellingSection
+        eyebrow="New Arrivals"
+        title="Fresh drops in motion"
+        products={newArrivals.products}
+      />
+      <FeaturesSection />
     </main>
   );
 }

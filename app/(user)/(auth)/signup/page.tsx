@@ -34,7 +34,7 @@ export default async function SignupPage() {
   const userRole = user?.role;
 
   if (userRole) {
-    return redirect(userRole === "admin" ? "/dashboard" : "/");
+    return redirect(userRole === "admin" ? "/admin/dashboard" : "/");
   }
 
   return <SignupForm />;

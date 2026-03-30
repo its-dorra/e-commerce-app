@@ -112,15 +112,24 @@ export default async function ProductsListing(props: ProductsProps) {
   ]);
 
   return (
-    <main className="grid w-full grid-cols-1 lg:grid-cols-[250px_1fr]">
-      <FilteringProducts>
-        <CategoriesFilter data={categories} />
-        <ColorsFilter data={colors} />
-        <SizesFilter data={sizes} />
-      </FilteringProducts>
-      <Suspense fallback={<LoadingSpinner size="xl" />}>
-        <Products searchParams={searchParams} />
-      </Suspense>
+    <main className="page-shell">
+      <section className="section-shell space-y-6">
+        <div className="section-heading mb-4">
+          <p className="eyebrow">Catalogue</p>
+          <h1 className="h2">Discover your next standout look.</h1>
+        </div>
+
+        <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
+          <FilteringProducts>
+            <CategoriesFilter data={categories} />
+            <ColorsFilter data={colors} />
+            <SizesFilter data={sizes} />
+          </FilteringProducts>
+          <Suspense fallback={<LoadingSpinner size="xl" />}>
+            <Products searchParams={searchParams} />
+          </Suspense>
+        </div>
+      </section>
     </main>
   );
 }
