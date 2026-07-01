@@ -20,7 +20,7 @@ export default function HeroSection() {
               curated to elevate your everyday wardrobe.
             </p>
             <div className="flex flex-col gap-3 sm:flex-row">
-              <Link href="/products">
+              <Link href="/products" prefetch>
                 <Button
                   variant="primary"
                   size="lg"

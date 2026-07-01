@@ -37,11 +37,9 @@ export default function NavBar() {
           <ul
             className={`${isNavigationOpen ? "flex" : "hidden"} fixed bottom-0 left-0 right-0 top-[4.75rem] z-50 mx-auto flex-col items-center justify-center gap-8 bg-zinc-50/95 text-sm backdrop-blur lg:static lg:flex lg:flex-row lg:gap-2 lg:bg-transparent lg:backdrop-blur-none`}
           >
-            <li className="w-full max-w-xs px-4 lg:hidden">
-              <SearchProductInput className="w-full" />
-            </li>
-            <li className="rounded-xl px-3 py-2 text-xl font-semibold uppercase tracking-wider text-zinc-800 transition-colors hover:bg-zinc-200/80 lg:text-sm lg:font-medium lg:normal-case lg:tracking-normal">
+            <li>
               <Link
+                className="rounded-xl px-3 py-2 text-xl font-semibold uppercase tracking-wider text-zinc-800 transition-colors hover:bg-zinc-200/80 lg:text-sm lg:font-medium lg:normal-case lg:tracking-normal"
                 onClick={() => {
                   setIsNavigationOpen(false);
                 }}
@@ -53,8 +51,9 @@ export default function NavBar() {
             <li>
               <CategoriesNavBar />
             </li>
-            <li className="rounded-xl px-3 py-2 text-xl font-semibold uppercase tracking-wider text-zinc-800 transition-colors hover:bg-zinc-200/80 lg:text-sm lg:font-medium lg:normal-case lg:tracking-normal">
+            <li>
               <Link
+                className="rounded-xl px-3 py-2 text-xl font-semibold uppercase tracking-wider text-zinc-800 transition-colors hover:bg-zinc-200/80 lg:text-sm lg:font-medium lg:normal-case lg:tracking-normal"
                 onClick={() => {
                   setIsNavigationOpen(false);
                 }}
@@ -63,8 +62,9 @@ export default function NavBar() {
                 About
               </Link>
             </li>
-            <li className="rounded-xl px-3 py-2 text-xl font-semibold uppercase tracking-wider text-zinc-800 transition-colors hover:bg-zinc-200/80 lg:text-sm lg:font-medium lg:normal-case">
+            <li>
               <Link
+                className="rounded-xl px-3 py-2 text-xl font-semibold uppercase tracking-wider text-zinc-800 transition-colors hover:bg-zinc-200/80 lg:text-sm lg:font-medium lg:normal-case"
                 onClick={() => {
                   setIsNavigationOpen(false);
                 }}
@@ -73,8 +73,9 @@ export default function NavBar() {
                 Cart
               </Link>
             </li>
-            <li className="rounded-xl px-3 py-2 text-xl font-semibold uppercase tracking-wider text-zinc-800 transition-colors hover:bg-zinc-200/80 lg:hidden">
+            <li>
               <Link
+                className="rounded-xl px-3 py-2 text-xl font-semibold uppercase tracking-wider text-zinc-800 transition-colors hover:bg-zinc-200/80 lg:hidden"
                 onClick={() => {
                   setIsNavigationOpen(false);
                 }}
@@ -85,8 +86,6 @@ export default function NavBar() {
             </li>
           </ul>
           <div className="ml-auto hidden items-center gap-x-3 lg:flex">
-            <SearchProductInput className="w-64" />
-
             <Link className="rounded-full" href="/account">
               <Button variant="secondary" size="icon" className="rounded-full">
                 <UserRound className="h-4 w-4" />

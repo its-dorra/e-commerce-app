@@ -68,6 +68,7 @@ export default function CategoriesNavBar() {
                   <Link
                     href={`/products/?categories=${name}`}
                     className="block w-full text-left"
+                    prefetch
                   >
                     {name}
                   </Link>
