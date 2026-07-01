@@ -45,56 +45,10 @@ export const metadata = {
   },
 };
 
-interface ProductsProps {
-  searchParams: Promise<{
-    categories: string | string[] | undefined;
-    colors: string | string[] | undefined;
-    sizes: Size | Size[] | undefined;
-    page: string | undefined;
-  }>;
-}
 
-async function Products({
-  searchParams,
-}: {
-  searchParams: Awaited<ProductsProps["searchParams"]>;
-}) {
-  const user = await getCurrentUser();
+function Products() {
+ 
 
-  const userRole = user?.role;
-
-  if (userRole === "admin") {
-    return redirect("/admin/dashboard");
-  }
-
-  const page = Number(searchParams.page || 1);
-
-  const { categories, colors, sizes } = searchParams;
-
-  await Promise.all([
-    serverTrpc.products.products.prefetch({
-      page,
-      perPage: 8,
-      ...(categories && { categories }),
-      ...(colors && { colors }),
-      ...(sizes && { sizes }),
-    }),
-    serverTrpc.products.products.prefetch({
-      page: page + 1,
-      perPage: 8,
-      ...(categories && { categories }),
-      ...(colors && { colors }),
-      ...(sizes && { sizes }),
-    }),
-    page > 1 &&
-      serverTrpc.products.products.prefetch({
-        page: page - 1,
-        perPage: 8,
-        ...(categories && { categories }),
-        ...(colors && { colors }),
-        ...(sizes && { sizes }),
-      }),
-  ]);
 
   return (
     <HydrateClient>
@@ -103,8 +57,8 @@ async function Products({
   );
 }
 
-export default async function ProductsListing(props: ProductsProps) {
-  const searchParams = await props.searchParams;
+export default async function ProductsListing() {
+
   const [sizes, categories, colors] = await Promise.all([
     getSizes(),
     getCategories(),
@@ -125,9 +79,8 @@ export default async function ProductsListing(props: ProductsProps) {
             <ColorsFilter data={colors} />
             <SizesFilter data={sizes} />
           </FilteringProducts>
-          <Suspense fallback={<LoadingSpinner size="xl" />}>
-            <Products searchParams={searchParams} />
-          </Suspense>
+
+          <Products />
         </div>
       </section>
     </main>

@@ -4,6 +4,7 @@ import { getProductById, getProducts } from "@/lib/features/products/services";
 import env from "@/server/env";
 import { notFound } from "next/navigation";
 import ProductsContainer from "@/lib/features/products/components/ProductsContainer";
+import { Suspense } from "react";
 
 export async function generateMetadata(props: {
   params: Promise<{ slug: string }>;
@@ -49,16 +50,6 @@ export default async function ProductPage(props: {
 
   if (!product) return notFound();
 
-  const related = await getProducts({
-    categories: product.category,
-    page: 1,
-    perPage: 5,
-  });
-
-  const relatedProducts = related.products.filter(
-    (item) => item.id !== product.id,
-  );
-
   return (
     <main className="page-shell">
       <section className="section-shell">
@@ -68,15 +59,9 @@ export default async function ProductPage(props: {
         </div>
       </section>
 
-      {relatedProducts.length > 0 && (
-        <section className="section-shell pt-0">
-          <div className="section-heading">
-            <p className="eyebrow">Related picks</p>
-            <h2 className="h2">Complete the look</h2>
-          </div>
-          <ProductsContainer products={relatedProducts.slice(0, 4)} />
-        </section>
-      )}
+      <Suspense>
+        <RelatedProducts productId={product.id} category={product.category} />
+      </Suspense>
 
       <section className="section-shell pt-0">
         <div className="section-muted p-6 md:p-8">
@@ -89,5 +74,35 @@ export default async function ProductPage(props: {
         </div>
       </section>
     </main>
+  );
+}
+
+async function RelatedProducts({
+  productId,
+  category,
+}: {
+  productId: number;
+  category: string;
+}) {
+  const related = await getProducts({
+    categories: category,
+    page: 1,
+    perPage: 5,
+  });
+
+  const relatedProducts = related.products.filter(
+    (item) => item.id !== productId,
+  );
+
+  if (relatedProducts.length === 0) return null;
+
+  return (
+    <section className="section-shell pt-0">
+      <div className="section-heading">
+        <p className="eyebrow">Related picks</p>
+        <h2 className="h2">Complete the look</h2>
+      </div>
+      <ProductsContainer products={relatedProducts.slice(0, 4)} />
+    </section>
   );
 }
