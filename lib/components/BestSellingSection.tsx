@@ -1,15 +1,17 @@
 import { IProducts } from "../features/products/types";
 import ProductsContainer from "../features/products/components/ProductsContainer";
 
-export default function BestSellingSection({
+export default async function BestSellingSection({
   title,
   eyebrow,
-  products,
+  productsPromise,
 }: {
   title: string;
   eyebrow: string;
-  products: IProducts["products"];
+  productsPromise: Promise<IProducts["products"]>;
 }) {
+  const products = await productsPromise;
+
   if (!products.length) return null;
 
   return (

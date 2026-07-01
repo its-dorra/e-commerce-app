@@ -29,8 +29,6 @@ export function CategoryFilter({ name }: CategoryProps) {
           isQueryParamInUrl
             ? deleteQuery("categories", name)
             : appendQuery("categories", name);
-
-          // setIsActive(!isActive);
         }}
       />
       <Label htmlFor={name} className="text-sm text-zinc-700">

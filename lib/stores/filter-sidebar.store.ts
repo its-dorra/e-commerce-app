@@ -1,3 +1,5 @@
+"use client";
+
 import { create } from "zustand";
 import scrollLock from "scroll-lock";
 
@@ -6,7 +8,7 @@ interface FilterStore {
   toggle: () => void;
 }
 
-export const useToggleFilter = create<FilterStore>((set) => ({
+export const useToggleFilter = create<FilterStore>()((set) => ({
   isFilterAsideOpen: false,
   toggle: () => {
     set((state) => {

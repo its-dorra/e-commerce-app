@@ -21,24 +21,7 @@ export default function ProductsClient() {
     "featured" | "price-asc" | "price-desc" | "name-asc"
   >("featured");
 
-  if (isPending) return <LoadingSpinner size="xl" />;
-
-  if (isError)
-    return (
-      <div className="section-muted flex min-h-[18rem] w-full flex-col items-center justify-center gap-3 p-6 text-center">
-        <p className="text-sm text-zinc-600">
-          Something went wrong: {error.message}
-        </p>
-        <Button variant="primary" onClick={() => refetch()}>
-          Retry
-        </Button>
-      </div>
-    );
-
-  const {
-    products,
-    pagination: { page, perPage, total, totalPages },
-  } = data;
+  const products = data?.products || [];
 
   const sortedProducts = useMemo(() => {
     const cloned = [...products];
@@ -55,12 +38,30 @@ export default function ProductsClient() {
     }
   }, [products, sortBy]);
 
+  if (isPending) return <LoadingSpinner size="xl" />;
+
+  if (isError)
+    return (
+      <div className="section-muted flex min-h-[18rem] w-full flex-col items-center justify-center gap-3 p-6 text-center">
+        <p className="text-sm text-zinc-600">
+          Something went wrong: {error.message}
+        </p>
+        <Button variant="primary" onClick={() => refetch()}>
+          Retry
+        </Button>
+      </div>
+    );
+
   if (sortedProducts.length === 0)
     return (
       <div className="section-muted flex min-h-[22rem] w-full items-center justify-center p-6 text-sm text-zinc-600">
         There are no products matching these filters.
       </div>
     );
+
+  const {
+    pagination: { page, perPage, total, totalPages },
+  } = data;
 
   const from = (page - 1) * perPage + 1;
   const to = totalPages > page ? page * perPage : total;

@@ -3,9 +3,8 @@ import BestSellingSection from "@/lib/components/BestSellingSection";
 import FeaturesSection from "@/lib/components/FeaturesSection";
 import HeroSection from "@/lib/components/HeroSection";
 import { getProducts } from "@/lib/features/products/services";
-import { getCurrentUser } from "@/server/lucia/utils";
-import { redirect } from "next/navigation";
 import env from "@/server/env";
+import { Suspense } from "react";
 
 export const metadata = {
   title: "Fashion Haven | Trendy Clothing for Every Style",
@@ -40,34 +39,30 @@ export const metadata = {
   },
 };
 
-export default async function Home() {
-  const user = await getCurrentUser();
-
-  const [featuredProducts, newArrivals] = await Promise.all([
-    getProducts({ page: 1, perPage: 4 }),
-    getProducts({ page: 2, perPage: 4 }),
-  ]);
-
-  const userRole = user?.role;
-
-  if (userRole === "admin") {
-    return redirect("/admin/dashboard");
-  }
+export default function Home() {
+  const [featuredProducts, newArrivals] = [
+    getProducts({ page: 1, perPage: 4 }).then((res) => res.products),
+    getProducts({ page: 2, perPage: 4 }).then((res) => res.products),
+  ];
 
   return (
     <main>
       <HeroSection />
-      <BestSellingSection
-        eyebrow="Featured"
-        title="Most wanted this week"
-        products={featuredProducts.products}
-      />
+      <Suspense>
+        <BestSellingSection
+          eyebrow="Featured"
+          title="Most wanted this week"
+          productsPromise={featuredProducts}
+        />
+      </Suspense>
       <BrowseFashion />
-      <BestSellingSection
-        eyebrow="New Arrivals"
-        title="Fresh drops in motion"
-        products={newArrivals.products}
-      />
+      <Suspense>
+        <BestSellingSection
+          eyebrow="New Arrivals"
+          title="Fresh drops in motion"
+          productsPromise={newArrivals}
+        />
+      </Suspense>
       <FeaturesSection />
     </main>
   );
