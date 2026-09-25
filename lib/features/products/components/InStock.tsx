@@ -1,13 +1,18 @@
 export default function InStock({ quantity }: { quantity: number }) {
   return (
-    <p
-      className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] ${
+    <span
+      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${
         quantity > 0
-          ? "border-emerald-200 bg-emerald-50 text-emerald-700"
-          : "border-zinc-300 bg-zinc-100 text-zinc-500"
+          ? "border border-emerald-300/60 bg-emerald-50/80 text-emerald-800"
+          : "border border-stone-300 bg-stone-100 text-stone-500"
       }`}
     >
-      {quantity > 0 ? "in stock" : "out of stock"}
-    </p>
+      <span
+        className={`h-1.5 w-1.5 rounded-full ${
+          quantity > 0 ? "animate-pulse bg-emerald-600" : "bg-stone-400"
+        }`}
+      />
+      {quantity > 0 ? "In stock" : "Sold out"}
+    </span>
   );
 }

@@ -1,27 +1,29 @@
 import UserPageLayout from "@/lib/components/UserPageLayout";
 import WishlistContainer from "@/lib/features/wishlist/components/wishlist-container";
-import { HydrateClient, serverTrpc } from "@/lib/trpc/server";
-
-import { assertAuthenticated } from "@/server/lucia/utils";
-
+import { assertAuthenticated } from "@/lib/auth";
+import { getAllwishlistItems } from "@/server/data-access/wishlist";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
+import { WishlistSkeleton } from "@/lib/components/skeletons/account-skeletons";
 
-export default async function WishListPage() {
+async function WishlistContent() {
   const user = await assertAuthenticated();
 
-  const userRole = user.role;
-
-  if (userRole === "admin") {
+  if (user.role === "admin") {
     return redirect("/dashboard");
   }
 
-  await serverTrpc.wishlists.getWishlistItems.prefetch();
+  const items = await getAllwishlistItems({ userId: user.id });
 
+  return <WishlistContainer items={items} />;
+}
+
+export default function WishListPage() {
   return (
     <UserPageLayout title="Wishlist">
-      <HydrateClient>
-        <WishlistContainer />
-      </HydrateClient>
+      <Suspense fallback={<WishlistSkeleton />}>
+        <WishlistContent />
+      </Suspense>
     </UserPageLayout>
   );
 }

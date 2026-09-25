@@ -11,6 +11,7 @@ interface QuantitySelectorProps {
   size?: "default" | "sm" | "lg" | "icon" | null;
   handleIncreaseQuantity: () => void;
   handleDecreaseQuantity: () => void;
+  disabled?: boolean;
 }
 
 export default function QuantitySelector({
@@ -20,6 +21,7 @@ export default function QuantitySelector({
   size,
   handleDecreaseQuantity,
   handleIncreaseQuantity,
+  disabled = false,
 }: QuantitySelectorProps) {
   return (
     <div className="flex items-center gap-3">
@@ -27,7 +29,7 @@ export default function QuantitySelector({
         <Button
           variant="ghost"
           size={size}
-          disabled={value === 1}
+          disabled={disabled || value === 1}
           onClick={handleDecreaseQuantity}
           className="rounded-lg"
         >
@@ -39,7 +41,7 @@ export default function QuantitySelector({
         <Button
           variant="ghost"
           size={size}
-          disabled={value === maxValue}
+          disabled={disabled || value === maxValue}
           onClick={handleIncreaseQuantity}
           className="rounded-lg"
         >

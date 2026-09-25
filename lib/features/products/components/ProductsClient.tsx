@@ -1,7 +1,5 @@
 "use client";
 
-import LoadingSpinner from "@/lib/components/LoadingSpinner";
-import { useProducts } from "../hooks/useProducts";
 import FilterButton from "./FilterButton";
 import ProductsContainer from "./ProductsContainer";
 import PaginationComponent from "@/lib/components/PaginationComponent";
@@ -12,47 +10,37 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useMemo, useState } from "react";
-import { Button } from "@/components/ui/button";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { getProducts } from "../services";
 
-export default function ProductsClient() {
-  const { data, isPending, isError, error, refetch } = useProducts();
-  const [sortBy, setSortBy] = useState<
-    "featured" | "price-asc" | "price-desc" | "name-asc"
-  >("featured");
+type ProductsData = Awaited<ReturnType<typeof getProducts>>;
 
-  const products = data?.products || [];
+export default function ProductsClient({
+  productsData,
+}: {
+  productsData: ProductsData;
+}) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
-  const sortedProducts = useMemo(() => {
-    const cloned = [...products];
+  const sortBy = searchParams.get("sortBy") || "featured";
 
-    switch (sortBy) {
-      case "price-asc":
-        return cloned.sort((a, b) => a.basePrice - b.basePrice);
-      case "price-desc":
-        return cloned.sort((a, b) => b.basePrice - a.basePrice);
-      case "name-asc":
-        return cloned.sort((a, b) => a.name.localeCompare(b.name));
-      default:
-        return cloned;
+  const handleSortChange = (value: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("page");
+    if (value === "featured") {
+      params.delete("sortBy");
+    } else {
+      params.set("sortBy", value);
     }
-  }, [products, sortBy]);
+    const queryString = params.toString();
+    router.push(queryString ? `${pathname}?${queryString}` : pathname);
+  };
 
-  if (isPending) return <LoadingSpinner size="xl" />;
+  const products = productsData.products;
 
-  if (isError)
-    return (
-      <div className="section-muted flex min-h-[18rem] w-full flex-col items-center justify-center gap-3 p-6 text-center">
-        <p className="text-sm text-zinc-600">
-          Something went wrong: {error.message}
-        </p>
-        <Button variant="primary" onClick={() => refetch()}>
-          Retry
-        </Button>
-      </div>
-    );
-
-  if (sortedProducts.length === 0)
+  if (products.length === 0)
     return (
       <div className="section-muted flex min-h-[22rem] w-full items-center justify-center p-6 text-sm text-zinc-600">
         There are no products matching these filters.
@@ -61,31 +49,28 @@ export default function ProductsClient() {
 
   const {
     pagination: { page, perPage, total, totalPages },
-  } = data;
+  } = productsData;
 
   const from = (page - 1) * perPage + 1;
   const to = totalPages > page ? page * perPage : total;
 
   return (
-    <div className="section-muted space-y-6 p-4 md:p-6 lg:p-8">
-      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <p className="text-sm text-zinc-600">
-          Showing {from}-{to} of {total} results
+    <div className="space-y-6">
+      <div className="flex animate-fade-in flex-col gap-3 rounded-2xl border border-stone-200/80 bg-stone-50/70 p-4 md:flex-row md:items-center md:justify-between">
+        <p className="font-body text-xs font-medium tracking-wide text-stone-600">
+          Showing{" "}
+          <span className="font-semibold text-stone-900">
+            {from}–{to}
+          </span>{" "}
+          of <span className="font-semibold text-stone-900">{total}</span> items
         </p>
         <div className="flex w-full items-center gap-3 md:w-auto md:justify-end">
           <FilterButton />
-          <Select
-            value={sortBy}
-            onValueChange={(value) =>
-              setSortBy(
-                value as "featured" | "price-asc" | "price-desc" | "name-asc",
-              )
-            }
-          >
-            <SelectTrigger className="h-11 w-full rounded-xl border-zinc-200 bg-zinc-50 md:w-[190px]">
+          <Select value={sortBy} onValueChange={handleSortChange}>
+            <SelectTrigger className="h-10 w-full rounded-lg border-stone-200 bg-white font-body text-xs md:w-[190px]">
               <SelectValue placeholder="Sort by" />
             </SelectTrigger>
-            <SelectContent className="rounded-xl border-zinc-200 bg-zinc-50">
+            <SelectContent className="rounded-xl border-stone-200/90 bg-white font-body text-xs shadow-lg">
               <SelectItem value="featured">Featured</SelectItem>
               <SelectItem value="price-asc">Price: low to high</SelectItem>
               <SelectItem value="price-desc">Price: high to low</SelectItem>
@@ -95,7 +80,7 @@ export default function ProductsClient() {
         </div>
       </div>
 
-      <ProductsContainer products={sortedProducts} />
+      <ProductsContainer products={products} />
       <PaginationComponent count={total} perPage={perPage} />
     </div>
   );

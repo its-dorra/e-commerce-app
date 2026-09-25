@@ -7,34 +7,37 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { useDeleteProduct } from "../../products/hooks/useDeleteProduct";
+import { useAction } from "next-safe-action/hooks";
+import { deleteProductAction } from "@/server/actions/products";
+import toast from "react-hot-toast";
 
 interface DeleteProductDialogProps {
-  productId: number;
-  handleToggle: (id: number | null) => void;
+  productId: string;
+  handleToggle: (id: string | null) => void;
 }
 
 export default function DeleteProductDialog({
   productId,
   handleToggle,
 }: DeleteProductDialogProps) {
-  const { mutate, isPending } = useDeleteProduct();
   const [open, setOpen] = useState(true);
 
+  const { execute, isPending } = useAction(deleteProductAction, {
+    onSuccess: () => {
+      toast.success("Product deleted successfully");
+      setOpen(false);
+      handleToggle(null);
+    },
+    onError: ({ error }) => {
+      toast.error(error.serverError || "Failed to delete product");
+    },
+  });
+
   const handleOnClick = () => {
-    mutate(
-      { id: productId },
-      {
-        onSuccess: () => {
-          setOpen(false);
-          handleToggle(null);
-        },
-      },
-    );
+    execute({ id: productId });
   };
 
   return (
@@ -43,8 +46,8 @@ export default function DeleteProductDialog({
         <DialogHeader>
           <DialogTitle>Are you absolutely sure?</DialogTitle>
           <DialogDescription>
-            This action cannot be undone. This will permanently delete your
-            account and remove your data from our servers.
+            This action cannot be undone. This will permanently delete the
+            product from the catalogue.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
@@ -61,7 +64,7 @@ export default function DeleteProductDialog({
             onClick={handleOnClick}
             variant="destructive"
           >
-            Continue
+            {isPending ? "Deleting..." : "Continue"}
           </Button>
         </DialogFooter>
       </DialogContent>

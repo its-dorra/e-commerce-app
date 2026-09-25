@@ -1,5 +1,5 @@
 import SignupForm from "@/lib/features/user/components/SignupForm";
-import { getCurrentUser } from "@/server/lucia/utils";
+import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import env from "@/server/env";
 

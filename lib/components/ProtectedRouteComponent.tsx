@@ -1,13 +1,10 @@
-import { validateRequest } from "@/server/lucia/utils";
-import { redirect } from "next/navigation";
+import { assertAuthenticated } from "@/lib/auth";
 import { PropsWithChildren } from "react";
 
 export default async function ProtectedRouteComponent({
   children,
 }: PropsWithChildren) {
-  const { session } = await validateRequest();
+  await assertAuthenticated();
 
-  if (!session) return redirect("/login");
-
-  return <>children</>;
+  return <>{children}</>;
 }

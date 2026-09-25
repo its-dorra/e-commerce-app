@@ -2,29 +2,47 @@
 
 import { insertAddressSchema } from "@/server/db/schema/address";
 import { useForm } from "@tanstack/react-form";
-import { ZodValidator, zodValidator } from "@tanstack/zod-form-adapter";
-import { useAddress } from "../hooks/useAddress";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import FormField from "@/lib/components/FormField";
-import { useUpdateAddress } from "../hooks/useUpdateAddress";
+import { useAction } from "next-safe-action/hooks";
+import { updateUserAddressAction } from "@/server/actions/address";
+import toast from "react-hot-toast";
 
-export default function AddressForm() {
-  const { data } = useAddress();
-  const { mutate, isPending: isUpdatingAddress } = useUpdateAddress();
-
-  const form = useForm<z.infer<typeof insertAddressSchema>, ZodValidator>({
-    defaultValues: {
-      city: data?.userAddress?.city || "",
-      state: data?.userAddress?.state || "",
-      streetAddress: data?.userAddress?.streetAddress || "",
+export default function AddressForm({
+  address,
+}: {
+  address?: {
+    city: string;
+    state: string;
+    streetAddress: string;
+  } | null;
+}) {
+  const { execute, isPending: isUpdatingAddress } = useAction(
+    updateUserAddressAction,
+    {
+      onSuccess: () => {
+        toast.success("Address updated successfully.");
+      },
+      onError: ({ error }) => {
+        toast.error(
+          `Failed to update address: ${error.serverError || "Please try again."}`,
+        );
+      },
     },
-    validatorAdapter: zodValidator(),
+  );
+
+  const form = useForm({
+    defaultValues: {
+      city: address?.city || "",
+      state: address?.state || "",
+      streetAddress: address?.streetAddress || "",
+    },
     validators: {
       onChange: insertAddressSchema,
     },
     onSubmit: async ({ value }) => {
-      mutate(value);
+      execute(value);
     },
   });
 
@@ -35,7 +53,7 @@ export default function AddressForm() {
         e.stopPropagation();
         form.handleSubmit();
       }}
-      className="section-muted mt-2 flex w-full max-w-[700px] flex-col gap-y-4 p-5 md:p-6"
+      className="flex w-full max-w-[700px] flex-col gap-y-5 rounded-2xl border border-stone-200/80 bg-stone-50/60 p-6 md:p-8"
     >
       <div className="w-full max-w-[600px]">
         <form.Field
@@ -72,7 +90,7 @@ export default function AddressForm() {
                 inputType="text"
                 name={field.name}
                 field={field}
-                label="State"
+                label="State / Province"
               />
             )}
           />
@@ -82,12 +100,12 @@ export default function AddressForm() {
         selector={(state) => [state.canSubmit, state.isSubmitting]}
         children={([canSubmit, isSubmitting]) => (
           <Button
-            className="mt-4 w-fit"
+            className="mt-2 w-fit font-medium"
             variant="primary"
             disabled={isUpdatingAddress || !canSubmit || isSubmitting}
             type="submit"
           >
-            Save Changes
+            {isUpdatingAddress ? "Saving..." : "Save Changes"}
           </Button>
         )}
       />

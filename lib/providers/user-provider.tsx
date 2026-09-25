@@ -1,41 +1,51 @@
 "use client";
 
 import { createContext, PropsWithChildren, useContext } from "react";
+import { authClient } from "@/lib/auth-client";
 
-import { useUser as useUserQuery } from "../features/user/hooks/useUser";
-
-interface UserContext {
+export interface UserContextType {
   user?: {
     id: string;
     email: string;
     role: "user" | "admin" | null;
-    createdAt: Date | null;
+    createdAt?: Date | null;
     profile: {
-      id: string;
-      createdAt: Date | null;
-      userId: string;
-      updatedAt: Date | null;
       displayName: string | null;
-      imageId: string | null;
       image: string | null;
-      bio: string;
     } | null;
-  };
+  } | null;
+  isPending?: boolean;
 }
 
-const UserContext = createContext<UserContext | null>(null);
+const UserContext = createContext<UserContextType | null>(null);
 
 export default function UserProvider({ children }: PropsWithChildren) {
-  const { data: user } = useUserQuery();
+  const { data: session, isPending } = authClient.useSession();
 
+  const user = session?.user
+    ? {
+        id: session.user.id,
+        email: session.user.email,
+        role: ((session.user as any).role as "user" | "admin") || "user",
+        createdAt: session.user.createdAt
+          ? new Date(session.user.createdAt)
+          : null,
+        profile: {
+          displayName: session.user.name || null,
+          image: session.user.image || null,
+        },
+      }
+    : null;
 
   return (
-    <UserContext.Provider value={{ user }}>{children}</UserContext.Provider>
+    <UserContext.Provider value={{ user, isPending }}>
+      {children}
+    </UserContext.Provider>
   );
 }
 
 export const useUser = () => {
   const context = useContext(UserContext);
-  if (!context) throw new Error("useSession is used outside of its provider");
+  if (!context) throw new Error("useUser is used outside of its provider");
   return context;
 };

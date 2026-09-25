@@ -1,18 +1,12 @@
-import {
-  integer,
-  sqliteTable,
-  text,
-  uniqueIndex,
-} from "drizzle-orm/sqlite-core";
+import { pgTable, text, uniqueIndex, uuid } from "drizzle-orm/pg-core";
 import { userTable } from "./users";
-import { relations } from "drizzle-orm";
-import { createInsertSchema } from "drizzle-zod";
+import { createInsertSchema } from "drizzle-orm/zod";
 import { z } from "zod";
 
-export const addressTable = sqliteTable(
+export const addressTable = pgTable(
   "address",
   {
-    id: integer("id").primaryKey({ autoIncrement: true }),
+    id: uuid("id").defaultRandom().primaryKey(),
     userId: text("user_id")
       .notNull()
       .references(() => userTable.id, { onDelete: "cascade" }),
@@ -20,9 +14,7 @@ export const addressTable = sqliteTable(
     city: text("city").notNull(),
     state: text("state").notNull(),
   },
-  (table) => ({
-    userIdx: uniqueIndex("address_user_idx").on(table.userId),
-  }),
+  (table) => [uniqueIndex("address_user_idx").on(table.userId)],
 );
 
 export const insertAddressSchema = createInsertSchema(addressTable, {
@@ -35,10 +27,3 @@ export const insertAddressSchema = createInsertSchema(addressTable, {
 });
 
 export type Address = z.infer<typeof insertAddressSchema>;
-
-export const addressRelations = relations(addressTable, ({ one }) => ({
-  user: one(userTable, {
-    fields: [addressTable.userId],
-    references: [userTable.id],
-  }),
-}));

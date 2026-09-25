@@ -1,1 +1,0 @@
-ALTER TABLE `orders` ADD `is_seen` integer DEFAULT false NOT NULL;

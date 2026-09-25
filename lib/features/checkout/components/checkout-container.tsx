@@ -1,20 +1,18 @@
 "use client";
 
 import EmptyListMessage from "@/lib/components/EmptyListMessage";
-import { useCart } from "../../cart/hooks/useCart";
-import { useAddress } from "../../address/hooks/useAddress";
 import { useMemo } from "react";
-
 import { Button } from "@/components/ui/button";
-import LoadingSpinner from "@/lib/components/LoadingSpinner";
-
-import { useCreateOrder } from "../../orders/hooks/useCreateOrder";
 import { useForm } from "@tanstack/react-form";
 import { z } from "zod";
 import { insertAddressSchema } from "@/server/db/schema/address";
-import { ZodValidator, zodValidator } from "@tanstack/zod-form-adapter";
 import FormField from "@/lib/components/FormField";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
+import { useAction } from "next-safe-action/hooks";
+import { createOrderAction } from "@/server/actions/orders";
+import type { Cart } from "../../cart/types";
 
 const checkOutShippingInformation = insertAddressSchema.merge(
   z.object({
@@ -25,37 +23,56 @@ const checkOutShippingInformation = insertAddressSchema.merge(
   }),
 );
 
-export default function CheckoutContainer() {
-  const { data: cartData, isPending: isGettingCart } = useCart();
+export default function CheckoutContainer({
+  cart,
+  address,
+}: {
+  cart?: Cart | null;
+  address?: {
+    city: string;
+    state: string;
+    streetAddress: string;
+  } | null;
+}) {
+  const router = useRouter();
 
-  const { mutate, isPending: isCreatingOrder } = useCreateOrder();
-
-  const { data: addressData } = useAddress();
+  const { execute: createOrder, isPending: isCreatingOrder } = useAction(
+    createOrderAction,
+    {
+      onSuccess: ({ data }) => {
+        if (data?.id) {
+          toast.success("Order created successfully.");
+          router.replace(`/orders/${data.id}/success`);
+        }
+      },
+      onError: ({ error }) => {
+        toast.error(
+          `Error creating order: ${error.serverError || "Please try again."}`,
+        );
+      },
+    },
+  );
 
   const totalPrice = useMemo(() => {
-    return cartData?.cart?.cartItems.reduce((acc, item) => {
+    return cart?.cartItems.reduce((acc, item) => {
       return acc + item.itemPrice * item.quantity;
     }, 0);
-  }, [cartData?.cart?.cartItems])?.toFixed(2);
+  }, [cart?.cartItems])?.toFixed(2);
 
-  const form = useForm<
-    z.infer<typeof checkOutShippingInformation>,
-    ZodValidator
-  >({
+  const form = useForm({
     defaultValues: {
-      city: addressData?.userAddress?.city || "",
-      state: addressData?.userAddress?.state || "",
-      streetAddress: addressData?.userAddress?.streetAddress || "",
+      city: address?.city || "",
+      state: address?.state || "",
+      streetAddress: address?.streetAddress || "",
       phoneNumber: "",
     },
-    validatorAdapter: zodValidator(),
     validators: {
       onChange: checkOutShippingInformation,
     },
   });
 
-  const createOrder = () => {
-    mutate({
+  const handleCreateOrder = () => {
+    createOrder({
       city: form.state.values.city,
       wilaya: form.state.values.state,
       streetAddress: form.state.values.streetAddress,
@@ -63,28 +80,27 @@ export default function CheckoutContainer() {
     });
   };
 
-  if (isGettingCart)
-    return (
-      <div className="flex w-full justify-center">
-        <LoadingSpinner size="xl" />
-      </div>
-    );
-
-  if (!cartData || !cartData.cart || cartData.cart.cartItems.length === 0)
+  if (!cart || !cart.cartItems || cart.cartItems.length === 0)
     return (
       <EmptyListMessage
-        message="Your cart is empty. Plz fill it and then come again 😁"
+        message="Your cart is empty. Please add items to your cart before checking out."
         listName="Checkout"
       />
     );
 
   return (
-    <div className="grid w-full grid-cols-1 items-start justify-between gap-8 lg:grid-cols-[2fr_1fr]">
-      <div className="section-muted space-y-6 p-5 md:p-6">
-        <h4 className="h4">Shipping Information</h4>
-        <div className="flex flex-col space-y-2">
-          <div className="flex w-full max-w-[600px] flex-col gap-x-4 gap-y-4 lg:flex-row">
-            <div className="w-full max-w-[600px]">
+    <div className="grid w-full grid-cols-1 items-start justify-between gap-8 lg:grid-cols-[1.5fr_1fr]">
+      <div className="shadow-xs rounded-2xl border border-stone-200/80 bg-white p-6 md:p-8">
+        <h4 className="font-display text-2xl font-normal tracking-tight text-stone-900">
+          Shipping & Contact Information
+        </h4>
+        <p className="mt-1 font-body text-xs text-stone-500">
+          Please provide the exact delivery destination for your items.
+        </p>
+
+        <div className="mt-6 flex flex-col space-y-4">
+          <div className="flex w-full flex-col gap-4 sm:flex-row">
+            <div className="w-full">
               <form.Field
                 name="streetAddress"
                 children={(field) => (
@@ -97,7 +113,7 @@ export default function CheckoutContainer() {
                 )}
               />
             </div>
-            <div className="w-full max-w-[600px]">
+            <div className="w-full">
               <form.Field
                 name="state"
                 children={(field) => (
@@ -105,14 +121,14 @@ export default function CheckoutContainer() {
                     inputType="text"
                     name={field.name}
                     field={field}
-                    label="State"
+                    label="State / Province"
                   />
                 )}
               />
             </div>
           </div>
-          <div className="flex w-full max-w-[600px] flex-col gap-x-4 gap-y-4 lg:flex-row">
-            <div className="w-full max-w-[600px]">
+          <div className="flex w-full flex-col gap-4 sm:flex-row">
+            <div className="w-full">
               <form.Field
                 name="city"
                 children={(field) => (
@@ -125,12 +141,12 @@ export default function CheckoutContainer() {
                 )}
               />
             </div>
-            <div className="w-full max-w-[600px]">
+            <div className="w-full">
               <form.Field
                 name="phoneNumber"
                 children={(field) => (
                   <FormField
-                    inputType="text"
+                    inputType="tel"
                     name={field.name}
                     field={field}
                     label="Phone Number"
@@ -141,19 +157,23 @@ export default function CheckoutContainer() {
           </div>
         </div>
       </div>
-      <div className="section-muted inline-flex flex-col gap-y-6 p-5 md:sticky md:top-24 md:p-6">
-        <h4 className="h4">Your Order</h4>
-        <div className="inline-flex flex-col gap-y-4">
-          <div className="inline-flex flex-wrap items-center justify-between gap-3">
+
+      <div className="shadow-xs rounded-2xl border border-stone-200/80 bg-stone-50/80 p-6 md:sticky md:top-28">
+        <h4 className="font-display text-xl font-normal tracking-tight text-stone-900">
+          Order Summary
+        </h4>
+        <div className="mt-5 space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-stone-200/60 pb-4">
             <div className="flex items-center gap-x-2">
-              {cartData.cart.cartItems.map((item) => (
+              {cart.cartItems.map((item) => (
                 <div
-                  className="size-8 rounded-full bg-zinc-200 p-[6px]"
+                  className="size-10 overflow-hidden rounded-full border border-stone-200 bg-white"
                   key={item.id}
                 >
                   <img
                     className="h-full w-full object-cover"
-                    src={item.size.variant.images[0].imagePath}
+                    src={item.size.variant.images[0]?.imagePath || ""}
+                    alt="product thumbnail"
                   />
                 </div>
               ))}
@@ -161,29 +181,39 @@ export default function CheckoutContainer() {
             <Link href="/cart">
               <Button
                 variant="outline"
-                className="h-10 rounded-xl border-zinc-200 bg-zinc-50"
+                size="sm"
+                className="font-body text-xs text-stone-700 hover:text-stone-900"
               >
-                Edit Cart
+                Modify Cart
               </Button>
             </Link>
           </div>
-          <div className="inline-flex items-center justify-between">
-            <p className="body-1 text-zinc-600">Subtotal:</p>
-            <p className="body-1">$ {totalPrice}</p>
+
+          <div className="space-y-2.5 font-body text-xs">
+            <div className="flex items-center justify-between text-stone-500">
+              <span>Subtotal:</span>
+              <span className="font-semibold text-stone-900">
+                $ {totalPrice}
+              </span>
+            </div>
+            <div className="flex items-center justify-between text-stone-500">
+              <span>Shipping:</span>
+              <span className="font-medium text-emerald-700">
+                Complimentary
+              </span>
+            </div>
+            <div className="flex items-center justify-between text-stone-500">
+              <span>Estimated Tax:</span>
+              <span className="font-medium text-stone-900">$ 0.00</span>
+            </div>
           </div>
-          <div className="inline-flex items-center justify-between">
-            <p className="body-1 text-zinc-600">Shipping:</p>
-            <p className="body-1">Free</p>
+
+          <hr className="border-stone-200" />
+          <div className="flex items-center justify-between font-body text-sm font-semibold text-stone-900">
+            <span>Total:</span>
+            <span className="text-base text-amber-800">$ {totalPrice}</span>
           </div>
-          <div className="inline-flex items-center justify-between">
-            <p className="body-1 text-zinc-600">Tax:</p>
-            <p className="body-1">0</p>
-          </div>
-          <hr className="border-zinc-200" />
-          <div className="inline-flex items-center justify-between">
-            <p className="body-1 font-bold">Total:</p>
-            <p className="body-1 font-bold">$ {totalPrice}</p>
-          </div>
+
           <form.Subscribe
             selector={(state) => [
               state.canSubmit,
@@ -192,7 +222,7 @@ export default function CheckoutContainer() {
             ]}
             children={([canSubmit, isSubmitting, values]) => (
               <Button
-                onClick={createOrder}
+                onClick={handleCreateOrder}
                 disabled={
                   isCreatingOrder ||
                   !(canSubmit as boolean) ||
@@ -202,9 +232,9 @@ export default function CheckoutContainer() {
                   })
                 }
                 variant="primary"
-                className="h-11"
+                className="mt-2 h-11 w-full font-medium"
               >
-                Place Order
+                {isCreatingOrder ? "Processing..." : "Place Order"}
               </Button>
             )}
           />

@@ -1,25 +1,41 @@
-import { assertAdmin } from "@/server/lucia/utils";
+import { assertAdmin } from "@/lib/auth";
 import AdminPageLayout from "@/lib/components/AdminPageLayout";
-import { HydrateClient, serverTrpc } from "@/lib/trpc/server";
 import AddProductContainer from "@/lib/features/admin-products/components/add-product-container";
+import {
+  getCategories,
+  getColors,
+  getSizes,
+} from "@/lib/features/products/services";
+import { Suspense } from "react";
+import { AdminAddProductSkeleton } from "@/lib/components/skeletons/admin-skeletons";
 
-export default async function AddProductPage() {
+async function AddProductContent() {
   await assertAdmin();
 
-  await Promise.all([
-    serverTrpc.filters.categories.prefetch(),
-    serverTrpc.filters.colors.prefetch(),
-    serverTrpc.filters.sizes.prefetch(),
+  const [categories, colors, sizes] = await Promise.all([
+    getCategories(),
+    getColors(),
+    getSizes(),
   ]);
 
+  return (
+    <AddProductContainer
+      categories={categories}
+      colors={colors}
+      sizes={sizes}
+    />
+  );
+}
+
+export default function AddProductPage() {
   return (
     <AdminPageLayout
       before={[{ href: "/admin/products", to: "Products" }]}
       to="Add Product"
     >
-      <HydrateClient>
-        <AddProductContainer />
-      </HydrateClient>
+      <Suspense fallback={<AdminAddProductSkeleton />}>
+        <AddProductContent />
+      </Suspense>
     </AdminPageLayout>
   );
 }

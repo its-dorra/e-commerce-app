@@ -1,70 +1,44 @@
 import {
-  sqliteTable,
+  pgTable,
+  uuid,
   integer,
   text,
-  real,
+  doublePrecision,
+  timestamp,
   index,
-} from "drizzle-orm/sqlite-core";
+} from "drizzle-orm/pg-core";
 import { userTable } from "./users";
-import { relations } from "drizzle-orm";
 import { sizeTable } from "./productVariants";
 
-export const cartTable = sqliteTable("cart", {
-  id: integer("id", { mode: "number" }).primaryKey({
-    autoIncrement: true,
-  }),
+export const cartTable = pgTable("cart", {
+  id: uuid("id").defaultRandom().primaryKey(),
   userId: text("user_id")
     .notNull()
     .references(() => userTable.id, { onDelete: "cascade" }),
-  createdAt: integer("created_at", { mode: "timestamp" }).$default(
-    () => new Date(),
-  ),
-  updatedAt: integer("updated_at", { mode: "timestamp" })
-    .$default(() => new Date())
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .notNull()
     .$onUpdate(() => new Date()),
 });
 
-export const cartItemTable = sqliteTable(
+export const cartItemTable = pgTable(
   "cart_items",
   {
-    id: integer("id", { mode: "number" }).primaryKey({
-      autoIncrement: true,
-    }),
-    sizeId: integer("size_id")
+    id: uuid("id").defaultRandom().primaryKey(),
+    sizeId: uuid("size_id")
       .notNull()
       .references(() => sizeTable.id, { onDelete: "cascade" }),
     quantity: integer("quantity").notNull().default(1),
-    itemPrice: real("item_price").notNull(),
-    cartId: integer("cart_id")
+    itemPrice: doublePrecision("item_price").notNull(),
+    cartId: uuid("cart_id")
       .notNull()
       .references(() => cartTable.id, { onDelete: "cascade" }),
-    createdAt: integer("created_at", { mode: "timestamp" }).$default(
-      () => new Date(),
-    ),
-    updatedAt: integer("updated_at", { mode: "timestamp" })
-      .$default(() => new Date())
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .notNull()
       .$onUpdate(() => new Date()),
   },
-  (table) => ({
-    productIdIdx: index("cart_product_id_idx").on(table.sizeId),
-  }),
+  (table) => [index("cart_product_id_idx").on(table.sizeId)],
 );
-
-export const cartRelations = relations(cartTable, ({ one, many }) => ({
-  cartItems: many(cartItemTable),
-  user: one(userTable, {
-    fields: [cartTable.userId],
-    references: [userTable.id],
-  }),
-}));
-
-export const cartItemRelations = relations(cartItemTable, ({ one }) => ({
-  size: one(sizeTable, {
-    fields: [cartItemTable.sizeId],
-    references: [sizeTable.id],
-  }),
-  cart: one(cartTable, {
-    fields: [cartItemTable.cartId],
-    references: [cartTable.id],
-  }),
-}));

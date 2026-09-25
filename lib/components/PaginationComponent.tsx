@@ -8,7 +8,6 @@ import {
 } from "@/components/ui/pagination";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { MouseEvent } from "react";
 
 interface PaginationComponentProps {
   count: number;
@@ -19,8 +18,8 @@ export default function PaginationComponent({
   count,
   perPage,
 }: PaginationComponentProps) {
-  console.log({ count, perPage });
-
+  const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   const params = new URLSearchParams(searchParams);
   const currentPage = Number(searchParams.get("page") || 1);
@@ -29,46 +28,52 @@ export default function PaginationComponent({
   const navigateToPage = (page: number) => {
     if (page < 1 || page > pageCount) return;
     params.set("page", `${page}`);
-    // push(`${pathname}?${params.toString()}`);
-    window.history.pushState(null, "", `?${params.toString()}`);
+    router.push(`${pathname}?${params.toString()}`);
   };
 
-  const handlePreviousPage = (e: MouseEvent<HTMLButtonElement>) => {
+  const handlePreviousPage = () => {
     if (currentPage > 1) navigateToPage(currentPage - 1);
   };
 
-  const handleNextPage = (e: MouseEvent<HTMLButtonElement>) => {
+  const handleNextPage = () => {
     if (currentPage < pageCount) navigateToPage(currentPage + 1);
   };
 
   if (pageCount <= 1) return null;
 
   return (
-    <Pagination className="mt-4">
-      <PaginationContent className="flex w-full items-center justify-between">
+    <Pagination className="mt-8">
+      <PaginationContent className="flex w-full items-center justify-between font-body text-xs">
         <PaginationItem>
           <Button
             disabled={currentPage === 1}
             aria-disabled={currentPage === 1}
             variant="outline"
+            size="sm"
             onClick={handlePreviousPage}
-            className="flex gap-1.5"
+            className="flex gap-1.5 border-stone-200 bg-white font-medium text-stone-700 hover:border-amber-700 hover:text-amber-800"
           >
-            <ChevronLeft className="h-4 w-4" />
+            <ChevronLeft className="h-3.5 w-3.5" />
             <span>Previous</span>
           </Button>
         </PaginationItem>
+
+        <span className="font-body text-xs text-stone-500">
+          Page <strong className="text-stone-900">{currentPage}</strong> of{" "}
+          <strong className="text-stone-900">{pageCount}</strong>
+        </span>
 
         <PaginationItem>
           <Button
             disabled={currentPage === pageCount}
             aria-disabled={currentPage === pageCount}
             variant="outline"
+            size="sm"
             onClick={handleNextPage}
-            className="flex gap-1.5"
+            className="flex gap-1.5 border-stone-200 bg-white font-medium text-stone-700 hover:border-amber-700 hover:text-amber-800"
           >
             <span>Next</span>
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className="h-3.5 w-3.5" />
           </Button>
         </PaginationItem>
       </PaginationContent>

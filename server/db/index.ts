@@ -1,13 +1,8 @@
-import { drizzle } from "drizzle-orm/libsql";
+import { relations } from "./schema/relations";
 import env from "../env";
-import { createClient } from "@libsql/client";
-import * as schema from "./schema";
 
-const client = createClient({
-  url: env.DATABASE_URL,
-  authToken: env.DATABASE_TOKEN,
-});
+import { drizzle } from "drizzle-orm/node-postgres";
 
-const db = drizzle(client, { schema });
+const db = drizzle(env.DATABASE_URL, { relations });
 
 export default db;

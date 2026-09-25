@@ -19,17 +19,22 @@ export function ColorFilter({ name, hexCode }: ColorFilterProps) {
 
   return (
     <div
+      title={name}
       onClick={() => {
         isQueryParamInUrl
           ? deleteQuery("colors", name)
           : appendQuery("colors", name);
       }}
-      className={`flex h-8 w-8 cursor-pointer items-center justify-center rounded-full p-0.5 transition-all duration-200 ${isQueryParamInUrl ? "border-2 border-zinc-900 shadow" : "border border-zinc-200 shadow-sm"}`}
+      className={`flex h-7 w-7 cursor-pointer items-center justify-center rounded-full p-0.5 transition-all duration-200 ${
+        isQueryParamInUrl
+          ? "shadow-xs ring-2 ring-amber-700 ring-offset-2"
+          : "border border-stone-200 hover:scale-105"
+      }`}
     >
       <div
-        className="h-full w-full rounded-full"
+        className="h-full w-full rounded-full shadow-inner"
         style={{ backgroundColor: hexCode }}
-      ></div>
+      />
     </div>
   );
 }

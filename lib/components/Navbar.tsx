@@ -11,8 +11,14 @@ import SideBarButton from "./SideBarButton";
 import CartButton from "../features/cart/components/CartButton";
 import { UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import type { Cart } from "../features/cart/types";
 
-export default function NavBar() {
+interface NavBarProps {
+  cart?: Cart | null;
+  categories?: { id?: string; name: string }[];
+}
+
+export default function NavBar({ cart, categories = [] }: NavBarProps = {}) {
   const [isNavigationOpen, setIsNavigationOpen] = useState(false);
 
   const { inView, ref } = useInView({
@@ -24,79 +30,91 @@ export default function NavBar() {
     <>
       <div ref={ref} />
       <header
-        className={`sticky left-0 right-0 top-0 z-50 flex w-full items-center justify-center border-b border-zinc-200/70 py-3 transition-all duration-300 ${
+        className={`sticky left-0 right-0 top-0 z-50 flex w-full items-center justify-center border-b transition-all duration-300 ${
           inView
-            ? "bg-transparent"
-            : "bg-background/90 shadow-sm backdrop-blur-xl"
+            ? "border-transparent bg-transparent py-4"
+            : "shadow-xs border-stone-200/60 bg-stone-50/85 py-3 backdrop-blur-xl"
         }`}
       >
-        <nav className="page-shell flex items-center gap-4">
-          <Link href="/" className="shrink-0">
-            <Image src={completeLogo} alt="logo" />
+        <nav className="page-shell flex items-center justify-between gap-4">
+          <Link
+            href="/"
+            className="shrink-0 transition-opacity hover:opacity-85"
+          >
+            <Image src={completeLogo} alt="Fashion Haven logo" priority />
           </Link>
           <ul
-            className={`${isNavigationOpen ? "flex" : "hidden"} fixed bottom-0 left-0 right-0 top-[4.75rem] z-50 mx-auto flex-col items-center justify-center gap-8 bg-zinc-50/95 text-sm backdrop-blur lg:static lg:flex lg:flex-row lg:gap-2 lg:bg-transparent lg:backdrop-blur-none`}
+            className={`${isNavigationOpen ? "flex" : "hidden"} bg-stone-50/98 fixed bottom-0 left-0 right-0 top-[4.5rem] z-50 mx-auto flex-col items-center justify-center gap-7 p-6 text-sm backdrop-blur-2xl lg:static lg:flex lg:flex-row lg:gap-1 lg:bg-transparent lg:p-0 lg:backdrop-blur-none`}
           >
             <li>
               <Link
-                className="rounded-xl px-3 py-2 text-xl font-semibold uppercase tracking-wider text-zinc-800 transition-colors hover:bg-zinc-200/80 lg:text-sm lg:font-medium lg:normal-case lg:tracking-normal"
+                className="font-body group relative px-3 py-2 text-base font-medium tracking-wide text-stone-700 transition-colors hover:text-stone-950 lg:text-sm"
                 onClick={() => {
                   setIsNavigationOpen(false);
                 }}
                 href="/#home"
               >
-                Home
+                <span>Home</span>
+                <span className="absolute bottom-0 left-3 right-3 h-[1.5px] scale-x-0 bg-amber-700 transition-transform duration-300 group-hover:scale-x-100" />
               </Link>
             </li>
             <li>
-              <CategoriesNavBar />
+              <CategoriesNavBar categories={categories} />
             </li>
             <li>
               <Link
-                className="rounded-xl px-3 py-2 text-xl font-semibold uppercase tracking-wider text-zinc-800 transition-colors hover:bg-zinc-200/80 lg:text-sm lg:font-medium lg:normal-case lg:tracking-normal"
+                className="font-body group relative px-3 py-2 text-base font-medium tracking-wide text-stone-700 transition-colors hover:text-stone-950 lg:text-sm"
                 onClick={() => {
                   setIsNavigationOpen(false);
                 }}
-                href="#about"
+                href="/#about"
               >
-                About
+                <span>About</span>
+                <span className="absolute bottom-0 left-3 right-3 h-[1.5px] scale-x-0 bg-amber-700 transition-transform duration-300 group-hover:scale-x-100" />
               </Link>
             </li>
             <li>
               <Link
-                className="rounded-xl px-3 py-2 text-xl font-semibold uppercase tracking-wider text-zinc-800 transition-colors hover:bg-zinc-200/80 lg:text-sm lg:font-medium lg:normal-case"
+                className="font-body group relative px-3 py-2 text-base font-medium tracking-wide text-stone-700 transition-colors hover:text-stone-950 lg:text-sm"
                 onClick={() => {
                   setIsNavigationOpen(false);
                 }}
                 href="/cart"
               >
-                Cart
+                <span>Cart</span>
+                <span className="absolute bottom-0 left-3 right-3 h-[1.5px] scale-x-0 bg-amber-700 transition-transform duration-300 group-hover:scale-x-100" />
               </Link>
             </li>
             <li>
               <Link
-                className="rounded-xl px-3 py-2 text-xl font-semibold uppercase tracking-wider text-zinc-800 transition-colors hover:bg-zinc-200/80 lg:hidden"
+                className="font-body group relative px-3 py-2 text-base font-medium tracking-wide text-stone-700 transition-colors hover:text-stone-950 lg:hidden"
                 onClick={() => {
                   setIsNavigationOpen(false);
                 }}
                 href="/account"
               >
-                User
+                <span>Account</span>
               </Link>
             </li>
           </ul>
-          <div className="ml-auto hidden items-center gap-x-3 lg:flex">
+          <div className="ml-auto hidden items-center gap-x-2 lg:flex">
             <Link className="rounded-full" href="/account">
-              <Button variant="secondary" size="icon" className="rounded-full">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="rounded-full text-stone-700 hover:bg-stone-200/70 hover:text-stone-950"
+              >
                 <UserRound className="h-4 w-4" />
               </Button>
             </Link>
           </div>
-          <CartButton />
-          <SideBarButton
-            isOpen={isNavigationOpen}
-            toggleSideBar={() => setIsNavigationOpen(!isNavigationOpen)}
-          />
+          <div className="flex items-center gap-1.5">
+            <CartButton cart={cart} />
+            <SideBarButton
+              isOpen={isNavigationOpen}
+              toggleSideBar={() => setIsNavigationOpen(!isNavigationOpen)}
+            />
+          </div>
         </nav>
       </header>
     </>

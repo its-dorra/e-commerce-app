@@ -1,7 +1,5 @@
 "use client";
 
-import LoadingSpinner from "@/lib/components/LoadingSpinner";
-import { useGetOrdersByUser } from "../hooks/useGetOrdersByUser";
 import PaginationComponent from "@/lib/components/PaginationComponent";
 import {
   Accordion,
@@ -14,43 +12,35 @@ import ProductImage from "../../products/components/ProductImage";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import EmptyListMessage from "@/lib/components/EmptyListMessage";
+import { getOrdersByUser } from "@/server/data-access/orders";
 
-type OrderProps = Exclude<
-  ReturnType<typeof useGetOrdersByUser>["data"],
-  undefined
->["data"][number];
-
+type OrdersData = Awaited<ReturnType<typeof getOrdersByUser>>;
+type OrderProps = OrdersData["data"][number];
 type OrderItemProps = OrderProps["orderItems"][number];
 
-export default function UserOrdersContainer() {
-  const { data, isPending, isError } = useGetOrdersByUser();
-
-  if (isPending) {
-    return (
-      <div className="flex h-full w-full items-center justify-center">
-        <LoadingSpinner size="xl" />
-      </div>
-    );
-  }
-
-  if (isError) {
-    return <div>Something went wrong</div>;
+export default function UserOrdersContainer({
+  ordersData,
+}: {
+  ordersData: OrdersData;
+}) {
+  if (!ordersData || ordersData.data.length === 0) {
+    return <EmptyListMessage listName="Orders" />;
   }
 
   return (
     <div className="flex w-full flex-col gap-y-8">
       <div className="flex flex-col space-y-4">
-        {data.data.length === 0 && <EmptyListMessage listName="Orders" />}
-        {data.data.length > 0 && (
-          <Accordion className="space-y-3" type="single" collapsible>
-            {data.data.map((order) => {
-              return <Order key={order.id} order={order} />;
-            })}
-          </Accordion>
-        )}
+        <Accordion className="space-y-3" type="single" collapsible>
+          {ordersData.data.map((order) => {
+            return <Order key={order.id} order={order} />;
+          })}
+        </Accordion>
       </div>
 
-      <PaginationComponent count={data.pagination.totalCount} perPage={6} />
+      <PaginationComponent
+        count={ordersData.pagination.totalCount}
+        perPage={6}
+      />
     </div>
   );
 }
@@ -58,31 +48,42 @@ export default function UserOrdersContainer() {
 function Order({ order }: { order: OrderProps }) {
   return (
     <AccordionItem
-      className="overflow-hidden rounded-2xl border border-zinc-200/70 bg-zinc-50"
+      className="shadow-2xs overflow-hidden rounded-2xl border border-stone-200/80 bg-white"
       value={`${order.id}`}
     >
-      <AccordionTrigger className="flex flex-wrap justify-between gap-x-4 p-4 hover:bg-zinc-100 hover:no-underline">
+      <AccordionTrigger className="font-body flex flex-wrap justify-between gap-x-4 p-5 text-xs hover:bg-stone-50/70 hover:no-underline">
         <div>
-          <span className="font-bold">Order ID:</span> {order.id}
+          <span className="font-semibold text-stone-500">Order ID:</span>{" "}
+          <span className="font-medium text-stone-900">
+            #{order.id.slice(0, 8)}
+          </span>
         </div>
         <div>
-          <span className="font-bold">Total Price:</span> ${order.totalPrice}
+          <span className="font-semibold text-stone-500">Total:</span>{" "}
+          <span className="font-semibold text-amber-800">
+            ${order.totalPrice}
+          </span>
         </div>
         <div>
-          <span className="font-bold">Status:</span>{" "}
-          {capitalizeWords(order.status)}
+          <span className="font-semibold text-stone-500">Status:</span>{" "}
+          <span className="font-body inline-block rounded-md border border-amber-600/30 bg-amber-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-amber-800">
+            {capitalizeWords(order.status)}
+          </span>
         </div>
         <div>
-          <span className="font-bold">Created At:</span>{" "}
-          {order.createdAt?.toLocaleDateString(undefined, {
-            weekday: "narrow",
-            month: "short",
-            day: "numeric",
-            year: "numeric",
-          })}
+          <span className="font-semibold text-stone-500">Placed:</span>{" "}
+          <span className="text-stone-700">
+            {order.createdAt
+              ? new Date(order.createdAt).toLocaleDateString(undefined, {
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric",
+                })
+              : ""}
+          </span>
         </div>
       </AccordionTrigger>
-      <AccordionContent className="space-y-3 px-4 pb-4">
+      <AccordionContent className="space-y-3 border-t border-stone-100 bg-stone-50/40 p-5">
         {order.orderItems.map((item) => (
           <OrderItem key={item.id} item={item} />
         ))}
@@ -92,30 +93,52 @@ function Order({ order }: { order: OrderProps }) {
 }
 
 function OrderItem({ item }: { item: OrderItemProps }) {
+  const variant = item.size.variant;
+  const product = variant.product;
+
   return (
-    <div className="flex items-center gap-x-4 rounded-xl border border-zinc-200/70 bg-zinc-50 px-4 py-3 md:gap-x-8 lg:gap-x-12">
-      <ProductImage
-        imageUrl={item.size.variant.images[0].imagePath}
-        alt="Product image"
-        className="size-20 bg-zinc-100"
-      />
-      <div className="flex flex-col justify-between gap-y-4">
-        <p className="font-semibold text-zinc-800">
-          {item.size.variant.product.name}
-        </p>
-        <p className="text-sm text-zinc-600">
-          ${item.itemPrice} x {item.quantity} = $
-          {item.quantity * item.itemPrice}
-        </p>
+    <div className="flex flex-col items-start justify-between gap-4 rounded-xl border border-stone-200/60 bg-white p-3 sm:flex-row sm:items-center">
+      <div className="flex items-center gap-x-3">
+        <ProductImage
+          imageUrl={variant.images[0]?.imagePath || ""}
+          alt="product image"
+          className="size-16 flex-none rounded-lg bg-stone-100"
+        />
+        <div className="space-y-1">
+          <h6 className="font-display text-sm font-medium text-stone-900">
+            {product.name}
+          </h6>
+          <div className="font-body flex items-center gap-2 text-xs text-stone-500">
+            <span className="flex items-center gap-1">
+              Color:
+              <span
+                className="inline-block size-3 rounded-full border border-stone-300"
+                style={{ backgroundColor: variant.color.hexCode }}
+              />
+            </span>
+            <span>•</span>
+            <span>
+              Size: <strong className="uppercase">{item.size.size}</strong>
+            </span>
+            <span>•</span>
+            <span>Qty: {item.quantity}</span>
+          </div>
+        </div>
       </div>
-      <Link
-        className="ml-auto"
-        href={`/products/${item.size.variant.product.id}`}
-      >
-        <Button variant="outline" className="rounded-xl border-zinc-300">
-          View Item
-        </Button>
-      </Link>
+      <div className="flex w-full items-center justify-between sm:w-auto sm:flex-col sm:items-end sm:gap-2">
+        <p className="font-body text-sm font-semibold text-stone-900">
+          ${(item.itemPrice * item.quantity).toFixed(2)}
+        </p>
+        <Link href={`/products/${product.id}`}>
+          <Button
+            variant="outline"
+            size="sm"
+            className="font-body h-7 text-[11px]"
+          >
+            Buy Again
+          </Button>
+        </Link>
+      </div>
     </div>
   );
 }

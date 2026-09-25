@@ -1,17 +1,18 @@
 import { catchError } from "@/lib/utils";
 import db from "../db";
-import { checkInventoryAvailibilty, getProductVarientById } from "./products";
+import { getProductVarientById } from "./products";
 import { cartItemTable, cartTable } from "../db/schema";
 import { and, eq, inArray } from "drizzle-orm";
-import { TRPCError } from "@trpc/server";
 import { Transaction } from "@/server/types/db";
+import { cacheTag } from "next/cache";
+import { getCartUserTag, revalidateCartCache } from "./cart.cache";
 
 export const handleCartItem = ({
   cartId,
   quantity,
   productVariant,
 }: {
-  cartId: number;
+  cartId: string;
   productVariant: Exclude<
     Awaited<ReturnType<typeof getProductVarientById>>,
     undefined
@@ -20,22 +21,21 @@ export const handleCartItem = ({
 }) => {
   return db.transaction(async (tx) => {
     const existingItem = await tx.query.cartItemTable.findFirst({
-      where: and(
-        eq(cartItemTable.cartId, cartId),
-        eq(cartItemTable.sizeId, productVariant.id),
-      ),
+      where: {
+        cartId,
+        sizeId: productVariant.id,
+      },
     });
 
     if (existingItem) {
       const [updatedItem] = await tx
         .update(cartItemTable)
-        .set({ quantity })
+        .set({ quantity: existingItem.quantity + quantity })
         .where(eq(cartItemTable.id, existingItem.id))
         .returning();
       return updatedItem;
     }
 
-    // Calculate final item price including adjustments
     const finalPrice =
       productVariant.variant.product.basePrice +
       (productVariant.priceAdjustment || 0);
@@ -54,10 +54,13 @@ export const handleCartItem = ({
   });
 };
 
-export const getCartItems = (userId: string) => {
+export const getCartItems = async (userId: string) => {
+  "use cache";
+  cacheTag(getCartUserTag(userId));
+
   return db.query.cartTable.findFirst({
-    orderBy: ({ createdAt }, { desc }) => desc(createdAt),
-    where: ({ userId: tableUserId }, { eq }) => eq(tableUserId, userId),
+    orderBy: { createdAt: "desc" },
+    where: { userId },
     with: {
       cartItems: {
         with: {
@@ -72,7 +75,7 @@ export const getCartItems = (userId: string) => {
                     },
                     limit: 1,
 
-                    orderBy: ({ displayOrder }, { asc }) => asc(displayOrder),
+                    orderBy: { displayOrder: "asc" },
                   },
                   product: true,
                 },
@@ -88,8 +91,8 @@ export const getCartItems = (userId: string) => {
 export const getCart = (userId: string) => {
   return db.transaction(async (tx) => {
     const existingCart = await tx.query.cartTable.findFirst({
-      where: ({ userId: tableUserId }, { eq }) => eq(tableUserId, userId),
-      orderBy: ({ createdAt }, { desc }) => desc(createdAt),
+      where: { userId },
+      orderBy: { createdAt: "desc" },
     });
 
     if (existingCart) return existingCart;
@@ -105,42 +108,35 @@ export const addItemToCart = async ({
   quantity,
   userId,
 }: {
-  productVariantId: number;
+  productVariantId: string;
   userId: string;
   quantity: number;
 }) => {
   const [productVariant, errorGettingProductVariant] = await catchError(
     getProductVarientById(productVariantId),
   );
-  if (errorGettingProductVariant)
-    throw new TRPCError({
-      message: "Failed to fetch product details",
-      code: "INTERNAL_SERVER_ERROR",
-    });
-  if (!productVariant)
-    throw new TRPCError({
-      message: "Product variant not found",
-      code: "NOT_FOUND",
-    });
+  if (errorGettingProductVariant) {
+    throw new Error("Failed to fetch product details");
+  }
+  if (!productVariant) {
+    throw new Error("Product variant not found");
+  }
 
   const [userCart, errorHandlingCart] = await catchError(getCart(userId));
 
-  if (errorHandlingCart)
-    throw new TRPCError({
-      message: "Failed to process cart",
-      code: "INTERNAL_SERVER_ERROR",
-    });
+  if (errorHandlingCart) {
+    throw new Error("Failed to process cart");
+  }
 
   const [cartItem, errorHandlingCartItem] = await catchError(
     handleCartItem({ cartId: userCart.id, productVariant, quantity }),
   );
 
-  if (errorHandlingCartItem)
-    throw new TRPCError({
-      message: "Failed to process cart",
-      code: "INTERNAL_SERVER_ERROR",
-    });
+  if (errorHandlingCartItem) {
+    throw new Error("Failed to process cart");
+  }
 
+  revalidateCartCache(userId);
   return cartItem;
 };
 
@@ -148,12 +144,12 @@ export const deleteCartItem = async ({
   cartItemId,
   userId,
 }: {
-  cartItemId: number;
+  cartItemId: string;
   userId: string;
 }) => {
   const userCart = await getCart(userId);
 
-  return db
+  const deleted = await db
     .delete(cartItemTable)
     .where(
       and(
@@ -162,6 +158,9 @@ export const deleteCartItem = async ({
       ),
     )
     .returning();
+
+  revalidateCartCache(userId);
+  return deleted;
 };
 
 export const updateCartItemQuantity = async ({
@@ -169,7 +168,7 @@ export const updateCartItemQuantity = async ({
   quantity,
   userId,
 }: {
-  cartItemId: number;
+  cartItemId: string;
   quantity: number;
   userId: string;
 }) => {
@@ -177,7 +176,7 @@ export const updateCartItemQuantity = async ({
 
   const userCart = await getCart(userId);
 
-  return db
+  const updated = await db
     .update(cartItemTable)
     .set({ quantity })
     .where(
@@ -187,6 +186,9 @@ export const updateCartItemQuantity = async ({
       ),
     )
     .returning();
+
+  revalidateCartCache(userId);
+  return updated;
 };
 
 export const deleteCart = async ({
@@ -194,7 +196,7 @@ export const deleteCart = async ({
   tx,
 }: {
   tx: Transaction;
-  cartId: number;
+  cartId: string;
 }) => {
   return tx.delete(cartTable).where(eq(cartTable.id, cartId));
 };
@@ -203,7 +205,7 @@ export const deleteCartItems = async ({
   cartItemsIds,
   tx,
 }: {
-  cartItemsIds: number[];
+  cartItemsIds: string[];
   tx: Transaction;
 }) => {
   return tx

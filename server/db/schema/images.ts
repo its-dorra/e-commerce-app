@@ -1,42 +1,31 @@
-import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
-import { relations } from "drizzle-orm";
+import {
+  index,
+  integer,
+  pgTable,
+  text,
+  uuid,
+  timestamp,
+} from "drizzle-orm/pg-core";
 import { productVariantTable } from "./productVariants";
 
-export const imageTable = sqliteTable(
+export const imageTable = pgTable(
   "image",
   {
-    id: integer("id", { mode: "number" }).primaryKey({
-      autoIncrement: true,
-    }),
-    productVariantId: integer("product_variant_id")
+    id: uuid("id").defaultRandom().primaryKey(),
+    productVariantId: uuid("product_variant_id")
       .notNull()
       .references(() => productVariantTable.id, { onDelete: "cascade" }),
     imagePath: text("image_path").notNull(),
     displayOrder: integer("display_order").notNull().default(1),
 
-    createdAt: integer("created_at", { mode: "timestamp" }).$default(
-      () => new Date(),
-    ),
-    updatedAt: integer("updated_at", { mode: "timestamp" })
-      .$default(() => new Date())
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .notNull()
       .$onUpdate(() => new Date()),
   },
-  (table) => {
-    return {
-      productColorIdx: index("product_color_images_idx").on(
-        table.productVariantId,
-      ),
-      orderIdx: index("display_order_idx").on(
-        table.productVariantId,
-        table.displayOrder,
-      ),
-    };
-  },
+  (table) => [
+    index("product_color_images_idx").on(table.productVariantId),
+    index("display_order_idx").on(table.productVariantId, table.displayOrder),
+  ],
 );
-
-export const imageRelations = relations(imageTable, ({ one }) => ({
-  variant: one(productVariantTable, {
-    fields: [imageTable.productVariantId],
-    references: [productVariantTable.id],
-  }),
-}));

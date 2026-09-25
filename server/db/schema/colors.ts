@@ -1,18 +1,11 @@
-import { relations } from "drizzle-orm";
-import { sqliteTable, text, integer, index } from "drizzle-orm/sqlite-core";
-import { productVariantTable } from "./productVariants";
+import { pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
-export const colorTable = sqliteTable("colors", {
+export const colorTable = pgTable("colors", {
   name: text("name").primaryKey(),
   hexCode: text("hex_code").notNull(),
-  createdAt: integer("created_at", { mode: "timestamp" }).$default(
-    () => new Date(),
-  ),
-  updatedAt: integer("updated_at", { mode: "timestamp" })
-    .$default(() => new Date())
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .notNull()
     .$onUpdate(() => new Date()),
 });
-
-export const colorRelations = relations(colorTable, ({ one }) => ({
-  variant: one(productVariantTable),
-}));

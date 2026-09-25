@@ -56,7 +56,7 @@ export default function AccountSidebar() {
 
   return (
     <aside
-      className={`${isSidebarOpen ? "translate-x-0" : "-translate-x-[115%]"} fixed bottom-4 left-4 top-24 z-[60] flex w-[17rem] flex-col items-start gap-y-3 rounded-2xl border border-zinc-200 bg-zinc-50 p-4 shadow-lg transition-transform duration-300 lg:sticky lg:top-28 lg:z-10 lg:w-full lg:translate-x-0 lg:shadow-sm [&>*]:flex-shrink-0`}
+      className={`${isSidebarOpen ? "translate-x-0" : "-translate-x-[115%]"} lg:shadow-xs fixed bottom-4 left-4 top-24 z-[60] flex w-[17rem] flex-col items-start gap-y-1.5 rounded-2xl border border-stone-200/90 bg-white p-4 shadow-xl transition-transform duration-300 lg:sticky lg:top-28 lg:z-10 lg:w-full lg:translate-x-0 lg:border-stone-200/80 [&>*]:flex-shrink-0`}
     >
       {accountSidebarItems.map((item) => (
         <SidebarItem

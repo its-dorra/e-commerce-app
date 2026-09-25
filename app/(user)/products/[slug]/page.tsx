@@ -1,19 +1,25 @@
-import ProductDetails from "@/lib/features/products/components/ProductDetails";
+import ProductDetails, {
+  ProductDetailsSkeleton,
+} from "@/lib/features/products/components/ProductDetails";
 import ProductImagesSwiper from "@/lib/features/products/components/ProductImagesSwiper";
 import { getProductById, getProducts } from "@/lib/features/products/services";
 import env from "@/server/env";
 import { notFound } from "next/navigation";
 import ProductsContainer from "@/lib/features/products/components/ProductsContainer";
 import { Suspense } from "react";
+import { getCurrentUser } from "@/lib/auth";
+import { isProductInWishList } from "@/server/data-access/wishlist";
+import type { ProductDetails as ProductDetailsType } from "@/server/data-access/products";
+
+export const prefetch = "partial";
 
 export async function generateMetadata(props: {
   params: Promise<{ slug: string }>;
 }) {
   const params = await props.params;
-
   const { slug } = params;
 
-  const product = await getProductById(Number(slug));
+  const product = await getProductById(slug);
 
   if (!product) return notFound();
 
@@ -26,6 +32,7 @@ export async function generateMetadata(props: {
       url: `${env.BASE_URL}/products/${product.id}`,
       siteName: "Fashion Haven",
       locale: "en_US",
+      type: "website",
     },
     twitter: {
       card: "summary",
@@ -43,33 +50,40 @@ export default async function ProductPage(props: {
   params: Promise<{ slug: string }>;
 }) {
   const params = await props.params;
-
   const { slug } = params;
 
-  const product = await getProductById(Number(slug));
+  const product = await getProductById(slug);
 
   if (!product) return notFound();
 
   return (
     <main className="page-shell">
       <section className="section-shell">
-        <div className="grid gap-8 rounded-[2rem] border border-zinc-200/70 bg-zinc-50 p-4 shadow-sm md:p-6 lg:grid-cols-[1fr_1fr] lg:gap-10 lg:p-8">
+        <div className="grid gap-8 rounded-3xl border border-stone-200/80 bg-white p-5 shadow-sm md:p-8 lg:grid-cols-[1fr_1fr] lg:gap-12 lg:p-10">
           <ProductImagesSwiper images={product.images} />
-          <ProductDetails product={product} />
+          <Suspense fallback={<ProductDetailsSkeleton />}>
+            <ProductDetailsSection product={product} />
+          </Suspense>
         </div>
       </section>
 
-      <Suspense>
+      <Suspense
+        fallback={
+          <div className="section-shell pt-0">
+            <div className="h-48 w-full animate-pulse rounded-2xl bg-stone-100" />
+          </div>
+        }
+      >
         <RelatedProducts productId={product.id} category={product.category} />
       </Suspense>
 
       <section className="section-shell pt-0">
-        <div className="section-muted p-6 md:p-8">
-          <p className="eyebrow">Editorial note</p>
-          <p className="mt-3 max-w-2xl text-sm text-zinc-600 md:text-base">
-            This piece is part of our curated {product.category.toLowerCase()}{" "}
-            collection, designed for versatile styling from daywear to
-            after-hours looks.
+        <div className="rounded-2xl border border-stone-200/80 bg-stone-50/70 p-6 md:p-8">
+          <p className="eyebrow">Maison Note</p>
+          <p className="mt-2.5 max-w-2xl font-body text-xs font-light leading-relaxed text-stone-600 md:text-sm">
+            This piece is an intentional component of our curated{" "}
+            {product.category.toLowerCase()} collection, meticulously designed
+            for versatile styling from daywear to after-hours occasions.
           </p>
         </div>
       </section>
@@ -81,7 +95,7 @@ async function RelatedProducts({
   productId,
   category,
 }: {
-  productId: number;
+  productId: string;
   category: string;
 }) {
   const related = await getProducts({
@@ -105,4 +119,17 @@ async function RelatedProducts({
       <ProductsContainer products={relatedProducts.slice(0, 4)} />
     </section>
   );
+}
+
+async function ProductDetailsSection({
+  product,
+}: {
+  product: ProductDetailsType;
+}) {
+  const user = await getCurrentUser();
+  const inWishlist = user
+    ? await isProductInWishList({ productId: product.id, userId: user.id })
+    : false;
+
+  return <ProductDetails product={product} initialIsInWishlist={inWishlist} />;
 }

@@ -14,13 +14,13 @@ export default function ProductImage({
   return (
     <div
       className={cn(
-        "h-[350px] w-full overflow-hidden rounded-2xl bg-zinc-100/70 p-2",
+        "relative h-[340px] w-full overflow-hidden rounded-xl bg-stone-100/90",
         className,
       )}
     >
       <img
         className={cn(
-          "h-full w-full rounded-xl object-cover mix-blend-multiply",
+          "h-full w-full object-cover transition-transform duration-500",
           imageClassName,
         )}
         src={imageUrl.length > 0 ? imageUrl : undefined}

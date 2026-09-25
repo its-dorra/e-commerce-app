@@ -1,26 +1,32 @@
 import UserPageLayout from "@/lib/components/UserPageLayout";
 import CartContainer from "@/lib/features/cart/components/CartContainer";
-import { HydrateClient, serverTrpc } from "@/lib/trpc/server";
-import { assertAuthenticated } from "@/server/lucia/utils";
+import { assertAuthenticated } from "@/lib/auth";
+import { getCartItems } from "@/server/data-access/cart";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
+import { CartSkeleton } from "@/lib/components/skeletons/cart-checkout-skeletons";
 
-export default async function CartPage() {
+export const prefetch = "partial";
+
+async function CartContent() {
   const user = await assertAuthenticated();
 
-  const userRole = user.role;
-
-  if (userRole === "admin") {
+  if (user.role === "admin") {
     return redirect("/dashboard");
   }
 
-  await serverTrpc.carts.getCart.prefetch();
+  const cart = await getCartItems(user.id);
 
+  return <CartContainer cart={cart} />;
+}
+
+export default function CartPage() {
   return (
     <main className="page-shell section-shell">
       <UserPageLayout title="Your Cart">
-        <HydrateClient>
-          <CartContainer />
-        </HydrateClient>
+        <Suspense fallback={<CartSkeleton />}>
+          <CartContent />
+        </Suspense>
       </UserPageLayout>
     </main>
   );

@@ -1,19 +1,39 @@
-import { clientTrpc } from "@/lib/trpc/client";
+import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import toast from "react-hot-toast";
 
 export const useSignup = () => {
   const router = useRouter();
-  const utils = clientTrpc.useUtils();
+  const [isPending, setIsPending] = useState(false);
 
-  return clientTrpc.auth.signup.useMutation({
-    onSuccess: () => {
-      toast.success("You created an account successfully , Enjoy your session");
-      utils.auth.getCurrentUser.invalidate();
+  const mutate = async (data: {
+    fullName: string;
+    email: string;
+    password: string;
+  }) => {
+    setIsPending(true);
+    try {
+      const res = await authClient.signUp.email({
+        name: data.fullName,
+        email: data.email,
+        password: data.password,
+      });
+
+      if (res.error) {
+        toast.error(res.error.message || "Failed to sign up");
+        return;
+      }
+
+      toast.success("You created an account successfully, enjoy your session");
       router.replace("/products");
-    },
-    onError: (error) => {
-      toast.error("Something went wrong \n" + error.message);
-    },
-  });
+      router.refresh();
+    } catch (err: any) {
+      toast.error(err?.message || "Something went wrong");
+    } finally {
+      setIsPending(false);
+    }
+  };
+
+  return { mutate, isPending };
 };

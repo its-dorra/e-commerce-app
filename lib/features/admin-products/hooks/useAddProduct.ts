@@ -1,4 +1,3 @@
-import { clientTrpc } from "@/lib/trpc/client";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
@@ -6,7 +5,6 @@ export const useAddProduct = () => {
   const [data, setData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const utils = clientTrpc.useUtils();
 
   const addProduct = async (product: FormData) => {
     setIsLoading(true);
@@ -20,9 +18,10 @@ export const useAddProduct = () => {
       setData(result);
 
       toast.success("Product added successfully");
-      utils.products.products.invalidate();
+      return result;
     } catch (error) {
       setError((error as Error).message);
+      toast.error((error as Error).message || "Failed to add product");
     } finally {
       setIsLoading(false);
     }

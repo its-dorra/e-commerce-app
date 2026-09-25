@@ -1,26 +1,24 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { ZodValidator, zodValidator } from "@tanstack/zod-form-adapter";
 
 import { useForm } from "@tanstack/react-form";
 
 import FormField from "@/lib/components/FormField";
 import Link from "next/link";
 
-import { z } from "zod";
 import { loginSchema } from "@/server/schemas/users";
 
 import { useLogin } from "../hooks/useLogin";
+import GoogleOAuthButton from "./GoogleOAuthButton";
 
 export default function LoginForm() {
   const { mutate, isPending } = useLogin();
-  const form = useForm<z.infer<typeof loginSchema>, ZodValidator>({
+  const form = useForm({
     defaultValues: {
       email: "",
       password: "",
     },
-    validatorAdapter: zodValidator(),
     validators: {
       onChange: loginSchema,
     },
@@ -36,16 +34,27 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="mx-auto flex w-full max-w-md flex-col gap-y-8">
+    <div className="mx-auto flex w-full max-w-md flex-col gap-y-7">
       <div className="space-y-2">
-        <p className="eyebrow">Welcome back</p>
-        <h1 className="h3">Log in to continue shopping</h1>
-        <p className="text-sm text-zinc-600">
-          Access your wishlist, cart, and order updates in one place.
+        <p className="eyebrow">Welcome Back</p>
+        <h1 className="font-display text-3xl font-normal text-stone-900">
+          Sign In to Your Account
+        </h1>
+        <p className="font-body text-xs text-stone-500">
+          Access your curated wishlist, shopping bag, and expedited checkout.
         </p>
       </div>
 
-      <form onSubmit={onSubmit} className="space-y-5">
+      <GoogleOAuthButton text="Sign in with Google" />
+
+      <div className="relative flex items-center justify-center">
+        <div className="w-full border-t border-stone-200" />
+        <span className="absolute bg-white px-3 text-xs uppercase tracking-wider text-stone-400">
+          Or
+        </span>
+      </div>
+
+      <form onSubmit={onSubmit} className="space-y-4">
         <form.Field
           name="email"
           children={(field) => {
@@ -76,20 +85,23 @@ export default function LoginForm() {
           selector={(state) => [state.canSubmit, state.isSubmitting]}
           children={([canSubmit, isSubmitting]) => (
             <Button
-              className="mt-2 w-full"
+              className="mt-3 w-full font-medium"
               variant="primary"
               type="submit"
               disabled={!canSubmit || isSubmitting || isPending}
             >
-              Login
+              {isPending ? "Authenticating..." : "Sign In"}
             </Button>
           )}
         />
       </form>
-      <div className="flex items-center justify-center gap-x-1 text-sm">
-        <p className="text-zinc-600">Don&apos;t have an account?</p>
-        <Link className="font-medium text-zinc-900" href="/signup">
-          Sign up
+      <div className="flex items-center justify-center gap-x-1.5 font-body text-xs text-stone-500">
+        <p>Don&apos;t have an account?</p>
+        <Link
+          className="font-medium text-amber-800 hover:underline"
+          href="/signup"
+        >
+          Create one
         </Link>
       </div>
     </div>

@@ -1,18 +1,26 @@
 import AdminSidebar from "@/lib/features/dashboard/components/admin-sidebar";
-import { assertAdmin } from "@/server/lucia/utils";
-import { ReactNode } from "react";
+import { assertAdmin } from "@/lib/auth";
+import { ReactNode, Suspense } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 
-export default async function AdminLayout({
-  children,
-}: {
-  children: ReactNode;
-}) {
+async function AdminGuard({ children }: { children: ReactNode }) {
   await assertAdmin();
+  return <>{children}</>;
+}
 
+export default function AdminLayout({ children }: { children: ReactNode }) {
   return (
     <main className="grid min-h-screen w-full grid-flow-col grid-cols-[250px_1fr] gap-x-2 bg-gray-100">
       <AdminSidebar />
-      {children}
+      <Suspense
+        fallback={
+          <div className="p-8">
+            <Skeleton className="h-96 w-full rounded-2xl" />
+          </div>
+        }
+      >
+        <AdminGuard>{children}</AdminGuard>
+      </Suspense>
     </main>
   );
 }

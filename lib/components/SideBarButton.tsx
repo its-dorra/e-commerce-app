@@ -9,10 +9,12 @@ interface SideBar {
 export default function SideBarButton({ isOpen, toggleSideBar }: SideBar) {
   return (
     <Button
+      variant="ghost"
+      size="icon"
       onClick={toggleSideBar}
-      className="flex h-10 w-10 flex-col items-center justify-center gap-y-0.5 rounded-md border-[1px] hover:bg-gray-300 lg:hidden"
+      className="h-9 w-9 rounded-full text-stone-700 hover:bg-stone-200/60 hover:text-stone-950 lg:hidden"
     >
-      {isOpen ? <X size={24} /> : <Menu size={24} />}
+      {isOpen ? <X size={20} /> : <Menu size={20} />}
     </Button>
   );
 }

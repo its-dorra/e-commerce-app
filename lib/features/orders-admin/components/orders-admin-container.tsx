@@ -1,7 +1,6 @@
 "use client";
 
 import { Ellipsis } from "lucide-react";
-import { useAdminOrders } from "../hooks/useAdminOrders";
 import {
   Accordion,
   AccordionContent,
@@ -18,37 +17,36 @@ import {
 import { Button } from "@/components/ui/button";
 import PaginationComponent from "@/lib/components/PaginationComponent";
 import { capitalizeWords } from "@/lib/utils";
-import LoadingSpinner from "@/lib/components/LoadingSpinner";
 import ProductImage from "../../products/components/ProductImage";
-import { useAcceptOrder } from "../hooks/useAcceptOrder";
-import { useCancelOrder } from "../hooks/useCancelOrder";
+import { useAction } from "next-safe-action/hooks";
+import { acceptOrderAction, cancelOrderAction } from "@/server/actions/orders";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
+import type { getOrders } from "@/server/data-access/orders";
+
+type OrdersResponse = Awaited<ReturnType<typeof getOrders>>;
+type OrderType = OrdersResponse["data"][number];
+type OrderItemType = OrderType["orderItems"][number];
+
+interface OrdersAdminContainerProps {
+  initialData: OrdersResponse;
+}
 
 interface OrderItemProps {
-  item: NonNullable<
-    ReturnType<typeof useAdminOrders>["data"]
-  >["data"][number]["orderItems"][number];
+  item: OrderItemType;
 }
 
 interface OrderProps {
-  order: NonNullable<ReturnType<typeof useAdminOrders>["data"]>["data"][number];
+  order: OrderType;
 }
 
-export default function OrdersAdminContainer() {
-  const { data, isPending, isError } = useAdminOrders();
-
-  if (isPending)
-    return (
-      <div className="flex h-full items-center justify-between">
-        <LoadingSpinner size="xl" />
-      </div>
-    );
-
-  if (isError) return <div>Something went wrong</div>;
-
+export default function OrdersAdminContainer({
+  initialData,
+}: OrdersAdminContainerProps) {
   return (
     <main className="flex flex-col gap-y-4 rounded-lg bg-white p-6">
       <h4 className="h4">Orders</h4>
-      {data.pagination.totalCount === 0 ? (
+      {initialData.pagination.totalCount === 0 ? (
         <h4 className="h4">There's no orders to show</h4>
       ) : (
         <div className="flex w-full flex-col gap-4" role="table">
@@ -81,7 +79,7 @@ export default function OrdersAdminContainer() {
 
           <Accordion type="single" collapsible>
             <div className="flex flex-col gap-y-2" role="rowgroup">
-              {data?.data.map((order) => (
+              {initialData.data.map((order) => (
                 <Order key={order.id} order={order} />
               ))}
             </div>
@@ -89,16 +87,41 @@ export default function OrdersAdminContainer() {
         </div>
       )}
       <PaginationComponent
-        count={data.pagination.totalCount}
-        perPage={data.pagination.perPage}
+        count={initialData.pagination.totalCount}
+        perPage={initialData.pagination.perPage}
       />
     </main>
   );
 }
 
 function Order({ order }: OrderProps) {
-  const acceptOrderMutation = useAcceptOrder();
-  const cancelOrderMutation = useCancelOrder();
+  const router = useRouter();
+
+  const { execute: acceptOrder, isPending: isAccepting } = useAction(
+    acceptOrderAction,
+    {
+      onSuccess: () => {
+        toast.success("Order accepted successfully");
+        router.refresh();
+      },
+      onError: ({ error }) => {
+        toast.error(error.serverError || "Failed to accept order");
+      },
+    },
+  );
+
+  const { execute: cancelOrder, isPending: isCanceling } = useAction(
+    cancelOrderAction,
+    {
+      onSuccess: () => {
+        toast.success("Order canceled successfully");
+        router.refresh();
+      },
+      onError: ({ error }) => {
+        toast.error(error.serverError || "Failed to cancel order");
+      },
+    },
+  );
 
   const allItemsAvailable = order.orderItems.every(
     (item) =>
@@ -118,7 +141,7 @@ function Order({ order }: OrderProps) {
           className="grid w-full grid-flow-col grid-cols-[100px_2fr_1fr_1fr_1fr_1fr] gap-x-2"
           role="row"
         >
-          <div className="text-ellipsis" role="cell">
+          <div className="truncate" role="cell">
             {order.id}
           </div>
           <div role="cell">
@@ -165,28 +188,24 @@ function Order({ order }: OrderProps) {
                       order.status === "canceled" ||
                       order.status === "delivered" ||
                       order.status === "processing" ||
-                      acceptOrderMutation.isPending ||
+                      isAccepting ||
                       !allItemsAvailable
                     }
                     className="cursor-pointer"
-                    onClick={() =>
-                      acceptOrderMutation.mutate({ orderId: order.id })
-                    }
+                    onClick={() => acceptOrder({ orderId: order.id })}
                   >
-                    Accept
+                    {isAccepting ? "Accepting..." : "Accept"}
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     disabled={
                       order.status === "canceled" ||
                       order.status === "delivered" ||
-                      cancelOrderMutation.isPending
+                      isCanceling
                     }
                     className="cursor-pointer"
-                    onClick={() =>
-                      cancelOrderMutation.mutate({ orderId: order.id })
-                    }
+                    onClick={() => cancelOrder({ orderId: order.id })}
                   >
-                    Cancel
+                    {isCanceling ? "Canceling..." : "Cancel"}
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
               </DropdownMenuContent>
@@ -232,12 +251,12 @@ function OrderItem({ item }: OrderItemProps) {
         {item.itemPrice !==
           item.size.variant.product.basePrice +
             (item.size.priceAdjustment ?? 0) && (
-          <p className="text- rounded-sm bg-red-200 p-0.5 text-red-500">
-            Price have changed , plz Cancel the order
+          <p className="rounded-sm bg-red-200 p-0.5 text-xs text-red-500">
+            Price has changed, please cancel the order
           </p>
         )}
         {item.quantity > item.size.quantity && (
-          <p className="rounded-sm bg-red-200 p-0.5 text-red-500">
+          <p className="rounded-sm bg-red-200 p-0.5 text-xs text-red-500">
             Quantity not available
           </p>
         )}

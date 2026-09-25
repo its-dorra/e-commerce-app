@@ -1,6 +1,5 @@
-import { useWishlist } from "../hooks/useWishlist";
+import { getAllwishlistItems } from "@/server/data-access/wishlist";
 
-export type WishlistItem = Exclude<
-  ReturnType<typeof useWishlist>["data"],
-  undefined
+export type WishlistItem = Awaited<
+  ReturnType<typeof getAllwishlistItems>
 >[number];

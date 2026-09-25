@@ -1,18 +1,23 @@
 import { and, eq } from "drizzle-orm";
 import db from "../db";
 import { wishListTable } from "../db/schema";
+import { cacheTag } from "next/cache";
+import { getWishlistUserTag, revalidateWishlistCache } from "./wishlist.cache";
+import { getProductIdTag, revalidateProductByIdCache } from "./products.cache";
 
 export async function isProductInWishList({
   productId,
   userId,
 }: {
-  productId: number;
+  productId: string;
   userId: string;
 }) {
+  "use cache";
+  cacheTag(getWishlistUserTag(userId), getProductIdTag(productId));
+
   return db.query.wishListTable
     .findFirst({
-      where: (fields, { and, eq }) =>
-        and(eq(fields.productId, productId), eq(fields.userId, userId)),
+      where: { productId, userId },
     })
     .then((res) => !!res);
 }
@@ -21,13 +26,12 @@ export async function toggleProductInWishList({
   productId,
   userId,
 }: {
-  productId: number;
+  productId: string;
   userId: string;
 }) {
-  return db.transaction(async (tx) => {
+  const result = await db.transaction(async (tx) => {
     const wishList = await tx.query.wishListTable.findFirst({
-      where: (fields, { and, eq }) =>
-        and(eq(fields.productId, productId), eq(fields.userId, userId)),
+      where: { productId, userId },
     });
 
     if (wishList) {
@@ -49,11 +53,18 @@ export async function toggleProductInWishList({
       .returning()
       .then((res) => res[0]);
   });
+
+  revalidateWishlistCache(userId);
+  revalidateProductByIdCache(productId);
+  return result;
 }
 
-export const getAllwishlistItems = ({ userId }: { userId: string }) =>
-  db.query.wishListTable.findMany({
-    where: (fields, { eq }) => eq(fields.userId, userId),
+export const getAllwishlistItems = async ({ userId }: { userId: string }) => {
+  "use cache";
+  cacheTag(getWishlistUserTag(userId));
+
+  return db.query.wishListTable.findMany({
+    where: { userId },
     with: {
       product: {
         with: {
@@ -65,7 +76,7 @@ export const getAllwishlistItems = ({ userId }: { userId: string }) =>
             with: {
               images: {
                 columns: { imagePath: true },
-                orderBy: ({ displayOrder }, { asc }) => asc(displayOrder),
+                orderBy: { displayOrder: "asc" },
                 limit: 1,
               },
             },
@@ -74,3 +85,4 @@ export const getAllwishlistItems = ({ userId }: { userId: string }) =>
       },
     },
   });
+};

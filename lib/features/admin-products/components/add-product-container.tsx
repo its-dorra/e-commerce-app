@@ -1,13 +1,7 @@
 "use client";
-import { createProductSchema } from "@/server/db/schema/products";
+import { createProductSchema } from "@/server/schemas/products";
 import { useForm } from "@tanstack/react-form";
-import { zodValidator, ZodValidator } from "@tanstack/zod-form-adapter";
 import { z } from "zod";
-import {
-  useCategories,
-  useColors,
-  useSizes,
-} from "../../products/hooks/useFilters";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import FormField from "@/lib/components/FormField";
 import {
@@ -60,13 +54,21 @@ function objectToFormData(
   return formData;
 }
 
-interface AddProductContainerProps {}
+interface AddProductContainerProps {
+  categories: { name: string }[];
+  colors: { name: string; hexCode: string }[];
+  sizes: Size[];
+}
 
-export default function AddProductContainer({}: AddProductContainerProps) {
-  const { data, addProduct, isLoading: isAddingProduct } = useAddProduct();
+export default function AddProductContainer({
+  categories,
+  colors,
+  sizes,
+}: AddProductContainerProps) {
+  const { addProduct, isLoading: isAddingProduct } = useAddProduct();
   const router = useRouter();
 
-  const form = useForm<z.infer<typeof createProductSchema>, ZodValidator>({
+  const form = useForm({
     defaultValues: {
       name: "",
       basePrice: 0,
@@ -79,8 +81,7 @@ export default function AddProductContainer({}: AddProductContainerProps) {
           sizes: [{ size: "S", priceAdjustment: 0, quantity: 1 }],
         },
       ],
-    },
-    validatorAdapter: zodValidator(),
+    } as z.infer<typeof createProductSchema>,
     validators: {
       onChange: createProductSchema,
     },
@@ -92,12 +93,6 @@ export default function AddProductContainer({}: AddProductContainerProps) {
       router.push("/admin/products");
     },
   });
-
-  const { data: sizes } = useSizes();
-
-  const { data: colors, isPending: isGettingColors } = useColors();
-
-  const { data: categories, isPending: isGettingCategories } = useCategories();
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -138,7 +133,6 @@ export default function AddProductContainer({}: AddProductContainerProps) {
               <Select
                 name={field.name}
                 value={field.state.value}
-                disabled={isGettingCategories}
                 onValueChange={field.handleChange}
               >
                 <SelectTrigger className="focus:ring-0">
@@ -193,7 +187,6 @@ export default function AddProductContainer({}: AddProductContainerProps) {
                                 <Select
                                   name={field.name}
                                   value={field.state.value}
-                                  disabled={isGettingColors}
                                   onValueChange={field.handleChange}
                                 >
                                   <SelectTrigger className="w-full focus:ring-0">
@@ -248,13 +241,12 @@ export default function AddProductContainer({}: AddProductContainerProps) {
                                   <Select
                                     name={field.name}
                                     value={field.state.value}
-                                    disabled={isGettingCategories}
                                     onValueChange={(value: Size) =>
                                       field.handleChange(value)
                                     }
                                   >
                                     <SelectTrigger className="w-full focus:ring-0">
-                                      <SelectValue placeholder="Select a category" />
+                                      <SelectValue placeholder="Select a size" />
                                     </SelectTrigger>
                                     <SelectContent>
                                       <SelectGroup>

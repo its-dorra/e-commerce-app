@@ -1,31 +1,42 @@
 import UserPageLayout from "@/lib/components/UserPageLayout";
 import UserOrdersContainer from "@/lib/features/orders/components/user-orders-container";
-import { HydrateClient, serverTrpc } from "@/lib/trpc/server";
-import { assertAuthenticated } from "@/server/lucia/utils";
+import { assertAuthenticated } from "@/lib/auth";
+import { getOrdersByUser } from "@/server/data-access/orders";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
+import { UserOrdersSkeleton } from "@/lib/components/skeletons/account-skeletons";
 
-export default async function OrdersPage(props: {
+interface OrdersPageProps {
   searchParams?: Promise<{ page?: string }>;
-}) {
+}
+
+export const prefetch = "partial";
+
+async function OrdersContent({ searchParams }: OrdersPageProps) {
   const user = await assertAuthenticated();
 
-  const userRole = user.role;
-
-  if (userRole === "admin") {
+  if (user.role === "admin") {
     return redirect("/dashboard");
   }
 
-  const searchParams = await props.searchParams;
+  const params = await searchParams;
+  const page = Number(params?.page || 1);
 
-  const page = Number(searchParams?.page || 1);
+  const ordersData = await getOrdersByUser({
+    userId: user.id,
+    page,
+    perPage: 6,
+  });
 
-  await serverTrpc.orders.getOrdersByUser.prefetch({ page, perPage: 6 });
+  return <UserOrdersContainer ordersData={ordersData} />;
+}
 
+export default function OrdersPage(props: OrdersPageProps) {
   return (
     <UserPageLayout title="Orders">
-      <HydrateClient>
-        <UserOrdersContainer />
-      </HydrateClient>
+      <Suspense fallback={<UserOrdersSkeleton />}>
+        <OrdersContent searchParams={props.searchParams} />
+      </Suspense>
     </UserPageLayout>
   );
 }

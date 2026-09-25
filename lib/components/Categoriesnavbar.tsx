@@ -16,23 +16,30 @@ import {
 } from "@/components/ui/accordion";
 
 import { Button } from "@/components/ui/button";
-import { clientTrpc } from "../trpc/client";
 
-export default function CategoriesNavBar() {
-  const { data: categories } = clientTrpc.filters.categories.useQuery();
+interface CategoriesNavBarProps {
+  categories?: { id?: string; name: string }[];
+}
 
+export default function CategoriesNavBar({
+  categories = [],
+}: CategoriesNavBarProps) {
   return (
     <>
-      <Accordion type="single" collapsible className="no-underline lg:hidden">
+      <Accordion
+        type="single"
+        collapsible
+        className="w-full no-underline lg:hidden"
+      >
         <AccordionItem className="border-none no-underline" value="categories">
-          <AccordionTrigger className="rounded-xl border-none px-3 py-2 text-xl font-semibold uppercase tracking-wider text-zinc-800 no-underline transition-colors hover:bg-zinc-200/70 hover:no-underline lg:text-sm lg:font-medium">
+          <AccordionTrigger className="font-body w-full justify-center px-3 py-2 text-base font-medium tracking-wide text-stone-700 hover:text-stone-950 hover:no-underline">
             Categories
           </AccordionTrigger>
-          <AccordionContent className="my-6 space-y-1 no-underline">
-            {categories?.map(({ name }) => {
+          <AccordionContent className="my-2 space-y-1 no-underline">
+            {categories.map(({ name }) => {
               return (
                 <Button
-                  className="block w-full cursor-pointer justify-start rounded-xl text-base font-medium text-zinc-700"
+                  className="font-body block w-full cursor-pointer justify-start rounded-lg text-sm font-medium text-stone-600 hover:bg-stone-200/50 hover:text-stone-950"
                   variant="ghost"
                   key={name}
                 >
@@ -49,21 +56,26 @@ export default function CategoriesNavBar() {
         </AccordionItem>
       </Accordion>
       <DropdownMenu>
-        <DropdownMenuTrigger className="hidden items-center gap-1 rounded-xl border-none px-3 py-2 text-zinc-800 outline-none transition-colors hover:bg-zinc-200/70 lg:flex">
-          <span className="text-sm font-medium">Categories</span>
-          <Image src={chevronDownIcon} alt="chevron down" />
+        <DropdownMenuTrigger className="font-body group hidden items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-stone-700 outline-none transition-colors hover:text-stone-950 lg:flex">
+          <span>Categories</span>
+          <Image
+            src={chevronDownIcon}
+            alt="chevron down"
+            className="opacity-70 transition-transform duration-200 group-data-[state=open]:rotate-180"
+          />
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="space-y-1 rounded-2xl border-zinc-200/70 bg-zinc-50 p-3 shadow-lg">
-          {categories?.map(({ name }) => {
+        <DropdownMenuContent className="space-y-1 rounded-xl border-stone-200/80 bg-stone-50/95 p-2 shadow-lg backdrop-blur-md">
+          {categories.map(({ name }) => {
             return (
               <DropdownMenuItem
                 key={name}
                 asChild
-                className="rounded-lg text-sm font-medium text-zinc-700"
+                className="font-body rounded-lg text-xs font-medium text-stone-700 hover:bg-stone-200/70 hover:text-stone-950"
               >
                 <Button
-                  className="w-full justify-start border-none outline-none hover:bg-zinc-200/70"
+                  className="w-full justify-start border-none outline-none hover:bg-stone-200/70"
                   variant="ghost"
+                  size="sm"
                 >
                   <Link
                     href={`/products/?categories=${name}`}

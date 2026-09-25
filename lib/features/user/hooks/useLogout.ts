@@ -1,19 +1,25 @@
-import { clientTrpc } from "@/lib/trpc/client";
+import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import toast from "react-hot-toast";
 
 export const useLogout = () => {
-  const utils = clientTrpc.useUtils();
   const router = useRouter();
+  const [isPending, setIsPending] = useState(false);
 
-  return clientTrpc.auth.logout.useMutation({
-    onSuccess: () => {
+  const mutate = async () => {
+    setIsPending(true);
+    try {
+      await authClient.signOut();
       toast.success("You logged out successfully");
-      utils.auth.getCurrentUser.reset(undefined, { cancelRefetch: true });
       router.replace("/");
-    },
-    onError: (error) => {
-      toast.error(`Something wrong happened, ${error.message}`);
-    },
-  });
+      router.refresh();
+    } catch (error: any) {
+      toast.error(`Something wrong happened, ${error?.message || "error"}`);
+    } finally {
+      setIsPending(false);
+    }
+  };
+
+  return { mutate, isPending };
 };

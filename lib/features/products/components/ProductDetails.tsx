@@ -2,15 +2,14 @@
 
 import { ProductDetails } from "@/server/data-access/products";
 import InStock from "./InStock";
-import { useState } from "react";
+import { useState, useOptimistic, useTransition } from "react";
 import QuantitySelector from "./QuantitySelector";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/lib/providers/user-provider";
 import toast from "react-hot-toast";
-import { useAddToCart } from "../../cart/hooks/useAddToCart";
-import { useIsInWishlist } from "../../wishlist/hooks/useIsInWishlist";
 import { HeartIcon } from "lucide-react";
-import { useToggleWishList } from "../../wishlist/hooks/useToggleWishlist";
+import { addCartItemAction } from "@/server/actions/cart";
+import { toggleWishlistItemAction } from "@/server/actions/wishlist";
 import {
   Dialog,
   DialogContent,
@@ -33,8 +32,10 @@ const sizesOrdering: Record<string, number> = {
 
 export default function ProductDetailsComponent({
   product,
+  initialIsInWishlist = false,
 }: {
   product: ProductDetails;
+  initialIsInWishlist?: boolean;
 }) {
   const [filter, setFilter] = useState<{
     color?: string;
@@ -44,15 +45,12 @@ export default function ProductDetailsComponent({
 
   const { user } = useUser();
 
-  const {
-    data: isInWishlist,
-    isPending: isLoadingInWishlist,
-    isError,
-  } = useIsInWishlist({ productId: product.id });
-
-  const { mutate: addToCart, isPending: isAddingToCart } = useAddToCart();
-
-  const { mutate: toggleWishlist } = useToggleWishList();
+  const [optimisticIsInWishlist, setOptimisticIsInWishlist] = useOptimistic(
+    initialIsInWishlist,
+    (_, next: boolean) => next,
+  );
+  const [isTogglingWishlist, startWishlistTransition] = useTransition();
+  const [isAddingToCart, startAddToCartTransition] = useTransition();
 
   const sizes: string[] | undefined = filter?.color
     ? product.colors
@@ -90,90 +88,134 @@ export default function ProductDetailsComponent({
   };
 
   const handleToggleWishlist = () => {
-    if (!user)
-      return toast.error("You need to be logged in before you can add to cart");
+    if (!user) {
+      return toast.error("You need to be logged in to manage your wishlist");
+    }
 
-    toggleWishlist({ productId: product.id });
+    const nextState = !optimisticIsInWishlist;
+    startWishlistTransition(async () => {
+      setOptimisticIsInWishlist(nextState);
+      const res = await toggleWishlistItemAction({ productId: product.id });
+      if (res?.serverError) {
+        toast.error(res.serverError);
+      } else {
+        toast.success("Wishlist updated!");
+      }
+    });
   };
 
   const handleAddToCart = () => {
-    if (!user)
+    if (!user) {
       return toast.error("You need to be logged in before you can add to cart");
+    }
 
     const productVariant = product.colors
       .find((color) => color.colorName === filter.color)!
       .variants.find((variant) => variant.size.name === filter.size);
 
-    addToCart({
-      productVariantId: productVariant!.id,
-      quantity: filter.quantity,
-    });
+    if (productVariant) {
+      startAddToCartTransition(async () => {
+        const res = await addCartItemAction({
+          productVariantId: productVariant.id,
+          quantity: filter.quantity,
+        });
+        if (res?.serverError) {
+          toast.error(res.serverError);
+        } else {
+          toast.success("Added to cart!");
+        }
+      });
+    }
   };
 
   return (
     <div className="flex flex-col items-start justify-between gap-y-7">
-      <div className="w-full space-y-3 border-b border-zinc-200 pb-6">
+      <div className="w-full space-y-3.5 border-b border-stone-200/80 pb-6">
         <p className="eyebrow">{product.category}</p>
         <div className="flex items-start justify-between gap-x-4">
-          <h1 className="h2 max-w-[18rem]">{product.name}</h1>
+          <h1 className="font-display text-2xl font-normal tracking-tight text-stone-900 sm:text-3xl lg:text-4xl">
+            {product.name}
+          </h1>
           <InStock quantity={product.totalQuantity} />
         </div>
-        <p className="space-x-2 text-xl font-semibold text-zinc-900">
+        <p className="flex items-baseline gap-2 font-body text-2xl font-semibold tracking-tight text-stone-900">
           <span>${product.basePrice.toFixed(2)}</span>
-          {priceAdjustment > 0 && <span>(+ ${priceAdjustment})</span>}
+          {priceAdjustment > 0 && (
+            <span className="font-body text-sm font-normal text-amber-700">
+              (+${priceAdjustment.toFixed(2)})
+            </span>
+          )}
         </p>
       </div>
 
       {product.totalQuantity > 0 && (
         <div className="w-full space-y-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-zinc-600">
-            Available colors
+          <p className="font-body text-xs font-semibold uppercase tracking-widest text-stone-600">
+            Available Colors
           </p>
-          <div className="flex flex-wrap items-center gap-x-2">
+          <div className="flex flex-wrap items-center gap-2.5">
             {product.colors.map((color) => (
-              <div
+              <button
                 key={color.hexCode}
+                type="button"
                 onClick={() => {
                   setFilter((prev) => ({ ...prev, color: color.colorName }));
                 }}
-                className={`flex h-8 w-8 cursor-pointer items-center justify-center rounded-full p-0.5 transition-all duration-200 ${color.colorName === filter?.color ? "border-2 border-zinc-900 shadow" : "border border-zinc-200 shadow-sm"}`}
+                className={`flex h-8 w-8 cursor-pointer items-center justify-center rounded-full p-0.5 transition-all duration-200 ${
+                  color.colorName === filter?.color
+                    ? "scale-105 ring-2 ring-amber-700 ring-offset-2"
+                    : "border border-stone-300 hover:scale-105"
+                }`}
+                title={color.colorName}
               >
                 <div
-                  className="h-full w-full rounded-full"
+                  className="h-full w-full rounded-full shadow-inner"
                   style={{ backgroundColor: color.hexCode }}
                 />
-              </div>
+              </button>
             ))}
           </div>
         </div>
       )}
+
       {sizes && sizes.length > 0 && (
         <div className="w-full space-y-3">
           <div className="flex items-center justify-between">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-zinc-600">
-              Select size
+            <p className="font-body text-xs font-semibold uppercase tracking-widest text-stone-600">
+              Select Size
             </p>
             <Dialog>
               <DialogTrigger asChild>
                 <Button
                   variant="link"
-                  className="h-auto px-0 py-0 text-xs text-zinc-500"
+                  className="h-auto p-0 font-body text-xs text-stone-500 hover:text-amber-800"
                 >
                   Size guide
                 </Button>
               </DialogTrigger>
-              <DialogContent className="rounded-2xl border-zinc-200 bg-zinc-50">
+              <DialogContent className="rounded-2xl border-stone-200 bg-white">
                 <DialogHeader>
-                  <DialogTitle>Size guide</DialogTitle>
-                  <DialogDescription>
-                    Use your regular fit for daily wear, or size up for an
-                    oversized silhouette.
+                  <DialogTitle className="font-display text-xl">
+                    Size Guide
+                  </DialogTitle>
+                  <DialogDescription className="font-body text-xs">
+                    Choose your regular fit for everyday elegance, or size up
+                    for an oversized silhouette.
                   </DialogDescription>
                 </DialogHeader>
-                <ul className="space-y-2 text-sm text-zinc-600">
-                  <li>XS / S: Slim fit and close-to-body cut</li>
-                  <li>M / L: Regular fit for balanced styling</li>
-                  <li>XL+: Relaxed fit for layered outfits</li>
+                <ul className="space-y-2 font-body text-xs text-stone-600">
+                  <li>
+                    <strong className="text-stone-900">XS / S:</strong> Slim
+                    tailored silhouette
+                  </li>
+                  <li>
+                    <strong className="text-stone-900">M / L:</strong> Regular
+                    effortless drape
+                  </li>
+                  <li>
+                    <strong className="text-stone-900">XL+:</strong> Relaxed
+                    contemporary cut
+                  </li>
                 </ul>
               </DialogContent>
             </Dialog>
@@ -186,7 +228,11 @@ export default function ProductDetailsComponent({
                 }}
                 variant="ghost"
                 key={size}
-                className={`rounded-xl border px-3 py-2 uppercase ${size === filter.size ? "border-zinc-900 bg-zinc-900 text-zinc-50" : "border-zinc-300 bg-zinc-50 text-zinc-700"}`}
+                className={`h-10 min-w-10 rounded-lg border font-body text-xs font-medium uppercase transition-colors ${
+                  size === filter.size
+                    ? "border-stone-900 bg-stone-900 text-stone-50 hover:bg-stone-900 hover:text-stone-50"
+                    : "border-stone-200 bg-white text-stone-700 hover:border-stone-400 hover:bg-stone-50"
+                }`}
               >
                 {size}
               </Button>
@@ -194,11 +240,13 @@ export default function ProductDetailsComponent({
           </div>
         </div>
       )}
+
       {sizes && !sizes.length && (
-        <p className="body-1 text-zinc-600">
+        <p className="font-body text-xs text-stone-500">
           This color is currently out of stock.
         </p>
       )}
+
       {sizes && sizes.length > 0 && maxValue && (
         <QuantitySelector
           value={filter.quantity}
@@ -219,50 +267,105 @@ export default function ProductDetailsComponent({
               isAddingToCart
             }
             variant="primary"
-            className="h-11 w-full sm:w-[15rem]"
+            className="h-11 w-full font-medium sm:w-[15rem]"
           >
-            Add to cart
+            Add to Cart
           </Button>
-          {!isLoadingInWishlist && (
-            <Button
-              disabled={!user || isError}
-              variant="outline"
-              onClick={handleToggleWishlist}
-              className="h-11 w-full sm:w-auto"
-            >
-              <HeartIcon
-                className={isInWishlist ? "fill-red-500 text-red-500" : ""}
-              />
-            </Button>
-          )}
+          <Button
+            disabled={!user || isTogglingWishlist}
+            variant="outline"
+            onClick={handleToggleWishlist}
+            className="h-11 w-full sm:w-auto"
+          >
+            <HeartIcon
+              className={
+                optimisticIsInWishlist
+                  ? "fill-amber-700 text-amber-700"
+                  : "text-stone-600"
+              }
+            />
+          </Button>
         </div>
       )}
 
       <Tabs defaultValue="details" className="w-full">
-        <TabsList className="grid h-auto w-full grid-cols-3 gap-1 p-1">
-          <TabsTrigger className="text-xs md:text-sm" value="details">
+        <TabsList className="grid h-10 w-full grid-cols-3 gap-1 rounded-xl bg-stone-100 p-1">
+          <TabsTrigger className="font-body text-xs" value="details">
             Details
           </TabsTrigger>
-          <TabsTrigger className="text-xs md:text-sm" value="shipping">
+          <TabsTrigger className="font-body text-xs" value="shipping">
             Shipping
           </TabsTrigger>
-          <TabsTrigger className="text-xs md:text-sm" value="returns">
+          <TabsTrigger className="font-body text-xs" value="returns">
             Returns
           </TabsTrigger>
         </TabsList>
-        <TabsContent value="details">
-          Designed for all-day comfort with elevated styling cues and seasonal
-          versatility.
+        <TabsContent
+          value="details"
+          className="font-body text-xs leading-relaxed text-stone-600"
+        >
+          Designed for longevity and elevated comfort, featuring clean
+          finishings and premium construction.
         </TabsContent>
-        <TabsContent value="shipping">
-          Standard delivery in 3-5 business days. Express delivery options
-          available at checkout.
+        <TabsContent
+          value="shipping"
+          className="font-body text-xs leading-relaxed text-stone-600"
+        >
+          Standard complimentary delivery in 3–5 business days. Express next-day
+          shipping available at checkout.
         </TabsContent>
-        <TabsContent value="returns">
-          Returns accepted within 30 days in original condition with tags
-          attached.
+        <TabsContent
+          value="returns"
+          className="font-body text-xs leading-relaxed text-stone-600"
+        >
+          Returns accepted within 30 days in original packaging with unbroken
+          garment tags.
         </TabsContent>
       </Tabs>
+    </div>
+  );
+}
+
+export function ProductDetailsSkeleton() {
+  return (
+    <div className="flex flex-col items-start justify-between gap-y-7">
+      <div className="w-full space-y-3.5 border-b border-stone-200/80 pb-6">
+        <div className="h-4 w-24 animate-pulse rounded bg-stone-100" />
+        <div className="flex items-start justify-between gap-x-4">
+          <div className="h-9 w-3/4 animate-pulse rounded-lg bg-stone-100" />
+          <div className="h-6 w-20 animate-pulse rounded-full bg-stone-100" />
+        </div>
+        <div className="h-8 w-28 animate-pulse rounded-md bg-stone-100" />
+      </div>
+
+      <div className="w-full space-y-3">
+        <div className="h-3 w-28 animate-pulse rounded bg-stone-100" />
+        <div className="flex gap-2.5">
+          {[1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="size-8 animate-pulse rounded-full bg-stone-100"
+            />
+          ))}
+        </div>
+      </div>
+
+      <div className="w-full space-y-3">
+        <div className="h-3 w-24 animate-pulse rounded bg-stone-100" />
+        <div className="flex gap-2">
+          {[1, 2, 3, 4].map((i) => (
+            <div
+              key={i}
+              className="h-10 w-10 animate-pulse rounded-lg bg-stone-100"
+            />
+          ))}
+        </div>
+      </div>
+
+      <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center">
+        <div className="h-11 w-full animate-pulse rounded-xl bg-stone-100 sm:w-[15rem]" />
+        <div className="h-11 w-12 animate-pulse rounded-xl bg-stone-100" />
+      </div>
     </div>
   );
 }

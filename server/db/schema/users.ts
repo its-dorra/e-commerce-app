@@ -1,64 +1,89 @@
-import { relations } from "drizzle-orm";
-import { sqliteTable, text, integer, index } from "drizzle-orm/sqlite-core";
-import { cartTable } from "./carts";
-import { orderTable } from "./orders";
-import { wishListTable } from "./wishlist";
-import { addressTable } from "./address";
+import {
+  pgTable,
+  text,
+  timestamp,
+  boolean,
+  index,
+  uuid,
+} from "drizzle-orm/pg-core";
 
-export const userTable = sqliteTable(
-  "users",
-  {
-    id: text("id").primaryKey(),
-    email: text("email").notNull().unique(),
-    role: text("role").$type<"admin" | "user">().default("user"),
-    createdAt: integer("created_at", { mode: "timestamp" }).$default(
-      () => new Date(),
-    ),
-  },
-  (table) => {
-    return { emailIdx: index("email_idx").on(table.email) };
-  },
-);
+export const userTable = pgTable("user", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  email: text("email").notNull().unique(),
+  emailVerified: boolean("email_verified").default(false).notNull(),
+  image: text("image"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => new Date())
+    .notNull(),
+  role: text("role").$type<"admin" | "user">().default("user"),
+});
 
-export const accountTable = sqliteTable(
-  "accounts",
-  {
-    id: text("id").primaryKey(),
-    userId: text("user_id")
-      .notNull()
-      .unique()
-      .references(() => userTable.id, { onDelete: "cascade" }),
-    password: text("password"),
-    googleId: text("google_id").unique(),
-    accountType: text("account_type").$type<"email" | "google">(),
-    createdAt: integer("created_at", { mode: "timestamp" }).$default(
-      () => new Date(),
-    ),
-  },
-  (table) => {
-    return {
-      userIdIdx: index("user_id_idx").on(table.userId),
-      googleIdIdx: index("google_id_idx").on(table.googleId),
-    };
-  },
-);
-
-export const sessionTable = sqliteTable(
+export const sessionTable = pgTable(
   "session",
   {
     id: text("id").primaryKey(),
+    expiresAt: timestamp("expires_at").notNull(),
+    token: text("token").notNull().unique(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+    ipAddress: text("ip_address"),
+    userAgent: text("user_agent"),
     userId: text("user_id")
       .notNull()
       .references(() => userTable.id, { onDelete: "cascade" }),
-    expiresAt: integer("expires_at").notNull(),
   },
-  (table) => {
-    return { userIdIdx: index("sessions_user_id_idx").on(table.userId) };
-  },
+  (table) => [index("session_userId_idx").on(table.userId)],
 );
 
-export const profileTable = sqliteTable("profile", {
-  id: text("id").primaryKey(),
+export const accountTable = pgTable(
+  "account",
+  {
+    id: text("id").primaryKey(),
+    accountId: text("account_id").notNull(),
+    providerId: text("provider_id").notNull(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => userTable.id, { onDelete: "cascade" }),
+    accessToken: text("access_token"),
+    refreshToken: text("refresh_token"),
+    idToken: text("id_token"),
+    accessTokenExpiresAt: timestamp("access_token_expires_at"),
+    refreshTokenExpiresAt: timestamp("refresh_token_expires_at"),
+    scope: text("scope"),
+    password: text("password"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [index("account_userId_idx").on(table.userId)],
+);
+
+export const verificationTable = pgTable(
+  "verification",
+  {
+    id: text("id").primaryKey(),
+    identifier: text("identifier").notNull(),
+    value: text("value").notNull(),
+    expiresAt: timestamp("expires_at").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [index("verification_identifier_idx").on(table.identifier)],
+);
+
+export const profileTable = pgTable("profile", {
+  id: uuid("id").defaultRandom().primaryKey(),
   userId: text("userId")
     .notNull()
     .references(() => userTable.id, { onDelete: "cascade" })
@@ -67,33 +92,9 @@ export const profileTable = sqliteTable("profile", {
   imageId: text("imageId"),
   image: text("image"),
   bio: text("bio").notNull().default(""),
-  createdAt: integer("created_at", { mode: "timestamp" }).$default(
-    () => new Date(),
-  ),
-  updatedAt: integer("updated_at", { mode: "timestamp" })
-    .$default(() => new Date())
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .notNull()
     .$onUpdate(() => new Date()),
 });
-
-export const userRelations = relations(userTable, ({ one, many }) => ({
-  carts: many(cartTable),
-  orders: many(orderTable),
-  profile: one(profileTable),
-  account: one(accountTable),
-  wishList: many(wishListTable),
-  address: one(addressTable),
-}));
-
-export const profileRelations = relations(profileTable, ({ one }) => ({
-  user: one(userTable, {
-    fields: [profileTable.userId],
-    references: [userTable.id],
-  }),
-}));
-
-export const accountRelations = relations(accountTable, ({ one }) => ({
-  user: one(userTable, {
-    fields: [accountTable.userId],
-    references: [userTable.id],
-  }),
-}));

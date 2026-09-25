@@ -1,46 +1,54 @@
 "use client";
 
 import { useForm } from "@tanstack/react-form";
-import { useUser } from "../hooks/useUser";
-import { ZodValidator, zodValidator } from "@tanstack/zod-form-adapter";
 import { z } from "zod";
 import { updateAccountDetailsSchema } from "../schemas";
 import CircleAvatar from "./circle-avatar";
 import FormField from "@/lib/components/FormField";
 import { Button } from "@/components/ui/button";
-import { useUpdateUserInformation } from "../hooks/useUpdateUserInformation";
+import { useAction } from "next-safe-action/hooks";
+import { updateUserInformationAction } from "@/server/actions/auth";
+import toast from "react-hot-toast";
+import { User } from "better-auth";
 
-export default function AccountDetailsForm() {
-  const { data: user } = useUser();
-  const { mutate, isPending } = useUpdateUserInformation();
+export default function AccountDetailsForm({
+  userDetails,
+}: {
+  userDetails: User;
+}) {
+  const { execute, isPending } = useAction(updateUserInformationAction, {
+    onSuccess: () => {
+      toast.success("Account details updated successfully.");
+    },
+    onError: ({ error }) => {
+      toast.error(
+        `Failed to update details: ${error.serverError || "Please try again."}`,
+      );
+    },
+  });
 
-  const form = useForm<
-    z.infer<typeof updateAccountDetailsSchema>,
-    ZodValidator
-  >({
+  const displayName = userDetails.name;
+
+  const form = useForm({
     defaultValues: {
       password: "",
       confirmPassword: "",
-      displayName: user?.profile?.displayName || "",
-    },
-    validatorAdapter: zodValidator(),
+      displayName,
+    } as z.infer<typeof updateAccountDetailsSchema>,
     validators: {
       onChange: updateAccountDetailsSchema,
     },
     onSubmit: ({ value }) => {
-      mutate(value);
+      execute(value);
     },
   });
 
   return (
     <div className="mt-2 space-y-6">
-      <CircleAvatar
-        name={user?.profile?.displayName || ""}
-        imageUrl={user?.profile?.image || ""}
-      />
+      <CircleAvatar name={displayName} imageUrl={userDetails.image || ""} />
 
       <form
-        className="section-muted flex flex-col gap-y-4 p-5 md:p-6"
+        className="flex flex-col gap-y-5 rounded-2xl border border-stone-200/80 bg-stone-50/60 p-6 md:p-8"
         onSubmit={(e) => {
           e.preventDefault();
           e.stopPropagation();
@@ -55,48 +63,46 @@ export default function AccountDetailsForm() {
                 inputType="text"
                 name={field.name}
                 field={field}
-                label="FullName"
+                label="Full Name"
               />
             )}
           />
         </div>
-        {user?.account?.accountType === "email" && (
-          <div className="flex w-full max-w-[600px] flex-col gap-x-4 gap-y-4 lg:flex-row">
-            <div className="w-full max-w-[600px]">
-              <form.Field
-                name="password"
-                children={(field) => (
-                  <FormField
-                    inputType="password"
-                    name={field.name}
-                    field={field}
-                    label="Password"
-                  />
-                )}
-              />
-            </div>
-            <div className="w-full max-w-[600px]">
-              <form.Field
-                name="confirmPassword"
-                children={(field) => (
-                  <FormField
-                    inputType="password"
-                    name={field.name}
-                    field={field}
-                    label="Confirm password"
-                  />
-                )}
-              />
-            </div>
+        <div className="flex w-full max-w-[600px] flex-col gap-x-4 gap-y-4 lg:flex-row">
+          <div className="w-full max-w-[600px]">
+            <form.Field
+              name="password"
+              children={(field) => (
+                <FormField
+                  inputType="password"
+                  name={field.name}
+                  field={field}
+                  label="New Password"
+                />
+              )}
+            />
           </div>
-        )}
+          <div className="w-full max-w-[600px]">
+            <form.Field
+              name="confirmPassword"
+              children={(field) => (
+                <FormField
+                  inputType="password"
+                  name={field.name}
+                  field={field}
+                  label="Confirm New Password"
+                />
+              )}
+            />
+          </div>
+        </div>
         <Button
           variant="primary"
-          className="mt-4 w-fit"
+          className="mt-2 w-fit font-medium"
           type="submit"
           disabled={isPending}
         >
-          Save Changes
+          {isPending ? "Saving..." : "Save Changes"}
         </Button>
       </form>
     </div>

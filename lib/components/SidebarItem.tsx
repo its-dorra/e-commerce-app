@@ -24,28 +24,41 @@ export default function SidebarItem({ title, icon, href }: SidebarItemProps) {
         variant="ghost"
         disabled={isPending}
         onClick={() => mutate()}
-        className={`${isCurrentPage ? "bg-zinc-900 text-zinc-50" : ""} group flex h-11 w-full items-center justify-start gap-x-3 rounded-xl px-4 py-2 transition-colors hover:bg-zinc-200/80`}
+        className={`${
+          isCurrentPage
+            ? "bg-stone-900 text-stone-50"
+            : "text-stone-600 hover:bg-stone-100 hover:text-stone-900"
+        } group flex h-10 w-full items-center justify-start gap-x-3 rounded-lg px-3.5 py-2 font-body text-xs font-medium tracking-wide transition-colors`}
       >
-        <Image width={24} height={24} src={icon} alt="sidebar icon" />
-        <p
-          className={`${isCurrentPage ? "text-zinc-50" : "text-zinc-600"} text-sm font-semibold transition-colors group-hover:text-zinc-900`}
-        >
-          {title}
-        </p>
+        <Image
+          width={20}
+          height={20}
+          src={icon}
+          alt="sidebar icon"
+          className="opacity-80"
+        />
+        <p className="transition-colors">{title}</p>
       </Button>
     );
 
   return (
     <Link
-      className={`${isCurrentPage ? "bg-zinc-900" : ""} group flex h-11 w-full items-center justify-start gap-x-3 rounded-xl px-4 py-2 transition-colors hover:bg-zinc-200/80`}
+      className={`${
+        isCurrentPage
+          ? "shadow-2xs bg-stone-900 text-stone-50"
+          : "text-stone-600 hover:bg-stone-100/80 hover:text-stone-950"
+      } group flex h-10 w-full items-center justify-start gap-x-3 rounded-lg px-3.5 py-2 font-body text-xs font-medium tracking-wide transition-all`}
       href={href}
+      prefetch
     >
-      <Image width={24} height={24} src={icon} alt="sidebar icon" />
-      <p
-        className={`${isCurrentPage ? "text-zinc-50" : "text-zinc-600"} text-sm font-semibold transition-colors group-hover:text-zinc-900`}
-      >
-        {title}
-      </p>
+      <Image
+        width={20}
+        height={20}
+        src={icon}
+        alt="sidebar icon"
+        className={`${isCurrentPage ? "brightness-200 invert" : "opacity-80"}`}
+      />
+      <p className="transition-colors">{title}</p>
     </Link>
   );
 }

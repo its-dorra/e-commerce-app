@@ -23,8 +23,8 @@ export default function ProductImagesSwiper({ images }: { images: string[] }) {
           </CarouselItem>
         ))}
       </CarouselContent>
-      <CarouselPrevious className="left-3 hidden border-zinc-200 bg-zinc-50 md:flex" />
-      <CarouselNext className="right-3 hidden border-zinc-200 bg-zinc-50 md:flex" />
+      <CarouselPrevious className="backdrop-blur-xs left-3 hidden h-9 w-9 rounded-full border border-stone-200/90 bg-white/90 text-stone-800 shadow-sm transition-colors hover:border-amber-700 hover:text-amber-800 md:flex" />
+      <CarouselNext className="backdrop-blur-xs right-3 hidden h-9 w-9 rounded-full border border-stone-200/90 bg-white/90 text-stone-800 shadow-sm transition-colors hover:border-amber-700 hover:text-amber-800 md:flex" />
     </Carousel>
   );
 }

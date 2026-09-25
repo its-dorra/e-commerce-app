@@ -16,13 +16,13 @@ export default async function BestSellingSection({
 
   return (
     <section className="page-shell section-shell">
-      <div className="section-muted px-5 py-10 md:px-8 lg:px-10">
-        <div className="section-heading">
+      <div className="section-heading flex flex-col md:flex-row md:items-end md:justify-between">
+        <div>
           <p className="eyebrow">{eyebrow}</p>
-          <h2 className="h2">{title}</h2>
+          <h2 className="h2 mt-1">{title}</h2>
         </div>
-        <ProductsContainer products={products} />
       </div>
+      <ProductsContainer products={products} />
     </section>
   );
 }

@@ -10,24 +10,27 @@ export default function EmptyListMessage({
   message?: string;
 }) {
   return (
-    <div className="section-muted flex h-full w-full grow flex-col items-center justify-center gap-y-5 p-8 text-center">
-      <p className="text-sm text-zinc-600">
+    <div className="flex h-full min-h-[18rem] w-full grow flex-col items-center justify-center gap-y-4 rounded-2xl border border-dashed border-stone-300 bg-stone-50/60 p-10 text-center">
+      <h4 className="font-display text-2xl font-normal text-stone-800">
+        Your {listName} is Empty
+      </h4>
+      <p className="font-body max-w-md text-xs font-light leading-relaxed text-stone-500">
         {message
           ? message
-          : `Your ${listName} list is waiting for you to be filled`}
+          : `Explore our collection to add pieces to your ${listName.toLowerCase()}.`}
       </p>
-      <Button variant="primary">
-        <Link className="flex items-center gap-2" href="/products">
-          <span>Start Shopping</span>
+      <Link href="/products" className="pt-2">
+        <Button variant="primary" size="default" className="font-medium">
+          <span>Explore Collection</span>
           <Image
             src={arrowRightIcon}
-            className="fill-white text-white"
-            width={24}
-            height={24}
-            alt="arrow right icon"
+            className="h-3.5 w-3.5 brightness-200 invert filter"
+            width={16}
+            height={16}
+            alt="arrow right"
           />
-        </Link>
-      </Button>
+        </Button>
+      </Link>
     </div>
   );
 }

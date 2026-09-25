@@ -6,14 +6,22 @@ import {
   productVariantTable,
   sizeTable,
 } from "@/server/db/schema";
-
-import { and, count, countDistinct, eq, inArray } from "drizzle-orm";
-
+import { and, count, eq, inArray, SQL } from "drizzle-orm";
 import { FilterQuery, Size } from "../types/products";
-
 import { Transaction } from "@/server/types/db";
+import { cacheTag } from "next/cache";
+import {
+  getCategoriesGlobalTag,
+  getColorsGlobalTag,
+  getProductIdTag,
+  getProductsGlobalTag,
+  revalidateProductsCache,
+} from "./products.cache";
 
-export const getCategories = () => {
+export const getCategories = async () => {
+  "use cache";
+  cacheTag(getCategoriesGlobalTag());
+
   return db.query.categoryTable.findMany({
     columns: {
       name: true,
@@ -21,7 +29,10 @@ export const getCategories = () => {
   });
 };
 
-export const getColors = () => {
+export const getColors = async () => {
+  "use cache";
+  cacheTag(getColorsGlobalTag());
+
   return db.query.colorTable.findMany({
     columns: {
       name: true,
@@ -35,10 +46,16 @@ export const getSizes = (): Size[] => {
 };
 
 export const getProducts = async (
-  page: number,
-  { categories, colors, sizes }: FilterQuery,
+  page: number = 1,
+  { categories, colors, sizes, sortBy }: FilterQuery = {},
   perPage: number = PER_PAGE,
 ) => {
+  "use cache";
+  cacheTag(getProductsGlobalTag());
+
+  const hasVariantFilter =
+    (colors && colors.length > 0) || (sizes && sizes.length > 0);
+
   const productsQuery = db.query.productTable.findMany({
     columns: {
       description: false,
@@ -48,11 +65,34 @@ export const getProducts = async (
     },
     limit: perPage,
     offset: (page - 1) * perPage,
-    ...(categories &&
-      categories.length > 0 && {
-        where: (fields, { inArray }) =>
-          inArray(fields.categoryName, categories),
+    where: {
+      ...(categories &&
+        categories.length > 0 && {
+          categoryName: { in: categories },
+        }),
+      ...(hasVariantFilter && {
+        variants: {
+          ...(colors &&
+            colors.length > 0 && {
+              colorName: { in: colors },
+            }),
+          ...(sizes &&
+            sizes.length > 0 && {
+              sizes: {
+                size: { in: sizes },
+              },
+            }),
+        },
       }),
+    },
+    orderBy:
+      sortBy === "price-asc"
+        ? { basePrice: "asc" }
+        : sortBy === "price-desc"
+          ? { basePrice: "desc" }
+          : sortBy === "name-asc"
+            ? { name: "asc" }
+            : { createdAt: "desc" },
     with: {
       category: {
         columns: {
@@ -69,7 +109,7 @@ export const getProducts = async (
         },
         ...(colors &&
           colors.length > 0 && {
-            where: (fields, { inArray }) => inArray(fields.colorName, colors),
+            where: { colorName: { in: colors } },
           }),
         with: {
           color: {
@@ -80,7 +120,7 @@ export const getProducts = async (
           },
           images: {
             limit: 1,
-            orderBy: (fields, { asc }) => asc(fields.displayOrder),
+            orderBy: { displayOrder: "asc" },
             columns: {
               imagePath: true,
             },
@@ -88,7 +128,7 @@ export const getProducts = async (
           sizes: {
             ...(sizes &&
               sizes.length > 0 && {
-                where: (fields, { inArray }) => inArray(fields.size, sizes),
+                where: { size: { in: sizes } },
               }),
             columns: {
               quantity: true,
@@ -99,33 +139,53 @@ export const getProducts = async (
     },
   });
 
-  const filtersWhereClause = [
-    categories && categories.length > 0
-      ? inArray(productTable.categoryName, categories)
-      : null,
-    colors && colors.length > 0
-      ? inArray(productVariantTable.colorName, colors)
-      : null,
-    sizes && sizes.length > 0 ? inArray(sizeTable.size, sizes) : null,
-  ].filter((ele) => ele !== null);
+  const productConditions: SQL[] = [];
+  if (categories && categories.length > 0) {
+    productConditions.push(inArray(productTable.categoryName, categories));
+  }
+
+  if (hasVariantFilter) {
+    const variantConditions: SQL[] = [];
+    if (colors && colors.length > 0) {
+      variantConditions.push(inArray(productVariantTable.colorName, colors));
+    }
+    if (sizes && sizes.length > 0) {
+      variantConditions.push(inArray(sizeTable.size, sizes));
+    }
+
+    const variantQuery =
+      sizes && sizes.length > 0
+        ? db
+            .selectDistinct({ id: productVariantTable.productId })
+            .from(productVariantTable)
+            .innerJoin(
+              sizeTable,
+              eq(productVariantTable.id, sizeTable.productVariantId),
+            )
+            .where(
+              variantConditions.length > 0
+                ? and(...variantConditions)
+                : undefined,
+            )
+        : db
+            .selectDistinct({ id: productVariantTable.productId })
+            .from(productVariantTable)
+            .where(
+              variantConditions.length > 0
+                ? and(...variantConditions)
+                : undefined,
+            );
+
+    productConditions.push(inArray(productTable.id, variantQuery));
+  }
 
   const totalCountQuery = db
-    .select({ totalCount: countDistinct(productTable.id) })
+    .select({ totalCount: count(productTable.id) })
     .from(productTable)
-    .innerJoin(
-      productVariantTable,
-      eq(productTable.id, productVariantTable.productId),
-    )
-    .innerJoin(
-      sizeTable,
-      eq(productVariantTable.id, sizeTable.productVariantId),
-    )
-    .where(
-      filtersWhereClause.length > 0 ? and(...filtersWhereClause) : undefined,
-    )
-    .then((res) => res[0]);
+    .where(productConditions.length > 0 ? and(...productConditions) : undefined)
+    .then((res) => res[0]?.totalCount ?? 0);
 
-  const [products, { totalCount }] = await Promise.all([
+  const [products, totalCount] = await Promise.all([
     productsQuery,
     totalCountQuery,
   ]);
@@ -158,9 +218,12 @@ export const getProducts = async (
   };
 };
 
-export const getProductById = async (id: number) => {
+export const getProductById = async (id: string) => {
+  "use cache";
+  cacheTag(getProductIdTag(id));
+
   const product = await db.query.productTable.findFirst({
-    where: (table, { eq }) => eq(table.id, id),
+    where: { id },
     columns: {
       createdAt: false,
       updatedAt: false,
@@ -179,7 +242,7 @@ export const getProductById = async (id: number) => {
         },
         with: {
           sizes: {
-            where: (table, { gt }) => gt(table.quantity, 0),
+            where: { quantity: { gt: 0 } },
             columns: {
               priceAdjustment: true,
               quantity: true,
@@ -231,7 +294,7 @@ export const getProductById = async (id: number) => {
           size: {
             name: size.size,
           },
-          priceAdjustment: size.priceAdjustment,
+          priceAdjustment: size.priceAdjustment || 0,
           quantity: size.quantity,
         })),
       }))
@@ -241,11 +304,9 @@ export const getProductById = async (id: number) => {
   };
 };
 
-export const getProductVarientById = (sizeId: number) => {
+export const getProductVarientById = (sizeId: string) => {
   return db.query.sizeTable.findFirst({
-    where({ id }, { eq }) {
-      return eq(id, sizeId);
-    },
+    where: { id: sizeId },
     with: {
       variant: {
         with: {
@@ -256,12 +317,14 @@ export const getProductVarientById = (sizeId: number) => {
   });
 };
 
-export const deleteProductById = (productId: number) => {
-  return db
+export const deleteProductById = async (productId: string) => {
+  const [deleted] = await db
     .delete(productTable)
     .where(eq(productTable.id, productId))
-    .returning()
-    .then((res) => res?.[0]);
+    .returning();
+
+  revalidateProductsCache({ id: productId });
+  return deleted;
 };
 
 export type ProductDetails = Exclude<
@@ -287,7 +350,7 @@ export const addProduct = async (product: {
 }) => {
   const { variants, ...productData } = product;
 
-  return db.transaction(async (trx) => {
+  const result = await db.transaction(async (trx) => {
     try {
       const [productResult] = await trx
         .insert(productTable)
@@ -338,18 +401,21 @@ export const addProduct = async (product: {
       );
     }
   });
+
+  revalidateProductsCache();
+  return result;
 };
 
 export const checkInventoryAvailibilty = async ({
   sizeId,
   quantity,
 }: {
-  sizeId: number;
+  sizeId: string;
   quantity: number;
 }) => {
   if (quantity <= 0) throw new Error("Quantity can't be less or equal to 0");
   const size = await db.query.sizeTable.findFirst({
-    where: (fields, { eq }) => eq(fields.id, sizeId),
+    where: { id: sizeId },
     columns: {
       quantity: true,
     },
@@ -368,12 +434,12 @@ export const updateInventoryAfterPurchase = async ({
   quantity,
   tx,
 }: {
-  sizeId: number;
+  sizeId: string;
   quantity: number;
   tx: Transaction;
 }) => {
   const oldSize = await tx.query.sizeTable.findFirst({
-    where: (fields, { eq }) => eq(fields.id, sizeId),
+    where: { id: sizeId },
     columns: {
       quantity: true,
     },

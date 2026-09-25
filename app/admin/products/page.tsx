@@ -1,7 +1,9 @@
 import AdminPageLayout from "@/lib/components/AdminPageLayout";
 import AdminProductsContainer from "@/lib/features/admin-products/components/admin-products-container";
-import { HydrateClient, serverTrpc } from "@/lib/trpc/server";
-import { assertAdmin } from "@/server/lucia/utils";
+import { assertAdmin } from "@/lib/auth";
+import { getProducts } from "@/server/data-access/products";
+import { Suspense } from "react";
+import { AdminProductsSkeleton } from "@/lib/components/skeletons/admin-skeletons";
 
 interface ProductsProps {
   searchParams: Promise<{
@@ -9,25 +11,23 @@ interface ProductsProps {
   }>;
 }
 
-export default async function ProductManagement(props: ProductsProps) {
+async function ProductsContent({ searchParams }: ProductsProps) {
   await assertAdmin();
 
-  const adminPageProps = await props.searchParams;
-
+  const adminPageProps = await searchParams;
   const page = Number(adminPageProps.page || 1);
 
-  await Promise.all([
-    serverTrpc.products.products.prefetch({ page, perPage: 8 }),
-    serverTrpc.products.products.prefetch({ page: page + 1, perPage: 8 }),
-    page > 1 &&
-      serverTrpc.products.products.prefetch({ page: page - 1, perPage: 8 }),
-  ]);
+  const productsData = await getProducts(page, {}, 8);
 
+  return <AdminProductsContainer productsData={productsData} />;
+}
+
+export default function ProductManagement(props: ProductsProps) {
   return (
-    <HydrateClient>
-      <AdminPageLayout to="Products">
-        <AdminProductsContainer />
-      </AdminPageLayout>
-    </HydrateClient>
+    <AdminPageLayout to="Products">
+      <Suspense fallback={<AdminProductsSkeleton />}>
+        <ProductsContent searchParams={props.searchParams} />
+      </Suspense>
+    </AdminPageLayout>
   );
 }

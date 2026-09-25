@@ -4,17 +4,27 @@ import { Button } from "@/components/ui/button";
 import ProductImage from "../../products/components/ProductImage";
 import Image from "next/image";
 import { minusIcon, xIcon } from "@/assets";
-import { useUpdateCartItemQuantity } from "../hooks/useUpdateCartItemQuantity";
-import { useDeleteCartItem } from "../hooks/useDeleteCartItem";
 import QuantitySelector from "../../products/components/QuantitySelector";
 import { type CartItem } from "../types";
+import { useAction } from "next-safe-action/hooks";
+import {
+  deleteCartItemAction,
+  updateCartItemQuantityAction,
+} from "@/server/actions/cart";
 
 export default function CartItem({
-  item: {
+  item,
+  onDelete,
+  onUpdate,
+}: {
+  item: CartItem;
+  onDelete?: (id: string) => void;
+  onUpdate?: (id: string, quantity: number) => void;
+}) {
+  const {
     quantity,
     itemPrice,
     id,
-
     size: {
       size,
       quantity: productQuantity,
@@ -24,33 +34,45 @@ export default function CartItem({
         product: { name },
       },
     },
-  },
-}: {
-  item: CartItem;
-}) {
-  const { mutate: updateQuantity } = useUpdateCartItemQuantity();
+  } = item;
 
-  const { mutate: deleteItem, isPending: isDeleting } = useDeleteCartItem();
+  const { execute: updateQuantity, isPending: isUpdating } = useAction(
+    updateCartItemQuantityAction,
+  );
+  const { execute: deleteItem, isPending: isDeleting } =
+    useAction(deleteCartItemAction);
 
   const handleDeleteItem = () => {
-    deleteItem({ id });
+    if (onDelete) {
+      onDelete(id);
+    } else {
+      deleteItem({ id });
+    }
   };
 
   const handleIncreaseQuantity = () => {
-    if (quantity + 1 === productQuantity) return;
-    updateQuantity({ quantity: quantity + 1, cartItemId: id });
+    if (quantity + 1 > productQuantity) return;
+    if (onUpdate) {
+      onUpdate(id, quantity + 1);
+    } else {
+      updateQuantity({ quantity: quantity + 1, cartItemId: id });
+    }
   };
 
   const handleDecreaseQuantity = () => {
-    if (quantity === 1) return;
-    updateQuantity({ quantity: quantity - 1, cartItemId: id });
+    if (quantity <= 1) return;
+    if (onUpdate) {
+      onUpdate(id, quantity - 1);
+    } else {
+      updateQuantity({ quantity: quantity - 1, cartItemId: id });
+    }
   };
 
   return (
     <div className="flex items-center gap-4 rounded-xl border border-zinc-200/70 bg-zinc-50 p-3 last:border-zinc-200/70">
       <div className="relative">
         <ProductImage
-          imageUrl={images[0].imagePath}
+          imageUrl={images[0]?.imagePath || ""}
           alt="product image"
           className="size-24 flex-none bg-zinc-100"
         />
@@ -80,6 +102,7 @@ export default function CartItem({
             maxValue={productQuantity}
             handleDecreaseQuantity={handleDecreaseQuantity}
             handleIncreaseQuantity={handleIncreaseQuantity}
+            disabled={isUpdating}
           />
           <p className="text-sm font-semibold text-zinc-800">
             ${itemPrice.toFixed(2)}

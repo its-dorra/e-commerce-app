@@ -1,27 +1,31 @@
 import UserPageLayout from "@/lib/components/UserPageLayout";
 import AddressForm from "@/lib/features/address/components/address-form";
-
-import { HydrateClient, serverTrpc } from "@/lib/trpc/server";
-import { assertAuthenticated } from "@/server/lucia/utils";
-
+import { assertAuthenticated } from "@/lib/auth";
+import { getUserAddress } from "@/server/data-access/address";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
+import { AddressSkeleton } from "@/lib/components/skeletons/account-skeletons";
 
-export default async function AddressPage() {
+export const prefetch = "partial";
+
+async function AddressContent() {
   const user = await assertAuthenticated();
 
-  const userRole = user.role;
-
-  if (userRole === "admin") {
+  if (user.role === "admin") {
     return redirect("/dashboard");
   }
 
-  await serverTrpc.address.getUserAddress.prefetch();
+  const address = await getUserAddress({ userId: user.id });
 
+  return <AddressForm address={address} />;
+}
+
+export default function AddressPage() {
   return (
     <UserPageLayout title="Shipping address">
-      <HydrateClient>
-        <AddressForm />
-      </HydrateClient>
+      <Suspense fallback={<AddressSkeleton />}>
+        <AddressContent />
+      </Suspense>
     </UserPageLayout>
   );
 }

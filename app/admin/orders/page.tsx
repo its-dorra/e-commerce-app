@@ -1,7 +1,9 @@
 import AdminPageLayout from "@/lib/components/AdminPageLayout";
 import OrdersAdminContainer from "@/lib/features/orders-admin/components/orders-admin-container";
-import { HydrateClient, serverTrpc } from "@/lib/trpc/server";
-import { assertAdmin } from "@/server/lucia/utils";
+import { assertAdmin } from "@/lib/auth";
+import { getOrders } from "@/server/data-access/orders";
+import { Suspense } from "react";
+import { AdminOrdersSkeleton } from "@/lib/components/skeletons/admin-skeletons";
 
 interface OrdersPageProps {
   searchParams: Promise<{
@@ -9,25 +11,23 @@ interface OrdersPageProps {
   }>;
 }
 
-export default async function OrdersPage({ searchParams }: OrdersPageProps) {
+async function OrdersContent({ searchParams }: OrdersPageProps) {
   await assertAdmin();
 
-  const OrdersPageParams = await searchParams;
+  const ordersPageParams = await searchParams;
+  const page = Number(ordersPageParams.page || 1);
 
-  const page = Number(OrdersPageParams.page || 1);
+  const ordersData = await getOrders({ page, perPage: 8 });
 
-  await serverTrpc.orders.getOrders.prefetch({ page, perPage: 8 });
+  return <OrdersAdminContainer initialData={ordersData} />;
+}
 
-  serverTrpc.orders.getOrders.prefetch({ page: page + 1, perPage: 8 });
-  if (page > 1) {
-    serverTrpc.orders.getOrders.prefetch({ page: page - 1, perPage: 8 });
-  }
-
+export default function OrdersPage(props: OrdersPageProps) {
   return (
     <AdminPageLayout to="Orders">
-      <HydrateClient>
-        <OrdersAdminContainer />
-      </HydrateClient>
+      <Suspense fallback={<AdminOrdersSkeleton />}>
+        <OrdersContent searchParams={props.searchParams} />
+      </Suspense>
     </AdminPageLayout>
   );
 }

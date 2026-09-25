@@ -1,13 +1,21 @@
 import "./globals.css";
-import { Inter } from "next/font/google";
+import { Cormorant_Garamond, Montserrat } from "next/font/google";
 import { ReactNode } from "react";
 import UserProvider from "@/lib/providers/user-provider";
 import NextTopLoader from "nextjs-toploader";
 import { Toaster } from "react-hot-toast";
 import Providers from "@/lib/providers/providers";
 
-const inter = Inter({
+const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-display",
+});
+
+const montserrat = Montserrat({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-body",
 });
 
 export default function RootLayout({
@@ -16,8 +24,14 @@ export default function RootLayout({
   children: ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${inter.className} flex items-center justify-center`}>
+    <html
+      lang="en"
+      data-scroll-behavior="smooth"
+      className={`${cormorant.variable} ${montserrat.variable}`}
+    >
+      <body
+        className={`${montserrat.className} flex items-center justify-center`}
+      >
         <NextTopLoader showSpinner={false} />
         <Toaster
           toastOptions={{

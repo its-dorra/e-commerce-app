@@ -21,7 +21,13 @@ export function CategoryFilter({ name }: CategoryProps) {
   const appendQuery = useAppendQuery();
 
   return (
-    <div className="flex items-center gap-x-3 rounded-xl border border-zinc-200/70 bg-zinc-100/70 px-3 py-2">
+    <div
+      className={`flex items-center gap-x-3 rounded-lg border px-3 py-3 transition-colors ${
+        isQueryParamInUrl
+          ? "border-amber-700/60 bg-amber-50/50"
+          : "border-stone-200/80 bg-white hover:bg-stone-50"
+      }`}
+    >
       <Checkbox
         id={name}
         checked={isQueryParamInUrl}
@@ -31,7 +37,10 @@ export function CategoryFilter({ name }: CategoryProps) {
             : appendQuery("categories", name);
         }}
       />
-      <Label htmlFor={name} className="text-sm text-zinc-700">
+      <Label
+        htmlFor={name}
+        className="cursor-pointer font-body text-xs font-medium tracking-wide text-stone-700"
+      >
         {name}
       </Label>
     </div>

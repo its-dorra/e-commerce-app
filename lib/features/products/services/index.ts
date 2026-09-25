@@ -1,39 +1,43 @@
-import { serverTrpc } from "@/lib/trpc/server";
-import { Size } from "@/server/types/products";
-import { cache } from "react";
+import {
+  getCategories,
+  getColors,
+  getSizes,
+  getProducts as getProductsDataAccess,
+  getProductById as getProductByIdDataAccess,
+} from "@/server/data-access/products";
+import { FilterQuery, Size, SortBy } from "@/server/types/products";
 
-export const getCategories = async () => {
-  const res = await serverTrpc.products.categories();
+export { getCategories, getColors, getSizes };
 
-  return res;
+export const getProducts = async (
+  values: {
+    categories?: string | string[];
+    colors?: string | string[];
+    sizes?: Size | Size[];
+    sortBy?: SortBy | string;
+    page?: number;
+    perPage?: number;
+  } = {},
+) => {
+  return getProductsDataAccess(
+    values.page || 1,
+    {
+      categories:
+        typeof values.categories === "string"
+          ? [values.categories]
+          : values.categories,
+      colors:
+        typeof values.colors === "string" ? [values.colors] : values.colors,
+      sizes:
+        typeof values.sizes === "string"
+          ? [values.sizes as Size]
+          : values.sizes,
+      sortBy: values.sortBy as SortBy | undefined,
+    },
+    values.perPage,
+  );
 };
 
-export const getColors = async () => {
-  const res = await serverTrpc.products.colors();
-
-  return res;
+export const getProductById = async (id: string) => {
+  return getProductByIdDataAccess(id);
 };
-
-export const getSizes = async () => {
-  const res = await serverTrpc.products.sizes();
-
-  return res;
-};
-
-export const getProducts = async (values: {
-  categories?: string | string[];
-  colors?: string | string[];
-  sizes?: Size | Size[];
-  page?: number;
-  perPage?: number;
-}) => {
-  const res = await serverTrpc.products.products(values);
-
-  return res;
-};
-
-export const getProductById = cache(async (id: number) => {
-  const res = await serverTrpc.products.productById({ id });
-
-  return res;
-});

@@ -1,25 +1,28 @@
 import UserPageLayout from "@/lib/components/UserPageLayout";
 import AccountDetailsForm from "@/lib/features/user/components/account-details-form";
-import { HydrateClient, serverTrpc } from "@/lib/trpc/server";
-import { assertAuthenticated } from "@/server/lucia/utils";
+import { assertAuthenticated } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
+import { AccountDetailsSkeleton } from "@/lib/components/skeletons/account-skeletons";
 
-export default async function AccountDetailsPage() {
+export const prefetch = "partial";
+
+async function AccountDetailsContent() {
   const user = await assertAuthenticated();
 
-  const userRole = user.role;
-
-  if (userRole === "admin") {
+  if (user.role === "admin") {
     return redirect("/dashboard");
   }
 
-  await serverTrpc.auth.getCurrentUser.prefetch();
+  return <AccountDetailsForm userDetails={user} />;
+}
 
+export default function AccountDetailsPage() {
   return (
     <UserPageLayout title="Account Details">
-      <HydrateClient>
-        <AccountDetailsForm />
-      </HydrateClient>
+      <Suspense fallback={<AccountDetailsSkeleton />}>
+        <AccountDetailsContent />
+      </Suspense>
     </UserPageLayout>
   );
 }

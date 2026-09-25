@@ -21,9 +21,26 @@ const config: Config = {
       },
     },
     extend: {
+      fontFamily: {
+        display: ["var(--font-display)", "Georgia", "serif"],
+        body: ["var(--font-body)", "sans-serif"],
+        sans: ["var(--font-body)", "sans-serif"],
+      },
       colors: {
-        primaryWhite: "#F5F5F5",
-        secondaryWhite: "#E9E9EB",
+        primaryWhite: "#FAFAF9",
+        secondaryWhite: "#F5F5F4",
+        gold: {
+          50: "#FCFDF8",
+          100: "#F7F5EC",
+          200: "#EFE8CE",
+          300: "#E3D5A5",
+          400: "#CEB56A",
+          500: "#B89635",
+          600: "#9C7924",
+          700: "#805E1A",
+          800: "#694C18",
+          900: "#573E18",
+        },
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         card: {
@@ -87,10 +104,41 @@ const config: Config = {
             height: "0",
           },
         },
+        "fade-up": {
+          from: {
+            opacity: "0",
+            transform: "translateY(14px)",
+          },
+          to: {
+            opacity: "1",
+            transform: "translateY(0)",
+          },
+        },
+        "fade-in": {
+          from: {
+            opacity: "0",
+          },
+          to: {
+            opacity: "1",
+          },
+        },
+        "glow-pulse": {
+          "0%, 100%": {
+            opacity: "0.10",
+            transform: "scale(1)",
+          },
+          "50%": {
+            opacity: "0.18",
+            transform: "scale(1.06)",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "fade-up": "fade-up 0.65s cubic-bezier(0.16, 1, 0.3, 1) both",
+        "fade-in": "fade-in 0.5s ease-out both",
+        "glow-pulse": "glow-pulse 8s ease-in-out infinite",
       },
     },
   },

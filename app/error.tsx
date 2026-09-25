@@ -6,9 +6,14 @@ export default function ErrorPage({
   error: Error & { digest?: string };
 }) {
   return (
-    <div className="container mx-auto min-h-screen space-y-8 px-8 py-12 md:px-16 lg:px-24">
-      <h1 className="text-4xl font-bold">Oops! Something went wrong</h1>
-      <p className="text-lg">{error.message}</p>
+    <div className="page-shell flex min-h-[60vh] flex-col items-center justify-center space-y-4 text-center">
+      <p className="eyebrow">An Error Occurred</p>
+      <h1 className="font-display text-3xl font-normal text-stone-900 sm:text-4xl">
+        Something Went Wrong
+      </h1>
+      <p className="font-body max-w-md text-xs font-light text-stone-500">
+        {error.message}
+      </p>
     </div>
   );
 }

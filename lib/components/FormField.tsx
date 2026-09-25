@@ -9,7 +9,7 @@ import { HTMLInputTypeAttribute } from "react";
 type SharedProps = {
   label: string;
   name: string;
-  field: FieldApi<any, any, any, any>;
+  field: any;
   withLabel?: boolean;
   inputType: HTMLInputTypeAttribute;
 };
@@ -32,7 +32,7 @@ export default function FormField<T>({
       {withLabel && (
         <Label
           htmlFor={name}
-          className="text-xs uppercase tracking-[0.14em] text-zinc-600"
+          className="font-body text-[11px] font-semibold uppercase tracking-wider text-stone-600"
         >
           {label}
         </Label>
@@ -41,7 +41,7 @@ export default function FormField<T>({
       {type === "textArea" && (
         <Textarea
           rows={4}
-          className="resize-none px-3 focus-visible:ring-accent"
+          className="resize-none rounded-lg border-stone-200/90 bg-white px-3.5 py-2 font-body text-xs text-stone-900 focus-visible:border-amber-700 focus-visible:ring-1 focus-visible:ring-amber-700"
           id={name}
           name={name}
           value={field.state.value}
@@ -51,7 +51,6 @@ export default function FormField<T>({
       )}
       {type === "input" && (
         <Input
-          className="px-3 focus-visible:ring-accent"
           type={inputType}
           id={name}
           name={field.name}
@@ -61,8 +60,10 @@ export default function FormField<T>({
         />
       )}
       {field.state.meta.isTouched && field.state.meta.errors.length ? (
-        <p className="text-xs text-red-500">
-          {field.state.meta.errors.join(", ")}
+        <p className="font-body text-[11px] text-red-600">
+          {field.state.meta.errors
+            .map((error: { message: string }) => error.message)
+            .join(", ")}
         </p>
       ) : null}
     </div>

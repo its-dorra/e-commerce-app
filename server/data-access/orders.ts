@@ -11,34 +11,60 @@ import {
 } from "@/server/data-access/products";
 import { count, eq } from "drizzle-orm";
 import { PER_PAGE } from "@/lib/constants/app-config";
+import { cacheTag } from "next/cache";
+import {
+  getOrdersGlobalTag,
+  getOrderUserTag,
+  getOrderIdTag,
+  revalidateOrdersCache,
+} from "./orders.cache";
+import { revalidateCartCache } from "./cart.cache";
+import { revalidateProductsCache } from "./products.cache";
 
-export const setOrderAsSeen = async ({ orderId }: { orderId: number }) => {
-  return db
+export const setOrderAsSeen = async ({ orderId }: { orderId: string }) => {
+  const result = await db
     .update(orderTable)
     .set({ isSeen: true })
     .where(eq(orderTable.id, orderId));
+
+  return result;
 };
 
-export const getOrder = async (orderId: number) => {
+export const getOrder = async (orderId: string) => {
   return db.query.orderTable.findFirst({
-    where: (fields, { eq }) => eq(fields.id, orderId),
+    where: { id: orderId },
     with: {
-      orderItems: true,
+      orderItems: {
+        with: {
+          size: {
+            with: {
+              variant: {
+                columns: {
+                  productId: true,
+                },
+              },
+            },
+          },
+        },
+      },
     },
   });
 };
 
 export const getOrders = async ({
-  page,
+  page = 1,
   perPage = PER_PAGE,
 }: {
-  page: number;
+  page?: number;
   perPage?: number;
-}) => {
+} = {}) => {
+  "use cache";
+  cacheTag(getOrdersGlobalTag());
+
   const ordersQuery = db.query.orderTable.findMany({
     limit: perPage,
     offset: (page - 1) * perPage,
-    orderBy: (fields, { desc }) => desc(fields.createdAt),
+    orderBy: { createdAt: "desc" },
     with: {
       orderItems: {
         with: {
@@ -63,9 +89,7 @@ export const getOrders = async ({
                     columns: {
                       imagePath: true,
                     },
-                    orderBy(fields, operators) {
-                      return operators.asc(fields.displayOrder);
-                    },
+                    orderBy: { displayOrder: "asc" },
                     limit: 1,
                   },
                   product: {
@@ -89,10 +113,11 @@ export const getOrders = async ({
     .from(orderTable)
     .then((res) => res[0]);
 
-  const [orders, { totalCount }] = await Promise.all([
+  const [orders, countResult] = await Promise.all([
     ordersQuery,
     totalCountQuery,
   ]);
+  const totalCount = countResult?.totalCount || 0;
 
   return {
     data: orders,
@@ -108,17 +133,20 @@ export const getOrders = async ({
 export const getOrdersByUser = async ({
   userId,
   perPage = PER_PAGE,
-  page,
+  page = 1,
 }: {
   userId: string;
   perPage?: number;
-  page: number;
+  page?: number;
 }) => {
+  "use cache";
+  cacheTag(getOrderUserTag(userId));
+
   const ordersQuery = db.query.orderTable.findMany({
     limit: perPage,
     offset: (page - 1) * perPage,
-    where: (fields, { eq, and }) => eq(fields.userId, userId),
-    orderBy: (fields, { desc }) => desc(fields.createdAt),
+    where: { userId },
+    orderBy: { createdAt: "desc" },
     with: {
       orderItems: {
         with: {
@@ -141,9 +169,7 @@ export const getOrdersByUser = async ({
                     columns: {
                       imagePath: true,
                     },
-                    orderBy(fields, operators) {
-                      return operators.asc(fields.displayOrder);
-                    },
+                    orderBy: { displayOrder: "asc" },
                     limit: 1,
                   },
                   product: {
@@ -164,12 +190,14 @@ export const getOrdersByUser = async ({
   const totalCountQuery = db
     .select({ totalCount: count() })
     .from(orderTable)
+    .where(eq(orderTable.userId, userId))
     .then((res) => res[0]);
 
-  const [orders, { totalCount }] = await Promise.all([
+  const [orders, countResult] = await Promise.all([
     ordersQuery,
     totalCountQuery,
   ]);
+  const totalCount = countResult?.totalCount || 0;
 
   return {
     data: orders,
@@ -199,59 +227,66 @@ export const createOrder = async ({
 
   if (!cart) throw new Error("Cart not found.");
 
-  return db.transaction(async (tx) => {
-    try {
-      await Promise.all(
-        cart.cartItems.map((item) =>
-          checkInventoryAvailibilty({
-            sizeId: item.sizeId,
-            quantity: item.quantity,
-          }),
-        ),
-      );
-
-      const totalPrice = +cart.cartItems
-        .reduce((cur, item) => cur + item.itemPrice * item.quantity, 0)
-        .toFixed(2);
-
-      const [newOrder] = await tx
-        .insert(orderTable)
-        .values({
-          wilaya,
-          city,
-          streetAddress,
-          phoneNumber,
-          userId,
-          totalPrice,
-        })
-        .returning({ id: orderTable.id });
-
-      const orderItems = cart.cartItems.map(
-        ({ quantity, itemPrice, sizeId }) => ({
-          quantity,
-          itemPrice,
-          sizeId,
-          orderId: newOrder.id,
+  const newOrder = await db.transaction(async (tx) => {
+    await Promise.all(
+      cart.cartItems.map((item) =>
+        checkInventoryAvailibilty({
+          sizeId: item.sizeId,
+          quantity: item.quantity,
         }),
-      );
-      const cartItemsIds = cart.cartItems.map((item) => item.id);
+      ),
+    );
 
-      await Promise.all([
-        tx.insert(orderItemTable).values(orderItems),
+    const totalPrice = +cart.cartItems
+      .reduce((cur, item) => cur + item.itemPrice * item.quantity, 0)
+      .toFixed(2);
 
-        deleteCart({ tx, cartId: cart.id }),
+    const [orderRecord] = await tx
+      .insert(orderTable)
+      .values({
+        wilaya,
+        city,
+        streetAddress,
+        phoneNumber,
+        userId,
+        totalPrice,
+      })
+      .returning({ id: orderTable.id });
 
-        deleteCartItems({ tx, cartItemsIds }),
-      ]);
+    const orderItems = cart.cartItems.map(
+      ({ quantity, itemPrice, sizeId }) => ({
+        quantity,
+        itemPrice,
+        sizeId,
+        orderId: orderRecord.id,
+      }),
+    );
+    const cartItemsIds = cart.cartItems.map((item) => item.id);
 
-      return newOrder;
-    } catch (e) {
-      throw e;
-    }
+    await Promise.all([
+      tx.insert(orderItemTable).values(orderItems),
+      deleteCart({ tx, cartId: cart.id }),
+      deleteCartItems({ tx, cartItemsIds }),
+    ]);
+
+    return orderRecord;
   });
+
+  const productIds = Array.from(
+    new Set(
+      cart.cartItems
+        .map((item) => item.size?.variant?.product?.id)
+        .filter((id): id is string => Boolean(id)),
+    ),
+  );
+
+  revalidateOrdersCache({ id: newOrder.id, userId, productIds });
+  revalidateCartCache(userId);
+
+  return newOrder;
 };
 
-export const acceptOrder = async ({ orderId }: { orderId: number }) => {
+export const acceptOrder = async ({ orderId }: { orderId: string }) => {
   const order = await getOrder(orderId);
 
   if (!order) throw new Error("Order not found");
@@ -265,56 +300,82 @@ export const acceptOrder = async ({ orderId }: { orderId: number }) => {
     productsToCheck.map((item) => checkInventoryAvailibilty(item)),
   );
 
-  return db.transaction(async (tx) => {
-    try {
-      await Promise.all([
-        tx
-          .update(orderTable)
-          .set({ status: "processing" })
-          .where(eq(orderTable.id, orderId)),
-        ...productsToCheck.map((item) =>
-          updateInventoryAfterPurchase({ ...item, tx }),
-        ),
-      ]);
-      return true;
-    } catch (e) {
-      throw e;
-    }
+  const result = await db.transaction(async (tx) => {
+    await Promise.all([
+      tx
+        .update(orderTable)
+        .set({ status: "processing" })
+        .where(eq(orderTable.id, orderId)),
+      ...productsToCheck.map((item) =>
+        updateInventoryAfterPurchase({ ...item, tx }),
+      ),
+    ]);
+    return true;
   });
+
+  const productIds = Array.from(
+    new Set(
+      order.orderItems
+        .map((item) => item.size?.variant?.productId)
+        .filter((id): id is string => Boolean(id)),
+    ),
+  );
+
+  revalidateOrdersCache({
+    id: orderId,
+    userId: order.userId,
+    productIds,
+  });
+
+  return result;
 };
 
-export const cancelOrder = async ({ orderId }: { orderId: number }) => {
+export const cancelOrder = async ({ orderId }: { orderId: string }) => {
   const order = await getOrder(orderId);
 
   if (!order) throw new Error("Order not found");
 
+  let result;
   if (order.status === "pending") {
-    return db
+    result = await db
       .update(orderTable)
       .set({ status: "canceled" })
       .where(eq(orderTable.id, orderId));
   } else if (order.status === "processing") {
-    return db.transaction(async (tx) => {
-      try {
-        await Promise.all([
-          tx
-            .update(orderTable)
-            .set({ status: "canceled" })
-            .where(eq(orderTable.id, orderId)),
-          ...order.orderItems.map((item) =>
-            updateInventoryAfterPurchase({
-              sizeId: item.sizeId,
-              quantity: -item.quantity,
-              tx,
-            }),
-          ),
-        ]);
-        return true;
-      } catch (e) {
-        throw e;
-      }
+    result = await db.transaction(async (tx) => {
+      await Promise.all([
+        tx
+          .update(orderTable)
+          .set({ status: "canceled" })
+          .where(eq(orderTable.id, orderId)),
+        ...order.orderItems.map((item) =>
+          updateInventoryAfterPurchase({
+            sizeId: item.sizeId,
+            quantity: -item.quantity,
+            tx,
+          }),
+        ),
+      ]);
+      return true;
     });
-  } else {
-    return null;
   }
+
+  const productIds =
+    order.status === "processing"
+      ? Array.from(
+          new Set(
+            order.orderItems
+              .map((item) => item.size?.variant?.productId)
+              .filter((id): id is string => Boolean(id)),
+          ),
+        )
+      : undefined;
+
+  revalidateOrdersCache({
+    id: orderId,
+    userId: order.userId,
+    productIds,
+  });
+
+  return result;
 };
