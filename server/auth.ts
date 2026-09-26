@@ -19,12 +19,7 @@ export const auth = betterAuth({
       verification: verificationTable,
     },
   }),
-  account: {
-    accountLinking: {
-      enabled: true,
-      trustedProviders: ["google"],
-    },
-  },
+
   baseURL: env.BASE_URL,
   emailAndPassword: {
     enabled: true,
