@@ -19,12 +19,14 @@ export const auth = betterAuth({
       verification: verificationTable,
     },
   }),
+  baseURL: env.BASE_URL,
   emailAndPassword: {
     enabled: true,
     minPasswordLength: 8,
   },
   socialProviders: {
     google: {
+      prompt: "select_account",
       clientId: env.GOOGLE_CLIENT_ID,
       clientSecret: env.GOOGLE_CLIENT_SECRET,
     },
